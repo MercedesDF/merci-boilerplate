@@ -1,0 +1,22 @@
+// Variables Base
+
+// Colores (Light Mode Base)
+$color-bg-base: #ffffff; // Blanco puro
+$color-text-base: #0f172a; // Negro/Azul muy oscuro
+$color-primary: #ea580c; // Naranja oscuro (Orange 600)
+$color-secondary: #10b981; // Emerald 500
+$color-accent: #f59e0b; // Amber 500
+
+// Tipografía
+$font-family-base: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+
+// Espaciados (Escala genérica)
+$spacing-xs: 0.25rem;
+$spacing-sm: 0.5rem;
+$spacing-md: 1rem;
+$spacing-lg: 2rem;
+$spacing-xl: 6rem; // Aumentado para separar los títulos del header
+
+// Breakpoints
+$bp-medium: 768px;
+$bp-large: 1024px;

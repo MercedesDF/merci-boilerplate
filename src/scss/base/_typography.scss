@@ -1,0 +1,40 @@
+@use '../abstracts' as *;
+@use 'sass:color';
+
+body {
+    font-family: $font-family-base;
+    line-height: 1.6;
+    background-color: $color-bg-base;
+    color: $color-text-base;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    line-height: 1.2;
+    margin-bottom: $spacing-md;
+    font-weight: 700;
+    color: $color-text-base;
+
+    a {
+        color: inherit;
+        &:hover {
+            color: $color-primary;
+        }
+    }
+}
+
+p {
+    margin-bottom: $spacing-md;
+}
+
+a {
+    color: $color-primary;
+    text-decoration: none;
+    transition: color 0.2s ease;
+
+    &:hover,
+    &:focus {
+        color: color.scale($color-primary, $lightness: 20%);
+    }
+}

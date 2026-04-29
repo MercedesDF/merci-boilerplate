@@ -1,0 +1,62 @@
+@use '../abstracts' as *;
+@use 'sass:color';
+
+/**
+ * Componente: Merci UI
+ * @description Interfaz del asistente anclada flotante. Reemplaza el movimiento JS por CSS fijo.
+ */
+.merci-ui {
+    position: fixed;
+    bottom: $spacing-lg;
+    right: $spacing-lg;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+
+    &__trigger {
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+        border-radius: 50%;
+
+        // Focus visible para usuarios de teclado (WAI-ARIA)
+        &:hover, &:focus {
+            transform: scale(1.1);
+            outline: 2px solid $color-primary;
+            outline-offset: 4px;
+        }
+    }
+
+    &__avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        display: block; // Elimina el espacio fantasma de imágenes inline
+    }
+
+    &__message-box {
+        background-color: color.scale($color-primary, $lightness: 80%); // Fondo naranja pastel dinámico
+        color: $color-text-base;
+        padding: 0.5rem 1rem;
+        border-radius: 1rem 1rem 0 1rem; // Forma de burbuja de chat
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        max-width: 200px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        
+        // Animación delegada a CSS usando selectores de estado ARIA
+        opacity: 0;
+        transform: translateY(10px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+
+        &[aria-hidden="false"] {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+}

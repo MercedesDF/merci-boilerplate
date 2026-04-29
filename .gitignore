@@ -1,0 +1,21 @@
+.venv/
+__pycache__/
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Originales pesados: nunca en el repositorio. Solo se versiona .gitkeep para conservar la ruta acordada.
+.assets-raw/*
+!.assets-raw/.gitkeep
+
+# Evidencias de laboratorio (vídeos, capturas): no se versionan
+laboratorio/evidencias/*
+!laboratorio/evidencias/.gitkeep
+
+# Copias de seguridad locales
+backups/
+
+# Enlaces simbólicos de infraestructura CMS (no versionables)
+public/blog

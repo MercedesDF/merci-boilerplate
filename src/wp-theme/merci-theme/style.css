@@ -1,0 +1,16 @@
+/*
+Theme Name: Merci Theme
+Theme URI: https://{{DOMINIO}}
+Author: Mercedes DF
+Description: Tema ultraligero para el aislamiento de WordPress. Sin dependencias externas, enlazado al núcleo estático.
+Version: 1.0.0
+Text Domain: merci-theme
+*/
+
+/* 
+ * NOTA ARQUITECTÓNICA: 
+ * Este archivo CSS (Cascading Style Sheets - Hojas de Estilo en Cascada) 
+ * solo existe para que WP (WordPress) reconozca el tema a través de la cabecera de comentarios superior. 
+ * Los estilos visuales reales se compilan desde nuestro núcleo SASS hacia /assets/main.css.
+ * NO añadir reglas de diseño aquí para evitar duplicidad de renderizado.
+ */

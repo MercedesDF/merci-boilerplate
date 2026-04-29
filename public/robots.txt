@@ -1,0 +1,5 @@
+# robots.txt para mercedev.es
+User-agent: *
+Allow: /
+
+Sitemap: https://mercedev.es/sitemap.xml

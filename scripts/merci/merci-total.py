@@ -1,0 +1,54 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+merci-total.py — Orquestador maestro del ecosistema Merci.
+
+Ejecuta en secuencia lógica todos los scripts de compilación, 
+optimización y auditoría del proyecto. Excluye scripts interactivos 
+(merci-commit) o de vigilancia continua (merci-watch).
+"""
+
+import subprocess
+import sys
+from pathlib import Path
+
+# Definimos la ruta base donde residen los scripts
+SCRIPTS_DIR = Path(__file__).resolve().parent
+
+# Pipeline de ejecución secuencial. El orden es estricto por arquitectura:
+# 1. Optimizador (Prepara las imágenes WebP necesarias)
+# 2. Styles (Compila el SASS final a main.css)
+# 3. Sitemap (Actualiza las fechas SEO de los HTML generados)
+# 4. Audit (Revisa el código final en busca de secretos o fallos)
+# 5. Linkcheck (Rastrea que no haya enlaces rotos en el proyecto)
+PIPELINE = [
+    "merci-optimizer.py",
+    "merci-styles.py",
+    "merci-sitemap.py",
+    "merci-audit.py",
+    "merci-linkcheck.py"
+]
+
+def main():
+    print("🚀 [Merci Total] Iniciando orquestación del pipeline DevSecOps...\n")
+    
+    for script in PIPELINE:
+        script_path = SCRIPTS_DIR / script
+        
+        if not script_path.exists():
+            print(f"❌ [Merci Total] Error: No se encuentra el script {script}")
+            sys.exit(1)
+            
+        print(f"▶️ Ejecutando: {script} ...")
+        try:
+            # check=True garantiza el patrón "Fail-Fast": si un script falla, 
+            # el orquestador aborta inmediatamente sin ejecutar los siguientes.
+            subprocess.run([sys.executable, str(script_path)], check=True)
+        except subprocess.CalledProcessError as e:
+            print(f"\n❌ [Merci Total] Pipeline detenido. El script {script} ha fallado.")
+            sys.exit(e.returncode)
+            
+    print("\n✅ [Merci Total] ¡Pipeline completado con éxito! Todo optimizado y auditado.")
+
+if __name__ == "__main__":
+    main()

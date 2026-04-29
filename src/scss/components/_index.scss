@@ -1,0 +1,8 @@
+@forward 'hero';
+@forward 'card';
+@forward 'home';
+/* Aseguramos que el layout de la sección se exporte al main.css */
+@forward 'section';
+/* Integración visual de la tienda */
+@forward 'woocommerce';
+@forward '_merci';

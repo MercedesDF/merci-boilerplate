@@ -1,0 +1,60 @@
+@use '../abstracts' as *;
+
+/* Integración visual del Catálogo en Merci Boilerplate */
+.woocommerce {
+  /* Ocultamos la migas de pan y filtros redundantes para un look minimalista */
+  .woocommerce-breadcrumb,
+  .woocommerce-result-count,
+  .woocommerce-ordering {
+    display: none;
+  }
+
+  /* Convertimos su lista de productos en nuestra cuadrícula (Grid) */
+  .products {
+    display: grid;
+    gap: 2rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    @media (min-width: 768px) {
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+  }
+
+  /* Convertimos cada producto en una de nuestras Tarjetas (Card) */
+  .product {
+    background-color: hsl(0, 0%, 98%);
+    border-radius: 8px;
+    padding: 2rem;
+    border: 1px solid rgba($color-text-base, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    text-align: center;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+      border-color: $color-primary;
+    }
+
+    img {
+      border-radius: 4px;
+      margin-bottom: 1.5rem;
+      width: 100%;
+      height: auto;
+    }
+
+    .woocommerce-loop-product__title {
+      font-size: 1.25rem;
+      color: $color-primary;
+      margin-bottom: 0.5rem;
+    }
+
+    .price {
+      display: block;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: $color-text-base;
+    }
+  }
+}

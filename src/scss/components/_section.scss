@@ -1,0 +1,10 @@
+/**
+ * Componente: Section
+ * Propósito: Contenedor estructural universal para bloques de contenido.
+ * Aislar este layout permite su reutilización en vistas estáticas y dinámicas
+ * sin depender de los estilos específicos de una página (ej. _home.scss).
+ */
+
+.section {
+    padding: 4rem 2rem;
+}

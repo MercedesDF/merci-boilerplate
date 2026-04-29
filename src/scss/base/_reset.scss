@@ -1,0 +1,31 @@
+@use '../abstracts' as *;
+
+// Reset Estricto y Normalización Minimalista
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: $color-bg-base;
+    color: $color-text-base;
+    min-height: 100vh;
+    overflow-x: hidden;
+    max-width: 1200px; // Encapsula la web
+    margin: 0 auto;    // Centra el contenedor en pantallas grandes
+}
+
+img,
+picture,
+video {
+    display: block;
+    max-width: 100%;
+}

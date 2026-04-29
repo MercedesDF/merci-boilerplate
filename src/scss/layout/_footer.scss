@@ -1,0 +1,11 @@
+@use '../abstracts' as *;
+@use 'sass:color';
+
+.footer {
+    padding: $spacing-lg;
+    text-align: center;
+    border-top: 1px solid rgba($color-text-base, 0.1);
+    margin-top: $spacing-xl;
+    font-size: 0.875rem;
+    color: color.scale($color-text-base, $lightness: 30%);
+}
