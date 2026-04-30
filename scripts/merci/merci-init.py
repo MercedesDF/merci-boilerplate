@@ -120,6 +120,20 @@ def main():
     if instrucciones_merci.exists():
         instrucciones_merci.rename(REPO_ROOT / "instrucciones.md")
 
+    # 4. Creación de archivo de entorno de ejemplo
+    # QUÉ HACE: Genera un archivo .env con placeholders.
+    # POR QUÉ: Evita que el pipeline de 'merci total' falle en la primera ejecución
+    # al no encontrar las credenciales para el publicador Headless de WordPress.
+    print("  🔧 Creando archivo de entorno de ejemplo (.env)...")
+    env_content = """# Configuración para la conexión Headless a WordPress (merci-wp.py)
+
+    # Reemplaza estos valores con tus datos de desarrollo local.
+    WP_URL="http://tu-dominio-local.com"
+    WP_USER="tu_usuario_wp"
+    WP_APP_PASSWORD="tu_contraseña_de_aplicacion"
+"""
+    (REPO_ROOT / ".env").write_text(env_content, encoding="utf-8")
+
     print("\n🎉 ¡Inicialización completada! Bienvenido a tu nuevo proyecto.")
 
 if __name__ == "__main__":

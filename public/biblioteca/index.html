@@ -2,19 +2,20 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="description" content="Contacto - Merci Boilerplate">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contacto — merci-boilerplate.es</title>
-    <link rel="icon" href="/favicon.ico?v=3" type="image/x-icon">
-    <link rel="stylesheet" href="/css/main.css?v=12">
-    <script src="/js/MerciController.js?v=12" defer></script>
-    <script src="/js/main.js?v=12" defer></script>
-    <link rel="canonical" href="https://merci-boilerplate.es/contacto">
+    <title>Biblioteca — merci-boilerplate.es</title>
+    <meta name="description" content="Índice de publicaciones técnicas y proyectos de la Biblioteca.">
+    <link rel="canonical" href="https://merci-boilerplate.es/biblioteca/">
+    <link rel="stylesheet" href="/css/main.css?v=1777533518">
+    <script src="/js/MerciController.js?v=1777533450" defer></script>
+    <script src="/js/main.js?v=1777533419" defer></script>
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "ContactPage",
-      "name": "Contacto - merci-boilerplate.es"
+      "@type": "CollectionPage",
+      "name": "La Biblioteca - merci-boilerplate.es",
+      "description": "Índice de publicaciones técnicas y proyectos de la Biblioteca.",
+      "url": "https://merci-boilerplate.es/biblioteca/"
     }
     </script>
 </head>
@@ -38,25 +39,22 @@
             <a href="/contacto/" class="nav__link">Contacto</a>
         </nav>
     </header>
-    <main class="main">
+    <main class="main" id="main">
+        <!-- QUÉ HACE: Sección Hero unificada con el resto del ecosistema -->
         <section class="hero">
-            <h1 class="hero__title">Contacto</h1>
-            <p class="hero__subtitle">Comunicación directa y sin intermediarios. Cero formularios, cero rastreadores y máxima privacidad.</p>
+            <h1 class="hero__title">La Biblioteca</h1>
+            <p class="hero__subtitle">Documentación técnica, proyectos DevSecOps y arquitectura de software. El activo de conocimiento central del ecosistema.</p>
         </section>
-
-        <section class="home-section">
-            <h2 class="home-section__title">Canales Operativos</h2>
-            
-            <h3>Correo Electrónico</h3>
-            <p>Para propuestas de arquitectura, auditorías DevSecOps, consultoría técnica o simplemente charlar puedes escribirme directamente a:</p>
-            <p><strong><a href="mailto:merci-boilerplate@merci-boilerplate.es" aria-label="Enviar un correo electrónico a merci-boilerplate">merci-boilerplate@merci-boilerplate.es</a></strong></p>
-
-            <br>
-            
-            <h3>Comunicaciones Cifradas (PGP)</h3>
-            <p>Si necesitas transmitir información sensible o reportar una vulnerabilidad en la infraestructura, por favor cifra tu mensaje utilizando mi clave pública:</p>
-            <p><strong><a href="/llave-publica.asc" aria-label="Descargar clave pública PGP de merci-boilerplate">Descargar Clave Pública PGP</a></strong> (Huella: <code>PENDIENTE DE GENERAR</code>)</p>
-        </section>
+        
+        <!-- QUÉ HACE: Índice Curado (Table of Contents) autogenerado -->
+        <!-- POR QUÉ: Mejora la UX permitiendo navegación intra-página sin scroll excesivo. -->
+        <nav class="library-nav" aria-label="Índice de estanterías">
+            <h2 class="library-nav__title">Estanterías Temáticas</h2>
+            <ul class="library-nav__list">
+            </ul>
+        </nav>
+        
+        
     </main>
     <footer class="footer">
         <div class="footer__links">
@@ -70,7 +68,7 @@
         </div>
     </footer>
 
-     <!-- Asistente Merci -->
+    <!-- Asistente Merci -->
     <aside class="merci-ui" id="merci-ui" aria-label="Asistente virtual Merci">
         <!-- QUÉ HACE: Oculta el globo de mensaje a lectores de pantalla (aria-hidden) hasta que haya texto -->
         <div class="merci-ui__message-box" id="merci-message" aria-live="polite" aria-hidden="true">
@@ -81,6 +79,5 @@
             <img class="merci-ui__avatar" src="/assets/images/Merci-en-la-nube.webp" alt="Interactuar con Merci" width="80" height="80" loading="lazy">
         </button>
     </aside>
-
 </body>
 </html>

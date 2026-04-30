@@ -1,9 +1,24 @@
-# Merci Boilerplate v1.1.0
+# Merci Boilerplate v1.2.1
 
 Un entorno web híbrido, minimalista y seguro desde el diseño (Shift-Left). 
 Combina un núcleo estático ultrarrápido (HTML5, SASS, Vanilla JS y BEM (Block, Element, Modifier - Modificador de Elemento de Bloque)) con un motor dinámico aislado (WordPress). Diseñado para alcanzar un rendimiento perfecto (Core Web Vitals 100/100) y operar con 0 dependencias externas en el frontend.
 
 > 📖 **Historia y Arquitectura:** La justificación de las decisiones DevSecOps, el aislamiento del CMS y los manuales operativos se encuentran en la carpeta `/docs`.
+
+## 🚀 Novedades en la v1.2.1 (Hotfix)
+
+- **Generación de Entorno Seguro:** El script de instanciación (`merci-init.py`) ahora genera automáticamente una plantilla `.env` con credenciales de WordPress ficticias. Esto previene colapsos en la ejecución inicial de `merci total` y guía al desarrollador en la configuración del publicador Headless.
+
+## 🚀 Novedades en la v1.2.0 (Consolidación Headless y QA)
+
+Esta versión transforma el Boilerplate de un simple generador de sitios estáticos a un ecosistema híbrido maduro con publicación Headless y herramientas de QA estandarizadas:
+
+- **Publicador Headless para WordPress (`merci-wp.py`):** Permite escribir en Markdown localmente, compilar a HTML y publicar o actualizar posts masivamente a través de la API REST del CMS (Content Management System - Sistema de Gestión de Contenidos). Incluye "Kill-Switch" automático para devolver borradores despublicados al laboratorio.
+- **Asistente de Promoción Inteligente (`merci-promote.py`):** Ahora posee "conciencia de contexto". Detecta automáticamente si un borrador está destinado a la Biblioteca estática o a las rutas dinámicas de WordPress (`/blog`, `/art-de-cote`) y lo enruta al directorio correcto.
+- **Shift-Left Accessibility (QA Local):** El rastreador `merci-linkcheck.py` ha sido refactorizado para detectar colisiones de enlaces WAI-ARIA (identificando enlaces con el mismo texto pero distinto destino) antes de compilar.
+- **Sincronización SSOT (`merci-sync-pages.py`):** Las páginas estáticas independientes (como Contacto) ahora heredan automáticamente el `<header>`, `<footer>` y la UI del asistente desde la portada, eliminando la deriva de diseño.
+- **Backups Ultraligeros:** `merci-backup.py` optimizado mediante rutas absolutas para ignorar binarios y el CMS, generando copias de seguridad completas del código fuente en milisegundos (reducción de peso al 99%).
+- **UX Purista y Privacidad:** Nueva plantilla base de contacto estática. Cero formularios, cero latencia, preparada nativamente para alojamiento de claves PGP y cifrado E2EE.
 
 ## 🚀 Puesta en marcha (Instanciación)
 
