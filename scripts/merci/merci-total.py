@@ -16,14 +16,22 @@ from pathlib import Path
 SCRIPTS_DIR = Path(__file__).resolve().parent
 
 # Pipeline de ejecución secuencial. El orden es estricto por arquitectura:
-# 1. Optimizador (Prepara las imágenes WebP necesarias)
-# 2. Styles (Compila el SASS final a main.css)
-# 3. Sitemap (Actualiza las fechas SEO de los HTML generados)
-# 4. Audit (Revisa el código final en busca de secretos o fallos)
-# 5. Linkcheck (Rastrea que no haya enlaces rotos en el proyecto)
+# --- FASE DE CONSTRUCCIÓN (BUILD) ---
+# 1. Optimizador: Prepara las imágenes WebP necesarias.
+# 2. Styles: Compila el SASS final a main.css.
+# 3. Publish: SSG que compila la Biblioteca desde Markdown a HTML/PDF.
+# 4. WP Headless: Sincroniza los markdowns locales dinámicos hacia WordPress.
+# 5. Sync Pages: Propaga el header/footer maestro a las páginas secundarias.
+# --- FASE DE QA (QUALITY ASSURANCE) ---
+# 6. Sitemap: Escanea todos los HTML finales generados y actualiza el mapa XML.
+# 7. Audit: Auditoría estricta de seguridad, SEO y sintaxis sobre el código final.
+# 8. Linkcheck: Rastreo dinámico de enlaces rotos sobre el HTML final compilado.
 PIPELINE = [
     "merci-optimizer.py",
     "merci-styles.py",
+    "merci-publish.py",
+    "merci-wp.py",
+    "merci-sync-pages.py",
     "merci-sitemap.py",
     "merci-audit.py",
     "merci-linkcheck.py"

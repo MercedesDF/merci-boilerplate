@@ -164,6 +164,9 @@ function merci_boilerplate_auto_setup() {
     if (!term_exists('art-de-cote', 'category')) {
         wp_insert_term('Art de Coté', 'category', array('slug' => 'art-de-cote'));
     }
+    if (!term_exists('blog', 'category')) {
+        wp_insert_term('Blog', 'category', array('slug' => 'blog'));
+    }
 
     // 3. Purgar contenido basura por defecto ("¡Hola, mundo!" y "Página de ejemplo")
     // Localizamos los posts por su ID habitual en instalaciones nuevas y validamos su slug
@@ -237,3 +240,26 @@ function merci_inyectar_metadatos_seo() {
     echo '<script type="application/ld+json">' . wp_json_encode($json_ld) . '</script>' . "\n";
 }
 add_action( 'wp_head', 'merci_inyectar_metadatos_seo', 5 );
+
+// =========================================================================
+// 7. ARQUITECTURA DE LA INFORMACIÓN (Segregación de Feeds)
+// =========================================================================
+
+/*
+ * QUÉ HACE: Restringe el feed principal del blog para mostrar ÚNICAMENTE la categoría "Blog".
+ * POR QUÉ: Convierte la portada dinámica en un espacio exclusivo (Whitelist), evitando que
+ * colecciones independientes como "Art de Coté" u otras taxonomías contaminen el feed.
+ */
+function merci_filtrar_feed_principal($query) {
+    // Solo aplicamos esta regla en la página principal del blog (is_home)
+    // y solo a la consulta principal (is_main_query), no a menús o widgets.
+    if ( ! is_admin() && $query->is_home() && $query->is_main_query() ) {
+        
+        // QUÉ HACE: Delega la resolución del slug directamente al motor principal de WordPress.
+        // POR QUÉ: Evita el "fallo abierto" (mostrar todos los posts) si el ID de la categoría falla al cargarse.
+        // Si la categoría 'blog' no existe o está vacía, se mostrarán 0 posts (Fallo Seguro).
+        $query->set( 'category_name', 'blog' );
+    }
+}
+// Enganchamos nuestra función al 'hook' de WordPress que se dispara antes de obtener los posts.
+add_action( 'pre_get_posts', 'merci_filtrar_feed_principal' );

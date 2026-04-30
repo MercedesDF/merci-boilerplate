@@ -89,6 +89,13 @@ def main():
     purge_directory(REPO_ROOT / "laboratorio", exclude=["bitacora-merci-boilerplate.md"])
     purge_directory(REPO_ROOT / "public" / "biblioteca")
     purge_directory(REPO_ROOT / "public" / "descargas")
+    purge_directory(REPO_ROOT / "public" / "art-de-cote")
+    
+    # QUÉ HACE: Purga el material multimedia personal del autor original.
+    # POR QUÉ: Evita engordar el Boilerplate con fotos propias, pero preserva 
+    # los iconos estructurales de la UI (logos y el avatar del asistente Merci).
+    purge_directory(REPO_ROOT / ".assets-raw")
+    purge_directory(REPO_ROOT / "assets" / "images", exclude=["favicon.ico", "favicon.svg", "favicon.png", "logo.svg", "logo.webp", "logo.png", "merci-avatar.webp", "merci-avatar.png"])
     
     # Purga selectiva de manuales operativos exclusivos de la matriz
     print("  🗑️  Purgando manuales SOP exclusivos del proyecto matriz...")

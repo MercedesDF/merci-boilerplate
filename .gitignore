@@ -19,3 +19,6 @@ backups/
 
 # Enlaces simbólicos de infraestructura CMS (no versionables)
 public/blog
+
+# Secretos y variables de entorno local (Shift-Left Security)
+.env

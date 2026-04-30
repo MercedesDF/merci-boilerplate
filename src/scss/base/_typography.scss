@@ -21,6 +21,10 @@ h1, h2, h3, h4, h5, h6 {
         &:hover {
             color: $color-primary;
         }
+        &:visited {
+            /* QUÉ HACE: Asegura que los enlaces en cabeceras también respeten el estado de visitado. */
+            color: $color-visited;
+        }
     }
 }
 
@@ -32,6 +36,12 @@ a {
     color: $color-primary;
     text-decoration: none;
     transition: color 0.2s ease;
+
+    &:visited {
+        /* QUÉ HACE: Consume la variable global para teñir los enlaces ya leídos. */
+        /* POR QUÉ: Mantiene la centralización de los colores y mejora la UX al indicar el historial. */
+        color: $color-visited;
+    }
 
     &:hover,
     &:focus {

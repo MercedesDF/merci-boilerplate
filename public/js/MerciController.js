@@ -48,7 +48,7 @@ class MerciController {
 
         if (path === '/' || path === '/index.html') {
             return [
-                '¡Hola! Estás en la portada 👋',
+                '¡Hola! Me llamo Mercí, asistente de merci-boilerplate👋',
                 'Aquí nace el Merci Boilerplate 🚀',
                 'Todo operando a 100/100 en Web Vitals ⚡'
             ];
@@ -78,9 +78,9 @@ class MerciController {
             ];
         } else if (path.includes('/contacto')) {
             return [
-                '¿Quieres hablar con merci-boilerplate? 📨',
                 'Estás en la zona de contacto.',
-                'Yo soy solo un asistente, pero ella te leerá 😊'
+                '¿Quieres hablar con merci-boilerplate, el cerebro de la web? 📨',
+                'Escribe a hildegahr01@gmail.com con asunto: PODEMOS HABLAR? 😊'
             ];
         }
 

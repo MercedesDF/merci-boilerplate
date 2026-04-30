@@ -6,6 +6,8 @@ $color-text-base: #0f172a; // Negro/Azul muy oscuro
 $color-primary: #ea580c; // Naranja oscuro (Orange 600)
 $color-secondary: #10b981; // Emerald 500
 $color-accent: #f59e0b; // Amber 500
+// QUÉ HACE: Tono teja oscuro derivado del primary. Contraste WCAG AAA (~10.2:1) sobre blanco.
+$color-visited: #7c2d12;
 
 // Tipografía
 $font-family-base: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;

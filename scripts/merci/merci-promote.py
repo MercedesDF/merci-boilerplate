@@ -12,36 +12,44 @@ from pathlib import Path
 # 1. Definición de rutas absolutas unificadas
 REPO_ROOT = Path(__file__).resolve().parents[2]
 LABORATORIO_DIR = REPO_ROOT / "laboratorio"
-BIBLIOTECA_DIR = REPO_ROOT / "biblioteca"
+DESTINOS_DIR = [
+    REPO_ROOT / "biblioteca",
+    REPO_ROOT / "blog",
+    REPO_ROOT / "art-de-cote"
+]
 
 def main():
     print("🚀 [Merci Promote] Iniciando flujo de promoción de conocimiento...")
 
-    # 2. Escaneo Dual: Laboratorio (nuevos) y Biblioteca (despublicados / huérfanos)
-    borradores_lab = [f for f in LABORATORIO_DIR.glob("*.md") if f.name != "bitacora-merci-boilerplate.md"]
-    borradores_bib = []
+    # 2. Escaneo Global: Laboratorio (nuevos) y Directorios Raíz (despublicados / huérfanos)
+    # QUÉ HACE: Usa rglob para buscar también en subcarpetas (ej. laboratorio/blog/).
+    borradores_lab = [f for f in LABORATORIO_DIR.rglob("*.md") if f.name != "bitacora-merci-boilerplate.md" and "evidencias" not in f.parts]
+    borradores_dest = []
 
-    for f in BIBLIOTECA_DIR.glob("*.md"):
-        content = f.read_text(encoding="utf-8")
-        # Extracción rápida para leer el estado sin parsear todo
-        match = re.match(r"^---\n(.*?)\n---", content, re.DOTALL)
-        if match:
-            estado_match = re.search(r"^estado:\s*[\"']?(.*?)[\"']?\s*$", match.group(1), re.MULTILINE)
-            estado = estado_match.group(1).lower() if estado_match else "borrador"
-            if estado != "publicado":
-                borradores_bib.append(f)
-        else:
-            # Si no tiene YAML, es deuda técnica heredada y requiere curación
-            borradores_bib.append(f)
+    for dest_dir in DESTINOS_DIR:
+        if not dest_dir.exists():
+            continue
+        for f in dest_dir.rglob("*.md"):
+            content = f.read_text(encoding="utf-8", errors="replace")
+            # QUÉ HACE: Tolera saltos de línea Windows (\r\n) y espacios/BOM iniciales.
+            match = re.match(r"^\s*---\r?\n(.*?)\r?\n---", content, re.DOTALL)
+            if match:
+                estado_match = re.search(r"^estado:\s*[\"']?(.*?)[\"']?\s*$", match.group(1), re.MULTILINE)
+                estado = estado_match.group(1).lower() if estado_match else "borrador"
+                if estado != "publicado":
+                    borradores_dest.append(f)
+            else:
+                borradores_dest.append(f)
     
-    borradores_totales = borradores_lab + borradores_bib
+    borradores_totales = borradores_lab + borradores_dest
     if not borradores_totales:
-        print("  ℹ️ No se encontraron borradores pendientes en el Laboratorio ni en la Biblioteca.")
+        print("  ℹ️ No se encontraron borradores pendientes de curación.")
         return
 
     print("\n📄 Borradores pendientes de curación:")
     for idx, f in enumerate(borradores_totales, start=1):
-        origen = "Laboratorio" if f.parent == LABORATORIO_DIR else "Biblioteca (Despublicado)"
+        # QUÉ HACE: Identifica visualmente si el archivo viene del laboratorio o si es una despublicación de la raíz.
+        origen = "Laboratorio" if LABORATORIO_DIR in f.parents else f"Raíz: {f.parent.name} (Despublicado)"
         print(f"  [{idx}] {f.name} ({origen})")
 
     # 3. Interfaz de selección por consola
@@ -58,11 +66,13 @@ def main():
         return
 
     borrador_elegido = borradores_totales[seleccion - 1]
-    contenido = borrador_elegido.read_text(encoding="utf-8")
+    # QUÉ HACE: Leemos con utf-8-sig para limpiar automáticamente el Byte Order Mark (BOM) invisible.
+    contenido = borrador_elegido.read_text(encoding="utf-8-sig")
 
     # 4. Extracción de Metadatos usando expresiones regulares
     # Extrae el bloque entre los dos --- iniciales
-    match = re.match(r"^---\n(.*?)\n---\n(.*)", contenido, re.DOTALL)
+    # QUÉ HACE: \r?\n hace que el retorno de carro sea opcional, volviendo el parser multiplataforma.
+    match = re.match(r"^\s*---\r?\n(.*?)\r?\n---\r?\n?(.*)", contenido, re.DOTALL)
     if not match:
         print(f"  ❌ Error: El archivo {borrador_elegido.name} no tiene un YAML Frontmatter válido.")
         print("  Por favor, añade la estructura base (plantilla) antes de promoverlo.")
@@ -111,18 +121,34 @@ def main():
     # Ensamblamos el contenido final
     nuevo_contenido = f"{nuevo_yaml}\n{md_body}"
 
-    # 7. Traslado físico o Actualización In-Place
-    destino = BIBLIOTECA_DIR / borrador_elegido.name
+    # 7. Enrutamiento Dinámico: Determinar el destino basado en el origen
+    # QUÉ HACE: Analiza la ruta relativa del archivo para saber a qué directorio pertenece.
+    # POR QUÉ: Permite usar un solo script de curación para la Biblioteca (SSG) y para WordPress.
+    rel_path = borrador_elegido.relative_to(REPO_ROOT)
     
-    if borrador_elegido.parent == LABORATORIO_DIR:
+    if "blog" in rel_path.parts[:-1]:
+        directorio_destino = REPO_ROOT / "blog"
+        comando_sugerido = "merci wp"
+    elif "art-de-cote" in rel_path.parts[:-1]:
+        directorio_destino = REPO_ROOT / "art-de-cote"
+        comando_sugerido = "merci wp"
+    else:
+        directorio_destino = REPO_ROOT / "biblioteca"
+        comando_sugerido = "merci total"
+
+    directorio_destino.mkdir(parents=True, exist_ok=True)
+    destino = directorio_destino / borrador_elegido.name
+    
+    # 8. Traslado físico o Actualización In-Place
+    if LABORATORIO_DIR in borrador_elegido.parents:
         destino.write_text(nuevo_contenido, encoding="utf-8")
         borrador_elegido.unlink()
-        print(f"\n✅ Promoción exitosa. El archivo fue movido a: biblioteca/{destino.name}")
+        print(f"\n✅ Promoción exitosa. El archivo fue movido a: {directorio_destino.name}/{destino.name}")
     else:
         destino.write_text(nuevo_contenido, encoding="utf-8")
-        print(f"\n✅ Republicación exitosa. El borrador fue actualizado en: biblioteca/{destino.name}")
+        print(f"\n✅ Republicación exitosa. El borrador fue actualizado en: {directorio_destino.name}/{destino.name}")
         
-    print("  💡 Siguiente paso: Ejecuta 'python3 scripts/merci/merci-publish.py' para compilarlo.")
+    print(f"  💡 Siguiente paso: Ejecuta '{comando_sugerido}' para aplicar los cambios.")
 
 if __name__ == "__main__":
     main()

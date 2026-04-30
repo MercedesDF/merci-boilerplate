@@ -1,11 +1,36 @@
 @use '../abstracts' as *;
-@use 'sass:color';
 
 .footer {
-    padding: $spacing-lg;
-    text-align: center;
-    border-top: 1px solid rgba($color-text-base, 0.1);
-    margin-top: $spacing-xl;
-    font-size: 0.875rem;
-    color: color.scale($color-text-base, $lightness: 30%);
+    text-align: left;
+    /* QUÉ HACE: Añade el mismo padding horizontal (32px / 2rem) que el header y el main. */
+    /* POR QUÉ: Mantiene la alineación vertical de los contenidos (Grid Alignment) en todo el layout. */
+    padding: $spacing-lg $spacing-lg $spacing-xl;
+
+    &__links {
+        margin-bottom: 1.5rem;
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        font-weight: 500;
+    }
+
+    &__link {
+        color: inherit;
+        text-decoration: underline;
+        text-underline-offset: 4px;
+
+        &:visited {
+            color: $color-visited;
+        }
+    }
+
+    &__text {
+        a {
+            color: inherit;
+            text-decoration: underline;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+    }
 }

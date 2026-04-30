@@ -19,15 +19,20 @@ Este documento define las reglas de arquitectura e interacción de esta plantill
 5. **Convención de Commits:** Utilizar prefijos semánticos (`feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `perf:`).
 6. **Aislamiento de WordPress:** El CMS nunca debe escribir ni modificar archivos en el directorio `/public`. Su comunicación con el frontend es unidireccional y controlada por Nginx.
 
-## 4. Flujo Maestro de Publicación de Contenidos (SOP)
-El ecosistema cuenta con su propio SSG (Static Site Generation - Generación de Sitios Estáticos). Para publicar artículos en la Biblioteca estática:
+## 4. Flujo Maestro de Publicación (SOP Dual)
+El ecosistema cuenta con un flujo estático (SSG) y otro dinámico (Headless WP).
+
+**Para la Biblioteca (Núcleo Estático):**
 1. **Sincronización:** `git pull` para evitar conflictos con el servidor remoto.
-2. **Incubación:** Crear archivo Markdown con YAML Frontmatter en `laboratorio/`.
-3. **Curación:** Ejecutar `python3 scripts/merci/merci-promote.py` para auditar accesibilidad (WAI-ARIA - Web Accessibility Initiative - Accessible Rich Internet Applications) y moverlo a la Biblioteca (soporta subcarpetas temáticas).
-4. **Compilación:** Ejecutar `python3 scripts/merci/merci-publish.py` para compilar el HTML (con auto-nombrado de URL) y generar los PDFs.
-5. **QA Total:** Ejecutar `python3 scripts/merci/merci-total.py` para validar SEO (Search Engine Optimization - Optimización para Motores de Búsqueda), enlaces rotos y compilar SASS.
-6. **Trazabilidad:** Documentar los cambios en `laboratorio/bitacora-merci-boilerplate.md`.
-7. **Empaquetado:** Sellar atómicamente con `python3 scripts/merci/merci-commit.py`.
+2. **Incubación:** Crear un `.md` en `laboratorio/` con `estado: "borrador"`.
+3. **Curación:** Ejecutar `python3 scripts/merci/merci-promote.py` para curarlo y moverlo a la `biblioteca/`.
+4. **QA y Compilación:** Ejecutar `python3 scripts/merci/merci-total.py` (compila SSG, sincroniza páginas y audita el código resultante).
+
+**Para WordPress (Capa Dinámica):**
+1. **Incubación:** Crear un `.md` en `laboratorio/` con un `tema:` válido en tu WP.
+2. **Curación:** Ejecutar `merci-promote.py` para moverlo a las carpetas dinámicas de la raíz.
+3. **Sincronización:** Ejecutar `python3 scripts/merci/merci-wp.py` para publicarlo masivamente vía API REST e inyectar los IDs.
+4. **Despublicación:** Cambiar a `estado: "borrador"` y re-ejecutar el script expulsará el archivo de vuelta al laboratorio.
 
 ## 5. Decisiones Arquitectónicas Restringidas
 - **Cero dependencias visuales:** Prohibido el uso de librerías de animación de terceros o frameworks reactivos (Vue/React/Tailwind) en el frontend.

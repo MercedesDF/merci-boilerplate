@@ -34,11 +34,11 @@
         </button>
         <nav class="header__nav nav" id="main-nav" aria-label="Navegación principal">
             <a href="/" class="nav__link">Home</a>
-            <a href="/biblioteca" class="nav__link">Biblioteca</a>
-            <a href="/blog" class="nav__link">Blog</a>
-            <a href="/blog/category/art-de-cote" class="nav__link">Art de Coté</a>
-            <a href="/blog/tienda" class="nav__link">Tienda</a>
-            <a href="/contacto" class="nav__link">Contacto</a>
+            <a href="/biblioteca/" class="nav__link">Biblioteca</a>
+            <a href="/blog/" class="nav__link" aria-label="Ir a la portada del Blog">Blog</a>
+            <a href="/blog/category/art-de-cote/" class="nav__link">Art de Coté</a>
+            <a href="/blog/tienda/" class="nav__link">Tienda</a>
+            <a href="/contacto/" class="nav__link">Contacto</a>
         </nav>
     </header>
 
@@ -113,10 +113,14 @@
         ?>
         </section>
     </main>
-
-    <footer class="footer" style="text-align: left; padding-bottom: 6rem;">
+    <footer class="footer">
+        <div class="footer__links">
+            <a href="https://www.linkedin.com/in/mercedesdf-ingenieria/" target="_blank" rel="noopener noreferrer" class="footer__link">LinkedIn</a>
+            <a href="https://github.com/merci-boilerplateDF" target="_blank" rel="noopener noreferrer" class="footer__link">GitHub</a>
+            <a href="https://github.com/merci-boilerplateDF/merci-boilerplate" target="_blank" rel="noopener noreferrer" class="footer__link">Merci Boilerplate</a>
+        </div>
         <div class="footer__text">
-            <a href="#top" style="color: inherit; text-decoration: underline; font-weight: 600; display: inline-block; margin-bottom: 1rem;">↑ Volver arriba</a><br>
+            <a href="#top">↑ Volver arriba</a><br>
             &copy; 2026 <strong>merci-boilerplate</strong> — Base de código abierto bajo Licencia MIT.
         </div>
     </footer>
