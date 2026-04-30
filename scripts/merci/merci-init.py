@@ -87,10 +87,21 @@ def main():
     # 2. Purga de datos históricos
     purge_directory(REPO_ROOT / "biblioteca")
     purge_directory(REPO_ROOT / "laboratorio", exclude=["bitacora-merci-boilerplate.md"])
+    purge_directory(REPO_ROOT / "blog")
+    purge_directory(REPO_ROOT / "art-de-cote")
     purge_directory(REPO_ROOT / "public" / "biblioteca")
     purge_directory(REPO_ROOT / "public" / "descargas")
     purge_directory(REPO_ROOT / "public" / "art-de-cote")
     
+    # QUÉ HACE: Reconstruye las carpetas estructurales (Matriz y Laboratorio).
+    # POR QUÉ: Recrearlas vacías garantiza que no haya fugas de datos (borradores antiguos)
+    # pero asegura que el andamiaje del Headless CMS esté listo para el nuevo usuario.
+    for dir_name in ["blog", "art-de-cote"]:
+        for base in ["laboratorio", ""]:
+            dir_path = REPO_ROOT / base / dir_name if base else REPO_ROOT / dir_name
+            dir_path.mkdir(parents=True, exist_ok=True)
+            (dir_path / ".gitkeep").touch(exist_ok=True)
+
     # QUÉ HACE: Purga el material multimedia personal del autor original.
     # POR QUÉ: Evita engordar el Boilerplate con fotos propias, pero preserva 
     # los iconos estructurales de la UI (logos y el avatar del asistente Merci).

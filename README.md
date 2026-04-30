@@ -1,9 +1,14 @@
-# Merci Boilerplate v1.2.1
+# Merci Boilerplate v1.2.2
 
 Un entorno web híbrido, minimalista y seguro desde el diseño (Shift-Left). 
 Combina un núcleo estático ultrarrápido (HTML5, SASS, Vanilla JS y BEM (Block, Element, Modifier - Modificador de Elemento de Bloque)) con un motor dinámico aislado (WordPress). Diseñado para alcanzar un rendimiento perfecto (Core Web Vitals 100/100) y operar con 0 dependencias externas en el frontend.
 
 > 📖 **Historia y Arquitectura:** La justificación de las decisiones DevSecOps, el aislamiento del CMS y los manuales operativos se encuentran en la carpeta `/docs`.
+
+## 🚀 Novedades en la v1.2.2 (Hotfix de Seguridad y Estructura)
+
+- **Prevención de Fuga de Datos (DLP):** El destructor de instanciación (`merci-init.py`) ahora purga y reconstruye desde cero las carpetas dinámicas (`blog/`, `art-de-cote/`), asegurando que ningún borrador o propiedad intelectual del proyecto matriz se filtre al repositorio público.
+- **Preservación de Andamiaje Headless:** Se han inyectado archivos `.gitkeep` gestionados automáticamente para garantizar que los directorios de incubación dinámicos sobrevivan al control de versiones, eliminando advertencias de "directorio no encontrado" en la primera ejecución de `merci total`.
 
 ## 🚀 Novedades en la v1.2.1 (Hotfix)
 
