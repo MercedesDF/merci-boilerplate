@@ -49,7 +49,7 @@ class MerciController {
         if (path === '/' || path === '/index.html') {
             return [
                 '¡Hola! Me llamo Mercí, asistente de merci-boilerplate👋',
-                'Aquí nace el Merci Boilerplate 🚀',
+                'merci-boilerplate es la base de este proyecto🚀',
                 'Todo operando a 100/100 en Web Vitals ⚡'
             ];
         } else if (path.includes('/biblioteca')) {
@@ -66,7 +66,7 @@ class MerciController {
             ];
         } else if (path.includes('/tienda')) {
             return [
-                '¡Bienvenida a la Tienda! 🛒',
+                '¡Bienvenid@ a la Tienda! 🛒',
                 'Merchandising y catálogo oficial.',
                 'Gestionado por WooCommerce bajo el capó 🛍️'
             ];
@@ -80,7 +80,7 @@ class MerciController {
             return [
                 'Estás en la zona de contacto.',
                 '¿Quieres hablar con merci-boilerplate, el cerebro de la web? 📨',
-                'Escribe a hildegahr01@gmail.com con asunto: PODEMOS HABLAR? 😊'
+                'No dejes de visitar la Biblioteca, la fuente de saber.😊'
             ];
         }
 

@@ -4,6 +4,12 @@ estado: "borrador"
 tema: "Art de Coté"
 ---
 
+<!-- linkedin:
+Escribe aquí tu anuncio para LinkedIn.
+Acepta saltos de línea sin problemas.
+https://merci-boilerplate.es/blog/tu-url
+-->
+
 Escribe aquí el contenido de tu exploración colateral.
 
 *Nota: Al ejecutar `merci wp`, este documento se publicará en WordPress aislado en su propia categoría, sin aparecer en el feed cronológico del Blog principal.*

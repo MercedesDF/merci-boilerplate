@@ -1,4 +1,5 @@
 @use '../abstracts' as *;
+@use 'sass:color';
 
 /* Integración visual del Catálogo en Merci Boilerplate */
 .woocommerce {
@@ -55,6 +56,77 @@
       font-weight: 700;
       font-size: 1.1rem;
       color: $color-text-base;
+    }
+
+    /* QUÉ HACE: Estiliza el botón nativo de "Añadir al carrito" o "Leer más". */
+    .button {
+      display: inline-block;
+      background-color: $color-primary;
+      color: #ffffff;
+      padding: 0.6rem 1.2rem;
+      border-radius: 4px;
+      font-weight: 700;
+      margin-top: 1rem;
+      transition: background-color 0.2s ease;
+
+      &:hover, &:focus {
+        background-color: color.scale($color-primary, $lightness: -15%);
+        color: #ffffff;
+      }
+    }
+  }
+
+  /* ========================================================
+     Vista de Ficha de Producto Individual (.single-product)
+     ======================================================== */
+  
+  /* QUÉ HACE: Deshace el estilo de tarjeta y crea un layout de 2 columnas. */
+  .single-product & {
+    div.product {
+      background-color: transparent;
+      border: none;
+      box-shadow: none;
+      text-align: left;
+      padding: 0;
+      display: grid;
+      gap: 3rem;
+
+      &:hover {
+        transform: none; /* Evitamos que flote al pasar el ratón */
+      }
+
+      @media (min-width: 768px) {
+        grid-template-columns: 1fr 1fr;
+        align-items: start;
+      }
+    }
+
+    .price {
+      font-size: 1.5rem;
+      color: $color-primary;
+      margin-bottom: 1.5rem;
+    }
+
+    /* QUÉ HACE: Obliga a las pestañas de descripción a caer a una nueva fila ocupando el 100%. */
+    .woocommerce-tabs {
+      grid-column: 1 / -1;
+      margin-top: 3rem;
+      
+      ul.tabs {
+        list-style: none;
+        padding: 0;
+        display: flex;
+        gap: 2rem;
+        border-bottom: 1px solid rgba($color-text-base, 0.1);
+        margin-bottom: 2rem;
+
+        li {
+          padding-bottom: 0.5rem;
+          font-weight: 700;
+          cursor: pointer;
+          color: $color-text-base;
+        }
+      }
     }
   }
 }

@@ -277,7 +277,7 @@ def generar_indice_biblioteca(publicaciones, header_html, footer_html, css_v: in
         # Construimos el contenedor principal de la estantería (con diseño de columnas responsivo)
         enlaces_indice_html += f'                <li class="library-nav__item">\n'
         # QUÉ HACE: Delega el color a la clase SASS .indice__tema para permitir pseudo-clases interactivas (:visited).
-        enlaces_indice_html += f'                    <a href="#{tema_slug}" class="library-nav__theme-title">{tema}</a>\n'
+        enlaces_indice_html += f'                    <a href="#{tema_slug}" class="library-nav__theme-title" aria-label="Explorar estantería: {tema}">{tema}</a>\n'
         enlaces_indice_html += f'                    <ul class="library-nav__article-list">\n'
         
         cards_html = ""
@@ -314,7 +314,7 @@ def generar_indice_biblioteca(publicaciones, header_html, footer_html, css_v: in
         secciones_html += f"""
         <section class="library-section" id="{tema_slug}">
             <div class="library-section__header">
-                <h2 class="library-section__title home-card__title--highlight"><a href="#{tema_slug}">{tema}</a></h2>
+                <h2 class="library-section__title home-card__title--highlight"><a href="#{tema_slug}" aria-label="Ver sección: {tema}">{tema}</a></h2>
                 <a href="#top" class="library-section__back-link">↑ Volver arriba</a>
             </div>
             <div class="home-grid">

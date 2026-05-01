@@ -8,6 +8,7 @@ e inyecta el nuevo nombre y dominio del proyecto.
 
 import os
 import sys
+import shutil
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -58,7 +59,6 @@ def purge_directory(dir_path: Path, exclude: list = None):
         if item.is_file():
             item.unlink()
         elif item.is_dir():
-            import shutil
             shutil.rmtree(item)
 
 def main():
@@ -112,7 +112,6 @@ def main():
     print("  🗑️  Purgando manuales SOP exclusivos del proyecto matriz...")
     docs_matriz = REPO_ROOT / "docs" / "matriz"
     if docs_matriz.exists():
-        import shutil
         shutil.rmtree(docs_matriz)
     
     # 3. Intercambio Documental (Los Gemelos)

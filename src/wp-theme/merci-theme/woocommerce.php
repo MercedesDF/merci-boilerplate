@@ -41,6 +41,10 @@ $js_main_v = time();
             <p class="hero__subtitle">Catálogo de recursos, herramientas y merchandising oficial.</p>
         </section>
         <section class="section">
+            <?php if ( is_product() ) : ?>
+                <a href="<?php echo esc_url( get_permalink( wc_get_page_id( 'shop' ) ) ); ?>" class="card__back-link">← Volver a la Tienda</a>
+            <?php endif; ?>
+
             <!-- Aquí es donde inyectamos la magia de WooCommerce -->
             <?php woocommerce_content(); ?>
         </section>

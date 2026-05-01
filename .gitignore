@@ -22,3 +22,4 @@ public/blog
 
 # Secretos y variables de entorno local (Shift-Left Security)
 .env
+.linkedin_token.json
