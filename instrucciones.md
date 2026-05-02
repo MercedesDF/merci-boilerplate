@@ -32,7 +32,7 @@ El ecosistema cuenta con un flujo estático (SSG) y otro dinámico (Headless WP)
 **Para WordPress (Capa Dinámica):**
 1. **Incubación:** Crear un `.md` en `laboratorio/` con un `tema:` válido en tu WP.
 2. **Curación:** Ejecutar `merci-promote.py` para moverlo a las carpetas dinámicas de la raíz.
-3. **Sincronización:** Ejecutar `python3 scripts/merci/merci-wp.py` para publicarlo masivamente vía API REST e inyectar los IDs.
+3. **Sincronización:** Ejecutar `python3 scripts/merci/merci-wp.py` para publicarlo masivamente vía API REST (Resolución dinámica por slug, cero inyecciones locales).
 4. **Despublicación:** Cambiar a `estado: "borrador"` y re-ejecutar el script expulsará el archivo de vuelta al laboratorio.
 
 ## 5. Decisiones Arquitectónicas Restringidas

@@ -37,7 +37,7 @@ Por diseño arquitectónico (Environment Segregation), el núcleo estático (Bib
    ```bash
    python3 scripts/merci/merci-wp.py
    ```
-4. **Actualización y Borradores:** En la primera ejecución, el script **escribirá el `wp_id`** dentro del YAML de tu archivo local. En futuras ejecuciones, el script detectará el ID y actualizará el post en la base de datos. 
+4. **Actualización y Borradores:** El script **es 100% agnóstico al entorno**. Leerá el nombre de tu archivo (slug) y preguntará al servidor activo en tu `.env` si existe. Si no existe, lo crea. Si ya existe, lo actualiza limpiamente sin inyectar códigos locales.
 
 ---
 

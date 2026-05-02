@@ -39,6 +39,11 @@ WP_DIRS = [
 ]
 
 def slugify(texto: str) -> str:
+    """
+    QUÉ HACE: Convierte un texto en una cadena segura para URLs (slug) eliminando acentos y caracteres especiales.
+    POR QUÉ: Desacopla el nombre físico del archivo local de la URI pública, asegurando enlaces limpios 
+    y consistentes independientemente de cómo el autor nombre sus archivos en el sistema operativo.
+    """
     texto = str(texto)
     texto = unicodedata.normalize('NFKD', texto).encode('ascii', 'ignore').decode('ascii')
     texto = re.sub(r'[^\w\s-]', '', texto.lower())
@@ -47,7 +52,8 @@ def slugify(texto: str) -> str:
 def cargar_credenciales():
     """
     QUÉ HACE: Lector nativo de variables de entorno.
-    POR QUÉ: Evita la dependencia de 'python-dotenv'. Mantiene Shift-Left Security.
+    POR QUÉ: Evita la dependencia externa de 'python-dotenv', manteniendo el script ultraligero 
+    (regla de 0 dependencias) y asegurando las credenciales localmente (Shift-Left Security).
     """
     if not ENV_FILE.exists():
         print("❌ [Merci WP] Error: No se encontró el archivo .env seguro.")
@@ -67,14 +73,19 @@ def cargar_credenciales():
 def obtener_id_categoria(wp_url, auth_b64, nombre_categoria):
     """
     QUÉ HACE: Busca el ID numérico de una categoría en WordPress por su nombre.
-    POR QUÉ: La API REST de WP exige IDs numéricos para asignar categorías, no cadenas de texto.
+    POR QUÉ: La API REST de WP exige identificadores numéricos, no cadenas de texto. Resolverlo dinámicamente 
+    mantiene el archivo Markdown agnóstico a la base de datos final.
     """
     query = urllib.parse.quote(nombre_categoria)
     endpoint = f"{wp_url}/wp-json/wp/v2/categories?search={query}"
     
+    # QUÉ HACE: Inyecta cabeceras 'X-Authorization' (gemela) y 'User-Agent' personalizado.
+    # POR QUÉ: Evita la "Ceguera de Proxy" (proxies como Varnish purgan la cabecera estándar Authorization) 
+    # y elude Cortafuegos (WAF) que bloquean peticiones automatizadas de librerías genéricas de Python.
     req = urllib.request.Request(endpoint, method="GET")
     req.add_header("Authorization", f"Basic {auth_b64}")
-    req.add_header("User-Agent", "Merci-Headless/1.0")
+    req.add_header("X-Authorization", f"Basic {auth_b64}")
+    req.add_header("User-Agent", "Merci-Boilerplate-Agent/1.0")
 
     try:
         with urllib.request.urlopen(req) as response:
@@ -88,7 +99,35 @@ def obtener_id_categoria(wp_url, auth_b64, nombre_categoria):
         
     return None
 
+def obtener_id_por_slug(wp_url, auth_b64, slug):
+    """
+    QUÉ HACE: Interroga a la API para saber si ya existe un artículo publicado con el slug indicado.
+    POR QUÉ: Sustituye el uso de 'wp_id' fijos locales, logrando Paridad Dev/Prod absoluta al permitir 
+    sincronizar el mismo archivo Markdown en distintos servidores (Local o Nube) sin colisiones de base de datos.
+    """
+    endpoint = f"{wp_url}/wp-json/wp/v2/posts?slug={slug}"
+    req = urllib.request.Request(endpoint, method="GET")
+    req.add_header("Authorization", f"Basic {auth_b64}")
+    req.add_header("X-Authorization", f"Basic {auth_b64}")
+    req.add_header("User-Agent", "Merci-Boilerplate-Agent/1.0")
+    
+    try:
+        with urllib.request.urlopen(req) as response:
+            posts = json.loads(response.read().decode("utf-8"))
+            if posts and len(posts) > 0:
+                return posts[0].get("id")
+    except Exception:
+        pass
+    return None
+
 def publicar_en_wordpress(filepath: str, creds: dict):
+    """
+    QUÉ HACE: Lee un archivo Markdown, extrae su contenido y metadatos, y lo sincroniza
+    con la base de datos de WordPress correspondiente según el entorno activo.
+    POR QUÉ: Centraliza la lógica de publicación Headless, aislando al usuario del panel
+    de administración de WP y permitiendo gobernar el CMS puramente desde archivos planos
+    controlados por Git (GitOps).
+    """
     target_path = Path(filepath).resolve()
     
     if not target_path.exists():
@@ -113,6 +152,8 @@ def publicar_en_wordpress(filepath: str, creds: dict):
     yaml_raw, md_body = match.groups()
     
     meta = {}
+    # QUÉ HACE: Parsea el YAML de forma nativa sin librerías de terceros.
+    # POR QUÉ: Mantiene la compatibilidad y velocidad del orquestador (0 dependencias externas).
     for line in yaml_raw.splitlines():
         if ":" in line:
             key, val = line.split(":", 1)
@@ -121,7 +162,6 @@ def publicar_en_wordpress(filepath: str, creds: dict):
     titulo = meta.get("titulo", "Borrador desde Terminal")
     estado = meta.get("estado", "draft").lower()
     tema = meta.get("tema", "")
-    wp_id = meta.get("wp_id", "")
     
     # 3. Conversión de estados y formateo HTML
     wp_status = "publish" if estado == "publicado" else "draft"
@@ -132,6 +172,7 @@ def publicar_en_wordpress(filepath: str, creds: dict):
     # 4. Construir Payload (JSON) resolviendo la categoría
     payload = {
         "title": titulo,
+        "slug": target_path.stem,
         "content": html_content,
         "status": wp_status,
         "excerpt": meta.get("descripcion", "")
@@ -148,20 +189,23 @@ def publicar_en_wordpress(filepath: str, creds: dict):
 
     data = json.dumps(payload).encode("utf-8")
     
-    # 5. Disparar a la API REST de WordPress
-    # QUÉ HACE: Si existe un wp_id, cambia el endpoint para actualizar. Si no, crea uno nuevo.
-    if wp_id:
-        endpoint = f"{wp_url}/wp-json/wp/v2/posts/{wp_id}"
-        print(f"  🔄 Actualizando post existente (ID WP: {wp_id})...")
+    # 5. Disparar a la API REST de WordPress (Resolución dinámica multi-entorno)
+    entorno_id = obtener_id_por_slug(wp_url, auth_b64, target_path.stem)
+    if entorno_id:
+        endpoint = f"{wp_url}/wp-json/wp/v2/posts/{entorno_id}"
+        print(f"  🔄 Actualizando post existente (ID remoto: {entorno_id})...")
     else:
         endpoint = f"{wp_url}/wp-json/wp/v2/posts"
         print("  📡 Creando nuevo post en WordPress...")
         
+    # QUÉ HACE: Envío dual de credenciales y agente de usuario corporativo.
+    # POR QUÉ: Asegura que el POST atraviese Varnish Cache y Nginx en servidores de alto rendimiento.
     req = urllib.request.Request(endpoint, data=data, method="POST")
     req.add_header("Content-Type", "application/json")
     req.add_header("Authorization", f"Basic {auth_b64}")
-    req.add_header("User-Agent", "Merci-Headless/1.0")
-    
+    req.add_header("X-Authorization", f"Basic {auth_b64}")
+    req.add_header("User-Agent", "Merci-Boilerplate-Agent/1.0")
+
     try:
         with urllib.request.urlopen(req) as response:
             res_data = json.loads(response.read().decode("utf-8"))
@@ -212,14 +256,6 @@ def publicar_en_wordpress(filepath: str, creds: dict):
                 except Exception as e:
                     print(f"  ❌ Error al generar PDF para {target_path.name}: {e}")
 
-            # QUÉ HACE: Inyecta el ID devuelto por WordPress en el YAML del archivo local.
-            # POR QUÉ: Convierte el Markdown en la Única Fuente de Verdad (SSOT) sincronizada.
-            if not wp_id and nuevo_id:
-                nuevo_yaml = yaml_raw.strip() + f'\nwp_id: "{nuevo_id}"'
-                nuevo_contenido = content.replace(yaml_raw, nuevo_yaml, 1)
-                target_path.write_text(nuevo_contenido, encoding="utf-8")
-                print(f"  💾 ID de WordPress ({nuevo_id}) guardado en el Markdown local.")
-                
             # QUÉ HACE: Expulsa físicamente el archivo origen hacia el entorno de incubación si es borrador.
             # POR QUÉ: Paridad de flujos. Mantiene las carpetas dinámicas raíz exclusivas para contenido en producción.
             if estado != "publicado" and not target_path.is_relative_to(REPO_ROOT / "laboratorio"):
