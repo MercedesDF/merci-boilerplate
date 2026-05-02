@@ -77,32 +77,81 @@
             <?php if ( is_singular() ) : ?>
                 <!-- VISTA DE LECTURA (Artículo individual) -->
                 <?php while ( have_posts() ) : the_post(); ?>
-                    <article class="article">
-                        <?php if ( ! $header_title ) : ?>
-                            <h1 class="article__title"><?php the_title(); ?></h1>
-                        <?php endif; ?>
-                        <div class="article__content">
+                    <article class="card card--booklet">
+                        <a href="javascript:history.back()" class="card__back-link">← Volver</a>
+                        <header>
+                            <?php if ( ! $header_title ) : ?>
+                                <h1 class="home-card__title--highlight"><?php the_title(); ?></h1>
+                            <?php endif; ?>
+                            <!-- El botón enlaza directamente al servidor estático gracias a Nginx -->
+                            <a href="/descargas/<?php echo $post->post_name; ?>.pdf" class="card__download" download>📄 Descargar Edición PDF</a>
+                        </header>
+                        <div class="card__content">
                             <?php the_content(); ?>
                         </div>
                     </article>
                 <?php endwhile; ?>
             <?php else : ?>
                 <!-- VISTA DE LISTADO (Grid y Tarjetas) -->
-                <div class="grid">
-                    <?php while ( have_posts() ) : the_post(); ?>
-                        <article class="card card--booklet">
-                            <h2 class="card__title">
-                                <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
-                            </h2>
-                            <div class="card__meta">
-                                <?php echo get_the_date(); ?> | <?php the_category(', '); ?>
-                            </div>
-                            <div class="card__content">
-                                <?php the_excerpt(); ?>
-                            </div>
-                        </article>
-                    <?php endwhile; ?>
-                </div>
+                <?php
+                // QUÉ HACE: Agrupa los posts de la consulta actual por su subcategoría (tema).
+                $posts_por_tema = array();
+                while ( have_posts() ) {
+                    the_post();
+                    $cats = get_the_category();
+                    $tema = 'General'; // Fallback
+                    foreach ( $cats as $cat ) {
+                        // Ignoramos las categorías estructurales raíz
+                        if ( $cat->slug !== 'art-de-cote' && $cat->slug !== 'blog' && $cat->slug !== 'fichas' ) {
+                            $tema = $cat->name;
+                            break;
+                        }
+                    }
+                    $posts_por_tema[$tema][] = $post;
+                }
+                ?>
+                
+                <!-- QUÉ HACE: Construye el Índice de Contenidos recorriendo el bucle por primera vez -->
+                <nav class="library-nav" aria-label="Índice de artículos">
+                    <h2 class="library-nav__title">Índice de Contenidos</h2>
+                    <ul class="library-nav__list">
+                        <?php foreach ( $posts_por_tema as $tema => $lista_posts ) : ?>
+                            <li class="library-nav__item">
+                                <span class="library-nav__theme-title"><?php echo esc_html($tema); ?></span>
+                                <ul class="library-nav__article-list">
+                                    <?php foreach ( $lista_posts as $p ) : setup_postdata($post = $p); ?>
+                                        <li class="library-nav__article-item">
+                                            <a href="#<?php echo $post->post_name; ?>" class="library-nav__article-link" aria-label="Ir al resumen de: <?php echo esc_attr(get_the_title()); ?>"><?php the_title(); ?></a>
+                                        </li>
+                                    <?php endforeach; wp_reset_postdata(); ?>
+                                </ul>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </nav>
+
+                <!-- QUÉ HACE: Renderiza las secciones agrupadas por tema exactas a la Biblioteca Estática -->
+                <?php foreach ( $posts_por_tema as $tema => $lista_posts ) : ?>
+                    <section class="library-section" id="listado-<?php echo sanitize_title($tema); ?>">
+                        <div class="library-section__header">
+                            <h2 class="library-section__title home-card__title--highlight"><?php echo esc_html($tema); ?></h2>
+                            <a href="#top" class="library-section__back-link">↑ Volver arriba</a>
+                        </div>
+                        <div class="home-grid">
+                        <?php foreach ( $lista_posts as $p ) : setup_postdata($post = $p); ?>
+                            <article class="card card--booklet" id="<?php echo $post->post_name; ?>" style="scroll-margin-top: 100px;">
+                                <header>
+                                    <span class="card__meta"><?php echo get_the_date(); ?> — Cuadernillo</span>
+                                    <h2 class="card__title"><a href="<?php the_permalink(); ?>" aria-label="Leer artículo completo: <?php echo esc_attr(get_the_title()); ?>"><?php the_title(); ?></a></h2>
+                                </header>
+                                <div class="card__content">
+                                    <?php the_excerpt(); ?>
+                                </div>
+                            </article>
+                        <?php endforeach; wp_reset_postdata(); ?>
+                        </div>
+                    </section>
+                <?php endforeach; ?>
             <?php endif; ?>
 
         <?php 

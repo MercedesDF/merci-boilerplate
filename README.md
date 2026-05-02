@@ -1,9 +1,20 @@
-# Merci Boilerplate v1.2.2
+# Merci Boilerplate v1.3.0
 
 Un entorno web híbrido, minimalista y seguro desde el diseño (Shift-Left). 
 Combina un núcleo estático ultrarrápido (HTML5, SASS, Vanilla JS y BEM (Block, Element, Modifier - Modificador de Elemento de Bloque)) con un motor dinámico aislado (WordPress). Diseñado para alcanzar un rendimiento perfecto (Core Web Vitals 100/100) y operar con 0 dependencias externas en el frontend.
 
 > 📖 **Historia y Arquitectura:** La justificación de las decisiones DevSecOps, el aislamiento del CMS y los manuales operativos se encuentran en la carpeta `/docs`.
+
+### Novedades en v1.3.0 (Paridad Dev/Prod y Shift-Left Quality)
+
+- **Paridad Total SSG/CMS:** El tema de WordPress (`merci-theme`) ha sido refactorizado para clonar la experiencia de la Biblioteca Estática. Ahora autogenera un "Mega-Menú" de navegación interna y agrupa visualmente las tarjetas de artículos basándose en sus subcategorías reales, ignorando las taxonomías estructurales.
+- **Publicador Headless Avanzado (`merci-wp.py`):** El motor de sincronización dinámico ahora genera automáticamente réplicas locales en PDF de los artículos de WordPress y los nombra basándose estrictamente en la respuesta de la API REST (*Single Source of Truth*), erradicando los enlaces rotos. Además, inyecta los resúmenes (`excerpt`) directamente en el CMS, manteniendo la política de 0 dependencias en el frontend.
+- **Shift-Left Quality (QA):** Se ha integrado la regla `UI_INLINE_STYLE` en el auditor maestro (`merci-audit.py`). El orquestador ahora escanea y advierte sobre el uso de estilos en línea (`style="..."`) en archivos HTML, PHP y JS, protegiendo la metodología CSS BEM desde la fase de pre-commit. Además, se ha resuelto a nivel de orquestador la colisión de enlaces ancla para garantizar el 100/100 en accesibilidad WAI-ARIA.
+
+## 🚀 Novedades en la v1.2.3 (Lintern de estilos y blindaje anti-tokens OIDC)
+
+- **Linter Estricto de Estilos en Línea:** El auditor maestro (`merci-audit.py`) ahora escanea y advierte sobre el uso de atributos `style="..."` para proteger la arquitectura SASS 7-1 (BEM). Incluye soporte para silenciamiento explícito de falsos positivos mediante la inyección del comentario HTML `<!-- merci-audit:silence-style -->` en la línea afectada.
+- **Blindaje Anti-Fugas (Tokens OIDC):** Implementación de una doble capa de seguridad (Shift-Left) para las credenciales de LinkedIn. Además de la exclusión pasiva en `.gitignore`, el orquestador intercepta activamente el archivo `.linkedin_token.json` en el área de preparación (Stage) y bloquea el commit atómico de forma fulminante si detecta riesgo de exposición.
 
 ## 🚀 Novedades en la v1.2.2 (Hotfix de Seguridad y Estructura)
 

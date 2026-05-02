@@ -15,6 +15,7 @@ import base64
 import shutil
 import urllib.request
 import urllib.parse
+import unicodedata
 from urllib.error import URLError, HTTPError
 from pathlib import Path
 
@@ -24,12 +25,24 @@ except ImportError:
     print("🛡️ [Merci Error] Falta la librería 'markdown'. Ejecuta: pip install markdown")
     sys.exit(1)
 
+try:
+    from weasyprint import HTML
+except ImportError:
+    print("🛡️ [Merci Error] Falta la librería 'weasyprint'. Ejecuta: pip install weasyprint")
+    sys.exit(1)
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 ENV_FILE = REPO_ROOT / ".env"
 WP_DIRS = [
     REPO_ROOT / "blog",
     REPO_ROOT / "art-de-cote"
 ]
+
+def slugify(texto: str) -> str:
+    texto = str(texto)
+    texto = unicodedata.normalize('NFKD', texto).encode('ascii', 'ignore').decode('ascii')
+    texto = re.sub(r'[^\w\s-]', '', texto.lower())
+    return re.sub(r'[-\s]+', '-', texto).strip('-_')
 
 def cargar_credenciales():
     """
@@ -120,7 +133,8 @@ def publicar_en_wordpress(filepath: str, creds: dict):
     payload = {
         "title": titulo,
         "content": html_content,
-        "status": wp_status
+        "status": wp_status,
+        "excerpt": meta.get("descripcion", "")
     }
     
     if tema:
@@ -156,6 +170,48 @@ def publicar_en_wordpress(filepath: str, creds: dict):
             print(f"  ✅ ¡Éxito! Post transferido correctamente.")
             print(f"  🔗 Enlace de WP: {link}")
             
+            # 3.5 Generar PDF localmente (Paridad con Biblioteca)
+            # QUÉ HACE: Genera el PDF utilizando el slug definitivo asignado por WordPress en su base de datos.
+            # POR QUÉ: Asegura que el enlace dinámico ($post->post_name) de la web coincida matemáticamente con el archivo local.
+            wp_slug = res_data.get("slug")
+            if wp_slug and estado == "publicado":
+                out_pdf_filename = f"{wp_slug}.pdf"
+                out_pdf_path = REPO_ROOT / "public" / "descargas" / out_pdf_filename
+                out_pdf_path.parent.mkdir(parents=True, exist_ok=True)
+                
+                pdf_html_content = f"""<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{titulo}</title>
+    <style>
+        @page {{ size: A4; margin: 2.5cm; }}
+        body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #334155; }}
+        .portada {{ text-align: center; page-break-after: always; padding-top: 30%; }}
+        .portada h1 {{ font-size: 2.5em; color: #ea580c; margin-bottom: 0.2em; }}
+        .portada p {{ font-size: 1.2em; color: #64748b; }}
+        h2 {{ color: #ea580c; margin-top: 2em; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5em; }}
+        pre {{ background: #f1f5f9; padding: 1em; border-radius: 4px; white-space: pre-wrap; word-wrap: break-word; font-size: 0.9em; }}
+        code {{ font-family: monospace; background: #f1f5f9; padding: 0.2em 0.4em; border-radius: 3px; font-size: 0.9em; }}
+        img {{ max-width: 100%; height: auto; border-radius: 4px; }}
+    </style>
+</head>
+<body>
+    <div class="portada">
+        <h1>{titulo}</h1>
+        <p>Art de Coté | Cuadernillo</p>
+    </div>
+    <div class="contenido">
+        {html_content}
+    </div>
+</body>
+</html>"""
+                try:
+                    HTML(string=pdf_html_content, base_url=str(REPO_ROOT / "public")).write_pdf(out_pdf_path)
+                    print(f"  📄 PDF generado con éxito: public/descargas/{out_pdf_filename}")
+                except Exception as e:
+                    print(f"  ❌ Error al generar PDF para {target_path.name}: {e}")
+
             # QUÉ HACE: Inyecta el ID devuelto por WordPress en el YAML del archivo local.
             # POR QUÉ: Convierte el Markdown en la Única Fuente de Verdad (SSOT) sincronizada.
             if not wp_id and nuevo_id:

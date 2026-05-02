@@ -18,6 +18,7 @@ Este documento define las reglas de arquitectura e interacción de esta plantill
 4. **Copias de Seguridad (Disaster Recovery):** Utilizar `python3 scripts/merci/merci-backup.py` antes de cualquier operación destructiva o reescritura de historial.
 5. **Convención de Commits:** Utilizar prefijos semánticos (`feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `perf:`).
 6. **Aislamiento de WordPress:** El CMS nunca debe escribir ni modificar archivos en el directorio `/public`. Su comunicación con el frontend es unidireccional y controlada por Nginx.
+7. **Higiene de Importaciones (PEP 8):** Todas las importaciones en scripts Python deben declararse estrictamente al principio del archivo. Queda terminantemente prohibido realizar importaciones en medio del código.
 
 ## 4. Flujo Maestro de Publicación (SOP Dual)
 El ecosistema cuenta con un flujo estático (SSG) y otro dinámico (Headless WP).
@@ -38,6 +39,15 @@ El ecosistema cuenta con un flujo estático (SSG) y otro dinámico (Headless WP)
 - **Cero dependencias visuales:** Prohibido el uso de librerías de animación de terceros o frameworks reactivos (Vue/React/Tailwind) en el frontend.
 - **Accesibilidad Nativa:** Toda la UI (User Interface - Interfaz de Usuario) debe ser navegable mediante Tabulador y usar etiquetas semánticas (WAI-ARIA).
 - **Focus Management:** No se debe usar `tabindex="-1"` en el `body`.
+
+## 6. Protocolo Estricto de Cierre de Fase (Definition of Done)
+Antes de dar por concluida una funcionalidad mayor o transicionar a un nuevo hito, se recomienda ejecutar este checklist para asegurar la higiene del repositorio:
+
+1. **Conciliación de Deuda Técnica:** ¿Queda algún `TODO` en el código o un error silenciado temporalmente? Se deben resolver o registrar en la bitácora.
+2. **Cosecha de Conocimiento:** Extraer los desafíos superados y lecciones aprendidas hacia la bitácora.
+3. **Auditoría Documental:** Asegurar que el `README.md` y las directrices reflejan las nuevas herramientas o arquitecturas creadas.
+4. **Snapshot (Backup Local):** Generar una copia de seguridad (`merci-backup.py`) para tener un punto de restauración garantizado.
+5. **Sello Definitivo:** Una vez confirmados los 4 puntos anteriores, realizar el commit atómico de cierre.
 
 ---
 Cualquier colaborador que herede este repositorio debe leer este documento antes de solicitar integraciones o añadir dependencias externas.
