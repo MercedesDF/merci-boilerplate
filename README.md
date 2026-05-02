@@ -1,16 +1,21 @@
-# Merci Boilerplate v1.3.1
+# Merci Boilerplate v1.4.0
 
 Un entorno web híbrido, minimalista y seguro desde el diseño (Shift-Left). 
 Combina un núcleo estático ultrarrápido (HTML5, SASS, Vanilla JS y BEM (Block, Element, Modifier - Modificador de Elemento de Bloque)) con un motor dinámico aislado (WordPress). Diseñado para alcanzar un rendimiento perfecto (Core Web Vitals 100/100) y operar con 0 dependencias externas en el frontend.
 
 > 📖 **Historia y Arquitectura:** La justificación de las decisiones DevSecOps, el aislamiento del CMS y los manuales operativos se encuentran en la carpeta `/docs`.
 
-### Novedades en v1.3.1 (Paridad Dev/Prod y Proxy Bypass)
+## 🚀 Novedades en la v1.4.0 (Gobernanza y CI/CD en la nube)
 
-- **SSOT Dinámico por Slug:** Erradicada la inyección de `wp_id` fijos en los archivos Markdown. El orquestador Headless ahora resuelve la existencia de los artículos interrogando al servidor mediante su nombre de archivo (slug), permitiendo publicar exactamente el mismo documento contra Localhost, Staging o Producción sin colisiones.
-- **Escudo Anti-Proxy:** Inyectadas cabeceras personalizadas (`X-Authorization`) y firmas corporativas (`User-Agent`) en Python, junto a parches en el tema hijo para atravesar barreras de seguridad (Varnish Cache, OPcache, WAF) garantizando la publicación ininterrumpida en ecosistemas Cloud.
+- **Integración Continua (CI):** Añadido flujo de trabajo automatizado con GitHub Actions (`.github/workflows/audit.yml`). La auditoría estricta de seguridad y calidad (Shift-Left) se ejecuta ahora automáticamente en la nube en cada *push* o *pull request*, forzando el uso de Node.js 24.
+- **Gobernanza Open Source:** Incorporación de *Issue Templates* (Bug Report, Feature Request) y *Pull Request Template* estandarizadas bajo la estructura de 3 átomos (Desafío, Maniobra, Criterio), exigiendo validación estricta y limitando la fricción de mantenimiento.
 
-### Novedades en v1.3.0 (Paridad Dev/Prod y Shift-Left Quality)
+## 🚀 Novedades en la v1.3.1 (Paridad Dev/Prod y Proxy Bypass)
+
+- **SSOT (Single Source of Truth - Única Fuente de Verdad) Dinámico por Slug:** Erradicada la inyección de `wp_id` fijos en los archivos Markdown. El orquestador Headless ahora resuelve la existencia de los artículos interrogando al servidor mediante su nombre de archivo (slug), permitiendo publicar exactamente el mismo documento contra Localhost, Staging o Producción sin colisiones.
+- **Escudo Anti-Proxy:** Inyectadas cabeceras personalizadas (`X-Authorization`) y firmas corporativas (`User-Agent`) en Python, junto a parches en el tema hijo para atravesar barreras de seguridad (Varnish Cache, OPcache, WAF - Web Application Firewall - Cortafuegos de Aplicaciones Web) garantizando la publicación ininterrumpida en ecosistemas Cloud.
+
+## 🚀 Novedades en la v1.3.0 (Paridad Dev/Prod y Shift-Left Quality)
 
 - **Paridad Total SSG/CMS:** El tema de WordPress (`merci-theme`) ha sido refactorizado para clonar la experiencia de la Biblioteca Estática. Ahora autogenera un "Mega-Menú" de navegación interna y agrupa visualmente las tarjetas de artículos basándose en sus subcategorías reales, ignorando las taxonomías estructurales.
 - **Publicador Headless Avanzado (`merci-wp.py`):** El motor de sincronización dinámico ahora genera automáticamente réplicas locales en PDF de los artículos de WordPress y los nombra basándose estrictamente en la respuesta de la API REST (*Single Source of Truth*), erradicando los enlaces rotos. Además, inyecta los resúmenes (`excerpt`) directamente en el CMS, manteniendo la política de 0 dependencias en el frontend.
