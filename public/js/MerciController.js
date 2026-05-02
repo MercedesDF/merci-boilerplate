@@ -18,9 +18,9 @@ class MerciController {
         this.messageBox = this.container.querySelector('.merci-ui__message-box');
         this.messageText = this.container.querySelector('.merci-ui__message-text');
 
-        // QUÉ HACE: Carga el "cerebro" específico basándose en la URL actual.
-        // POR QUÉ: Permite respuestas contextuales sin consultas pesadas al servidor.
-        this.messages = this._loadKnowledgeBase();
+        // QUÉ HACE: Carga la base genérica primero y luego intenta conectar el lóbulo frontal (JSON).
+        this.messages = this._loadStandardKnowledgeBase();
+        this._connectBrain();
 
         this.state = 'idle'; 
         this.timeoutId = null; // Guarda la referencia del temporizador para no superponer mensajes
@@ -39,16 +39,44 @@ class MerciController {
     }
 
     /**
+     * QUÉ HACE: Lee el archivo estático generado por Python (Shift-Left AI) en segundo plano.
+     * POR QUÉ: Si el usuario está en un artículo, Merci sustituirá sus saludos genéricos
+     * por la frase inteligente pre-generada por Gemini, sin gastar cuota de API ni latencia.
+     */
+    async _connectBrain() {
+        try {
+            const response = await fetch('/js/brain_data.json');
+            if (!response.ok) return;
+            
+            const brainData = await response.json();
+            const currentPath = window.location.pathname;
+            
+            if (brainData[currentPath]) {
+                let aiMessage = brainData[currentPath];
+                // Degradación elegante: Si la cuota falló durante la compilación, limpiamos el prefijo.
+                if (aiMessage.startsWith('[Fallback]')) {
+                    aiMessage = aiMessage.replace('[Fallback]', '').trim();
+                }
+                // Si hay respuesta de la IA, Merci solo dirá eso en esta página.
+                this.messages = [aiMessage];
+                console.log('[Merci Brain] Sinapsis conectada. Frase contextual cargada.');
+            }
+        } catch (error) {
+            console.log('[Merci Brain] Usando base genérica (JSON no encontrado).');
+        }
+    }
+
+    /**
      * QUÉ HACE: Analiza la ruta del navegador y devuelve el diccionario adecuado.
      * POR QUÉ: Principio de Responsabilidad Única. Aísla los textos de la lógica de la UI.
      * Al usar .includes(), nos aseguramos de atrapar también las subrutas (ej. un artículo específico).
      */
-    _loadKnowledgeBase() {
+    _loadStandardKnowledgeBase() {
         const path = window.location.pathname;
 
         if (path === '/' || path === '/index.html') {
             return [
-                '¡Hola! Me llamo Mercí, asistente de merci-boilerplate👋',
+                '¡Hola! Soy tu asistente virtual de merci-boilerplate👋',
                 'merci-boilerplate es la base de este proyecto🚀',
                 'Todo operando a 100/100 en Web Vitals ⚡'
             ];
@@ -87,7 +115,7 @@ class MerciController {
         // Matriz por defecto de contingencia
         return [
             '¡Hola! 👋',
-            'Soy Merci, tu asistente DevSecOps 🤖',
+            'Soy tu asistente virtual DevSecOps 🤖',
             'Mi código es Vanilla JS puro 💻'
         ];
     }

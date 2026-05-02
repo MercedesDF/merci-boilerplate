@@ -9,6 +9,7 @@ e inyecta el nuevo nombre y dominio del proyecto.
 import os
 import sys
 import shutil
+import re
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -61,6 +62,68 @@ def purge_directory(dir_path: Path, exclude: list = None):
         elif item.is_dir():
             shutil.rmtree(item)
 
+def configure_ai_module(include_ai: bool):
+    """Configura la Marca Blanca del asistente o ejecuta su amputación quirúrgica."""
+    if include_ai:
+        print("  🧠 Configurando módulo de Inteligencia Artificial (Marca Blanca)...")
+        replace_in_files("Eres Merci, la asistente virtual", "Eres un asistente virtual técnico")
+        replace_in_files("Me llamo Mercí, asistente", "Soy tu asistente virtual")
+        replace_in_files("Soy Merci, tu asistente", "Soy tu asistente virtual")
+        replace_in_files("Interactuar con Merci", "Interactuar con el asistente")
+        replace_in_files("Asistente Merci", "Asistente Virtual")
+    else:
+        print("  🪓 Ejecutando amputación quirúrgica del módulo de Inteligencia Artificial...")
+        
+        # 1. Borrar archivos exclusivos de IA y UI del asistente
+        for f in ["scripts/merci/merci-brain.py", "public/js/MerciController.js", "public/js/brain_data.json", "src/scss/components/_merci.scss"]:
+            (REPO_ROOT / f).unlink(missing_ok=True)
+            
+        # 2. Purgar referencias en el DOM (HTML/PHP)
+        archivos_ui = [
+            "public/index.html",
+            "public/contacto/index.html",
+            "src/wp-theme/merci-theme/index.php",
+            "src/wp-theme/merci-theme/woocommerce.php"
+        ]
+        for ruta in archivos_ui:
+            archivo = REPO_ROOT / ruta
+            if archivo.exists():
+                content = archivo.read_text(encoding="utf-8")
+                content = re.sub(r'\s*<!-- Asistente .*?<\/aside>', '', content, flags=re.DOTALL | re.IGNORECASE)
+                content = re.sub(r'\s*<script src="/js/MerciController\.js.*?</script>', '', content, flags=re.IGNORECASE)
+                archivo.write_text(content, encoding="utf-8")
+                
+        # 3. Limpiar dependencias en Python y SASS
+        total_py = REPO_ROOT / "scripts" / "merci" / "merci-total.py"
+        if total_py.exists():
+            content_total = total_py.read_text(encoding="utf-8")
+            content_total = re.sub(r'\s*"merci-brain\.py",', '', content_total)
+            total_py.write_text(content_total, encoding="utf-8")
+            
+        scss_index = REPO_ROOT / "src" / "scss" / "components" / "_index.scss"
+        if scss_index.exists():
+            scss_index.write_text(scss_index.read_text(encoding="utf-8").replace("@forward 'merci';\n", ""), encoding="utf-8")
+            
+        sync_py = REPO_ROOT / "scripts" / "merci" / "merci-sync-pages.py"
+        if sync_py.exists():
+            content = sync_py.read_text(encoding="utf-8")
+            content = re.sub(r'\s*aside_pattern = r\'\(<aside class="merci-ui".*?</aside>\)\'', '', content)
+            content = re.sub(r'\s*aside_content = extract_block\(index_html, aside_pattern, "Aside \(Merci\)"\)', '', content)
+            content = re.sub(r'\s*nuevo_contacto = replace_block\(nuevo_contacto, aside_pattern, aside_content, "Aside \(Merci\)"\)', '', content)
+            content = content.replace(' (Header, Footer y Merci)', ' (Header y Footer)')
+            sync_py.write_text(content, encoding="utf-8")
+            
+        publish_py = REPO_ROOT / "scripts" / "merci" / "merci-publish.py"
+        if publish_py.exists():
+            content = publish_py.read_text(encoding="utf-8")
+            content = re.sub(r'\s*<script src="/js/MerciController\.js.*?</script>', '', content, flags=re.IGNORECASE)
+            content = re.sub(r'\s*m_match = re\.search\(r"\(<!-- Asistente .*?</aside>\)", index_content, re\.DOTALL \| re\.IGNORECASE\)', '', content)
+            content = re.sub(r'\s*if m_match:\n\s*footer_html \+= f"\\n\\n    \{m_match\.group\(1\)\}"', '', content)
+            content = re.sub(r'\s*js_controller_path = REPO_ROOT / "public/js/MerciController\.js"', '', content)
+            content = re.sub(r'\s*js_controller_version = int\(js_controller_path.*?\'11\'', '', content)
+            content = content.replace(', js_controller_version', '').replace(', js_c_v: int', '')
+            publish_py.write_text(content, encoding="utf-8")
+
 def main():
     print("🚀 [Merci Init] Preparación de nuevo proyecto a partir del Boilerplate.")
     print("⚠️  ADVERTENCIA DE SEGURIDAD: Este script es DESTRUCTIVO.")
@@ -74,6 +137,7 @@ def main():
         
     nuevo_dominio = input("Introduce el nuevo dominio (ej. midominio.com): ").strip()
     nuevo_nombre = input("Introduce el nombre del proyecto (ej. Mi Empresa): ").strip()
+    incluir_ia = input("\n🤖 ¿Deseas incluir el módulo de Inteligencia Artificial (Shift-Left AI) en tu proyecto? [Y/n]: ").strip().lower() != 'n'
     
     if not nuevo_dominio or not nuevo_nombre:
         print("❌ Error: Los datos no pueden estar vacíos.")
@@ -83,6 +147,8 @@ def main():
     replace_in_files("mercedev.es", nuevo_dominio)
     replace_in_files("mercedev", nuevo_nombre.lower().replace(" ", ""))
     replace_in_files("Mercedes", nuevo_nombre)
+    
+    configure_ai_module(incluir_ia)
 
     # 2. Purga de datos históricos
     purge_directory(REPO_ROOT / "biblioteca")
@@ -106,7 +172,11 @@ def main():
     # POR QUÉ: Evita engordar el Boilerplate con fotos propias, pero preserva 
     # los iconos estructurales de la UI (logos y el avatar del asistente Merci).
     purge_directory(REPO_ROOT / ".assets-raw")
-    purge_directory(REPO_ROOT / "assets" / "images", exclude=["favicon.ico", "favicon.svg", "favicon.png", "logo.svg", "logo.webp", "logo.png", "merci-avatar.webp", "merci-avatar.png"])
+    
+    imagenes_a_conservar = ["favicon.ico", "favicon.png", "logo.webp", "logo.png"]
+    if incluir_ia:
+        imagenes_a_conservar.append("Merci-en-la-nube.webp")
+    purge_directory(REPO_ROOT / "assets" / "images", exclude=imagenes_a_conservar)
     
     # Purga selectiva de manuales operativos exclusivos de la matriz
     print("  🗑️  Purgando manuales SOP exclusivos del proyecto matriz...")

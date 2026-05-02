@@ -1,9 +1,16 @@
-# Merci Boilerplate v1.4.0
+# Merci Boilerplate v1.5.0
 
 Un entorno web híbrido, minimalista y seguro desde el diseño (Shift-Left). 
 Combina un núcleo estático ultrarrápido (HTML5, SASS, Vanilla JS y BEM (Block, Element, Modifier - Modificador de Elemento de Bloque)) con un motor dinámico aislado (WordPress). Diseñado para alcanzar un rendimiento perfecto (Core Web Vitals 100/100) y operar con 0 dependencias externas en el frontend.
 
 > 📖 **Historia y Arquitectura:** La justificación de las decisiones DevSecOps, el aislamiento del CMS y los manuales operativos se encuentran en la carpeta `/docs`.
+
+## 🚀 Novedades en la v1.5.0 (Shift-Left AI y Autonomía)
+
+- **Inteligencia Estática (Zero Latency):** Integración nativa con la API de Google Gemini (`merci-brain.py`) sin exponer claves en el frontend ni penalizar el rendimiento. El orquestador escanea la documentación local durante la fase de compilación y genera un `brain_data.json` estático para respuestas contextualizadas instantáneas.
+- **Autodescubrimiento y Degradación Elegante:** El lóbulo frontal en Python detecta automáticamente los modelos de IA disponibles en la capa gratuita, gestiona inteligentemente las cuotas de red (Rate Limiting) y proporciona respuestas de contingencia (Fallbacks estáticos) para garantizar que la web nunca falle por caídas de la API externa.
+- **Fail-Gracefully en Lóbulo Frontal:** El orquestador de Inteligencia Artificial ya no detiene el pipeline maestro si el usuario no ha configurado una clave API de Gemini. Emite una advertencia informativa y permite al asistente operar con sus respuestas genéricas por defecto (Out-of-the-Box Experience).
+- **Experiencia de Desarrollo (DX):** Refactorización integral de los orquestadores CLI para aplicar la "Filosofía Unix" (Silence is Golden). Los comandos muestran ahora reportes ultra-minimalistas orientados al éxito, ocultando el ruido de procesamiento tras la bandera opcional `--verbose` y mejorando el espaciado visual.
 
 ## 🚀 Novedades en la v1.4.0 (Gobernanza y CI/CD en la nube)
 

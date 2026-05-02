@@ -26,7 +26,7 @@ DEST_DIR = REPO_ROOT / "assets/images"
 TARGET_WIDTHS = [1920, 1280, 800, 400]
 WEBP_QUALITY = 80  # Calidad del 0 al 100. 80 es un buen equilibrio.
 
-def optimize_images():
+def optimize_images(verbose=False):
     """
     Busca imágenes en el directorio fuente, las convierte a WebP en varios
     tamaños y las guarda en el directorio de destino.
@@ -47,7 +47,8 @@ def optimize_images():
     for image_path in image_files:
         try:
             with Image.open(image_path) as img:
-                print(f"⚙️  Procesando: {image_path.name}")
+                if verbose:
+                    print(f"⚙️  Procesando: {image_path.name}")
                 
                 # Preservar transparencia (canal Alpha) al convertir a WebP
                 if img.mode in ('RGBA', 'LA') or (img.mode == 'P' and 'transparency' in img.info):
@@ -58,7 +59,8 @@ def optimize_images():
                 # Siempre generar una versión base optimizada al tamaño original
                 base_output = DEST_DIR / f"{image_path.stem}.webp"
                 img.save(base_output, "WEBP", quality=WEBP_QUALITY)
-                print(f"   ✨ Generado base: {base_output.name}")
+                if verbose:
+                    print(f"   ✨ Generado base: {base_output.name}")
 
                 for width in TARGET_WIDTHS:
                     # Solo generar tamaños más pequeños que el original
@@ -76,11 +78,16 @@ def optimize_images():
                     output_path = DEST_DIR / output_filename
                     
                     resized_img.save(output_path, "WEBP", quality=WEBP_QUALITY)
-                    print(f"   ✨ Generado: {output_path.name}")
+                    if verbose:
+                        print(f"   ✨ Generado: {output_path.name}")
+                        
+                if not verbose:
+                    print(f"  ✅ Optimizada: {image_path.name}")
 
         except Exception as e:
             print(f"❌ Error procesando {image_path.name}: {e}", file=sys.stderr)
 
 if __name__ == "__main__":
-    optimize_images()
+    is_verbose = "--verbose" in sys.argv or "-v" in sys.argv
+    optimize_images(is_verbose)
     print("\n[Merci Optimizer] Proceso completado.")

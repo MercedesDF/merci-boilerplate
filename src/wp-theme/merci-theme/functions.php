@@ -275,8 +275,15 @@ add_action( 'pre_get_posts', 'merci_filtrar_feed_principal' );
 add_filter( 'wp_is_application_passwords_available', '__return_true' );
 
 // =========================================================================
-// 8. PARCHE PROXY: Restauración de Autorización Básica (Varnish / FastCGI)
+// 8. ESCUDOS ANTI-PROXY (Varnish / Nginx)
 // =========================================================================
+
+// 8.1 Prevención de Mixed Content y Redirecciones Inseguras (Ceguera HTTPS)
+if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strpos($_SERVER['HTTP_X_FORWARDED_PROTO'], 'https') !== false) {
+    $_SERVER['HTTPS'] = 'on';
+}
+
+// 8.2 Restauración de Autorización Básica (Varnish / FastCGI)
 // Proxies agresivos como Varnish o Nginx pueden purgar la cabecera 'Authorization'.
 // Si el orquestador Python envía la credencial mediante 'X-Authorization', la restauramos.
 if ( isset( $_SERVER['HTTP_X_AUTHORIZATION'] ) && ! isset( $_SERVER['HTTP_AUTHORIZATION'] ) ) {

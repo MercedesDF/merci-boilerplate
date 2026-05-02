@@ -32,6 +32,7 @@ PIPELINE = [
     "merci-publish.py",
     "merci-wp.py",
     "merci-sync-pages.py",
+    "merci-brain.py",
     "merci-sitemap.py",
     "merci-audit.py",
     "merci-linkcheck.py"
@@ -52,6 +53,7 @@ def main():
             # check=True garantiza el patrón "Fail-Fast": si un script falla, 
             # el orquestador aborta inmediatamente sin ejecutar los siguientes.
             subprocess.run([sys.executable, str(script_path)], check=True)
+            print()  # Separador visual entre bloques de ejecución
         except subprocess.CalledProcessError as e:
             print(f"\n❌ [Merci Total] Pipeline detenido. El script {script} ha fallado.")
             sys.exit(e.returncode)

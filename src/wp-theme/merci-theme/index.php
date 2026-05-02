@@ -174,13 +174,13 @@
         </div>
     </footer>
 
-    <!-- Asistente Merci -->
+    <!-- Asistente Virtual -->
     <aside class="merci-ui" id="merci-ui" aria-label="Asistente virtual Merci">
         <div class="merci-ui__message-box" id="merci-message" aria-live="polite" aria-hidden="true">
             <span class="merci-ui__message-text"></span>
         </div>
         <button class="merci-ui__trigger" aria-controls="merci-message" aria-expanded="false">
-            <img class="merci-ui__avatar" src="/assets/images/Merci-en-la-nube.webp" alt="Interactuar con Merci" width="80" height="80" loading="lazy">
+            <img class="merci-ui__avatar" src="/assets/images/Merci-en-la-nube.webp" alt="Interactuar con el asistente" width="80" height="80" loading="lazy">
         </button>
     </aside>
 

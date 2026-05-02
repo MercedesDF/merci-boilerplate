@@ -120,7 +120,7 @@ def obtener_id_por_slug(wp_url, auth_b64, slug):
         pass
     return None
 
-def publicar_en_wordpress(filepath: str, creds: dict):
+def publicar_en_wordpress(filepath: str, creds: dict, verbose: bool = False):
     """
     QUÉ HACE: Lee un archivo Markdown, extrae su contenido y metadatos, y lo sincroniza
     con la base de datos de WordPress correspondiente según el entorno activo.
@@ -165,7 +165,8 @@ def publicar_en_wordpress(filepath: str, creds: dict):
     
     # 3. Conversión de estados y formateo HTML
     wp_status = "publish" if estado == "publicado" else "draft"
-    print(f"  📖 Procesando: {titulo} (Estado WP: {wp_status})")
+    if verbose:
+        print(f"  📖 Procesando: {titulo} (Estado WP: {wp_status})")
     
     html_content = markdown.markdown(md_body, extensions=['fenced_code'])
     
@@ -179,11 +180,11 @@ def publicar_en_wordpress(filepath: str, creds: dict):
     }
     
     if tema:
-        print(f"  🔍 Buscando ID para la categoría: '{tema}'...")
+        if verbose: print(f"  🔍 Buscando ID para la categoría: '{tema}'...")
         cat_id = obtener_id_categoria(wp_url, auth_b64, tema)
         if cat_id:
             payload["categories"] = [cat_id]
-            print(f"  🏷️  Categoría vinculada (ID: {cat_id})")
+            if verbose: print(f"  🏷️  Categoría vinculada (ID: {cat_id})")
         else:
             print(f"  ⚠️ La categoría '{tema}' no existe en WP. Quedará sin categorizar.")
 
@@ -193,10 +194,10 @@ def publicar_en_wordpress(filepath: str, creds: dict):
     entorno_id = obtener_id_por_slug(wp_url, auth_b64, target_path.stem)
     if entorno_id:
         endpoint = f"{wp_url}/wp-json/wp/v2/posts/{entorno_id}"
-        print(f"  🔄 Actualizando post existente (ID remoto: {entorno_id})...")
+        if verbose: print(f"  🔄 Actualizando post existente (ID remoto: {entorno_id})...")
     else:
         endpoint = f"{wp_url}/wp-json/wp/v2/posts"
-        print("  📡 Creando nuevo post en WordPress...")
+        if verbose: print("  📡 Creando nuevo post en WordPress...")
         
     # QUÉ HACE: Envío dual de credenciales y agente de usuario corporativo.
     # POR QUÉ: Asegura que el POST atraviese Varnish Cache y Nginx en servidores de alto rendimiento.
@@ -211,12 +212,15 @@ def publicar_en_wordpress(filepath: str, creds: dict):
             res_data = json.loads(response.read().decode("utf-8"))
             link = res_data.get("link", "URL desconocida")
             nuevo_id = res_data.get("id")
-            print(f"  ✅ ¡Éxito! Post transferido correctamente.")
-            print(f"  🔗 Enlace de WP: {link}")
+            
+            if verbose:
+                print(f"  ✅ ¡Éxito! Post transferido correctamente.")
+                print(f"  🔗 Enlace de WP: {link}")
             
             # 3.5 Generar PDF localmente (Paridad con Biblioteca)
             # QUÉ HACE: Genera el PDF utilizando el slug definitivo asignado por WordPress en su base de datos.
             # POR QUÉ: Asegura que el enlace dinámico ($post->post_name) de la web coincida matemáticamente con el archivo local.
+            pdf_msg = ""
             wp_slug = res_data.get("slug")
             if wp_slug and estado == "publicado":
                 out_pdf_filename = f"{wp_slug}.pdf"
@@ -252,9 +256,13 @@ def publicar_en_wordpress(filepath: str, creds: dict):
 </html>"""
                 try:
                     HTML(string=pdf_html_content, base_url=str(REPO_ROOT / "public")).write_pdf(out_pdf_path)
-                    print(f"  📄 PDF generado con éxito: public/descargas/{out_pdf_filename}")
+                    if verbose: print(f"  📄 PDF generado con éxito: public/descargas/{out_pdf_filename}")
+                    pdf_msg = " (+ PDF)"
                 except Exception as e:
                     print(f"  ❌ Error al generar PDF para {target_path.name}: {e}")
+                    
+            if not verbose and estado == "publicado":
+                print(f"  ✅ Sincronizado en WP: {target_path.name}{pdf_msg}")
 
             # QUÉ HACE: Expulsa físicamente el archivo origen hacia el entorno de incubación si es borrador.
             # POR QUÉ: Paridad de flujos. Mantiene las carpetas dinámicas raíz exclusivas para contenido en producción.
@@ -276,6 +284,9 @@ def publicar_en_wordpress(filepath: str, creds: dict):
     return True
 
 if __name__ == "__main__":
+    is_verbose = "--verbose" in sys.argv or "-v" in sys.argv
+    args = [arg for arg in sys.argv[1:] if not arg.startswith("-")]
+    
     print("🚀 [Merci WP] Iniciando conexión Headless con WordPress...")
     creds = cargar_credenciales()
     
@@ -285,21 +296,22 @@ if __name__ == "__main__":
         
     # QUÉ HACE: Si se pasa un argumento, procesa ese archivo o carpeta. Si no, sincroniza masivamente.
     # POR QUÉ: Permite sincronizaciones atómicas globales (SSOT) evitando la deriva de configuración.
-    if len(sys.argv) > 1:
-        target = Path(sys.argv[1]).resolve()
+    if len(args) > 0:
+        target = Path(args[0]).resolve()
         if target.is_dir():
             for md_file in target.rglob("*.md"):
-                publicar_en_wordpress(str(md_file), creds)
+                publicar_en_wordpress(str(md_file), creds, is_verbose)
         else:
-            publicar_en_wordpress(str(target), creds)
+            publicar_en_wordpress(str(target), creds, is_verbose)
     else:
-        print("🔄 Sincronización masiva de carpetas dinámicas detectada...")
+        if is_verbose:
+            print("🔄 Sincronización masiva de carpetas dinámicas detectada...")
         for wp_dir in WP_DIRS:
             if wp_dir.exists():
-                print(f"\n📂 Escaneando directorio: {wp_dir.name}/")
+                if is_verbose: print(f"\n📂 Escaneando directorio: {wp_dir.name}/")
                 for md_file in wp_dir.rglob("*.md"):
-                    publicar_en_wordpress(str(md_file), creds)
+                    publicar_en_wordpress(str(md_file), creds, is_verbose)
             else:
-                print(f"\n⚠️  Directorio no encontrado: {wp_dir.name}/. Omitiendo.")
+                if is_verbose: print(f"\n⚠️  Directorio no encontrado: {wp_dir.name}/. Omitiendo.")
                 
     print("\n✅ [Merci WP] Sincronización finalizada.")
