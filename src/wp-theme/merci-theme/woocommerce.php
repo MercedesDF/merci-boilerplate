@@ -1,6 +1,6 @@
 <?php
 // Resolutor dinámico de versiones
-$root_dir = dirname(ABSPATH) . '/merci-boilerlate.es/public';
+$root_dir = dirname(ABSPATH) . '/merci-boilerplate.es/public';
 $css_v = time();
 $js_merci_v = time();
 $js_main_v = time();
@@ -20,7 +20,7 @@ $js_main_v = time();
     <div id="top" tabindex="-1" style="position: absolute; top: 0; left: 0;"></div>
     <header class="header">
         <a href="/" class="header__brand">
-            <img src="/assets/images/logo.webp?v=2" alt="merci-boilerlate" class="header__logo" width="263" height="65">
+            <img src="/assets/images/logo.webp?v=2" alt="merci-boilerplate" class="header__logo" width="263" height="65">
         </a>
         <button class="header__toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false">
             <span class="header__toggle-icon"></span>
@@ -54,7 +54,7 @@ $js_main_v = time();
     <footer class="footer" style="text-align: left; padding-bottom: 6rem;">
         <div class="footer__text">
             <a href="#top" style="color: inherit; text-decoration: underline; font-weight: 600; display: inline-block; margin-bottom: 1rem;">↑ Volver arriba</a><br>
-            &copy; 2026 <strong>merci-boilerlate</strong> — Base de código abierto bajo Licencia MIT.
+            &copy; 2026 <strong>merci-boilerplate</strong> — Base de código abierto bajo Licencia MIT.
         </div>
     </footer>
     <aside class="merci-ui" id="merci-ui" aria-label="Asistente virtual Merci">

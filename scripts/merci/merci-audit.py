@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-merci-audit.py — Auditoría local del proyecto merci-boilerlate.es (Fase 1).
+merci-audit.py — Auditoría local del proyecto merci-boilerplate.es (Fase 1).
 
 ¿Qué problema resuelve?
     Evitar que secretos o errores básicos lleguen al repositorio, y adelantar

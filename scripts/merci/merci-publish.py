@@ -115,7 +115,7 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
         print(f"  ❌ Error: Falta el atributo 'alt_portada' obligatorio en {filepath.name}")
         return False
     
-    canonical_url = f"https://merci-boilerlate.es/biblioteca/{out_filename}"
+    canonical_url = f"https://merci-boilerplate.es/biblioteca/{out_filename}"
 
     # QUÉ HACE: Pre-procesador de multimedia. Busca sintaxis de imagen que apunte a un vídeo.
     # POR QUÉ: Markdown nativo no soporta la etiqueta <video>. Usamos expresiones regulares para transformar 
@@ -163,7 +163,7 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
     <div class="portada">
         <h1>{titulo}</h1>
         <p>{tipo.capitalize()} | Vol. {meta.get('volumen', 1)}</p>
-        <p><strong>merci-boilerlate.es</strong> — {meta.get('fecha', '')}</p>
+        <p><strong>merci-boilerplate.es</strong> — {meta.get('fecha', '')}</p>
     </div>
     <div class="contenido">
         {html_content}
@@ -193,7 +193,7 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{titulo} — merci-boilerlate.es</title>
+    <title>{titulo} — merci-boilerplate.es</title>
     <meta name="description" content="{descripcion}">
     <link rel="canonical" href="{canonical_url}">
     <link rel="stylesheet" href="/css/main.css?v={css_v}">
@@ -325,9 +325,9 @@ def generar_indice_biblioteca(publicaciones, header_html, footer_html, css_v: in
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Biblioteca — merci-boilerlate.es</title>
+    <title>Biblioteca — merci-boilerplate.es</title>
     <meta name="description" content="Índice de publicaciones técnicas y proyectos de la Biblioteca.">
-    <link rel="canonical" href="https://merci-boilerlate.es/biblioteca/">
+    <link rel="canonical" href="https://merci-boilerplate.es/biblioteca/">
     <link rel="stylesheet" href="/css/main.css?v={css_v}">
     <script src="/js/MerciController.js?v={js_c_v}" defer></script>
     <script src="/js/main.js?v={js_m_v}" defer></script>
@@ -335,9 +335,9 @@ def generar_indice_biblioteca(publicaciones, header_html, footer_html, css_v: in
     {{
       "@context": "https://schema.org",
       "@type": "CollectionPage",
-      "name": "La Biblioteca - merci-boilerlate.es",
+      "name": "La Biblioteca - merci-boilerplate.es",
       "description": "Índice de publicaciones técnicas y proyectos de la Biblioteca.",
-      "url": "https://merci-boilerlate.es/biblioteca/"
+      "url": "https://merci-boilerplate.es/biblioteca/"
     }}
     </script>
 </head>
