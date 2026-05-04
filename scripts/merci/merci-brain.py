@@ -143,7 +143,7 @@ def generar_cerebro_estatico(api_key, modelo, force_clean=False):
             continue
         
         print(f"  🧠 Pensando saludo para: {titulo}...")
-        prompt = f"Eres un asistente virtual técnico de la web merci-boilerplate.es (Arquitectura DevSecOps). El usuario acaba de entrar a leer el artículo titulado '{titulo}' (Contexto: {desc}). Escribe un saludo directo, inteligente y con un sutil toque 'geek' o de ingeniería (una sola frase, máximo 15 palabras) dándole la bienvenida a este contenido concreto. No uses comillas."
+        prompt = f"Eres un asistente virtual técnico de la web merci-boilerlate.es (Arquitectura DevSecOps). El usuario acaba de entrar a leer el artículo titulado '{titulo}' (Contexto: {desc}). Escribe un saludo directo, inteligente y con un sutil toque 'geek' o de ingeniería (una sola frase, máximo 15 palabras) dándole la bienvenida a este contenido concreto. No uses comillas."
         
         respuesta = consultar_gemini(prompt, api_key, modelo)
         

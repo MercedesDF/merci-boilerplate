@@ -1,6 +1,6 @@
 <?php
 // Resolutor dinámico de versiones
-$root_dir = dirname(ABSPATH) . '/merci-boilerplate.es/public';
+$root_dir = dirname(ABSPATH) . '/merci-boilerlate.es/public';
 $css_v = time();
 $js_merci_v = time();
 $js_main_v = time();
@@ -20,18 +20,19 @@ $js_main_v = time();
     <div id="top" tabindex="-1" style="position: absolute; top: 0; left: 0;"></div>
     <header class="header">
         <a href="/" class="header__brand">
-            <img src="/assets/images/logo.webp?v=2" alt="merci-boilerplate" class="header__logo" width="263" height="65">
+            <img src="/assets/images/logo.webp?v=2" alt="merci-boilerlate" class="header__logo" width="263" height="65">
         </a>
         <button class="header__toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false">
             <span class="header__toggle-icon"></span>
         </button>
         <nav class="header__nav nav" id="main-nav" aria-label="Navegación principal">
             <a href="/" class="nav__link">Home</a>
-            <a href="/biblioteca" class="nav__link">Biblioteca</a>
-            <a href="/blog" class="nav__link">Blog</a>
-            <a href="/blog/category/art-de-cote" class="nav__link">Art de Coté</a>
-            <a href="/blog/tienda" class="nav__link">Tienda</a>
-            <a href="/contacto" class="nav__link">Contacto</a>
+            <a href="/biblioteca/" class="nav__link">Biblioteca</a>
+            <a href="/sobre-mi/" class="nav__link">Sobre Mí</a>
+            <a href="/blog/" class="nav__link" aria-label="Ir a la portada del Blog">Blog</a>
+            <a href="/blog/category/art-de-cote/" class="nav__link">Art de Coté</a>
+            <a href="/blog/tienda/" class="nav__link">Tienda</a>
+            <a href="/contacto/" class="nav__link">Contacto</a>
         </nav>
     </header>
 
@@ -53,7 +54,7 @@ $js_main_v = time();
     <footer class="footer" style="text-align: left; padding-bottom: 6rem;">
         <div class="footer__text">
             <a href="#top" style="color: inherit; text-decoration: underline; font-weight: 600; display: inline-block; margin-bottom: 1rem;">↑ Volver arriba</a><br>
-            &copy; 2026 <strong>merci-boilerplate</strong> — Base de código abierto bajo Licencia MIT.
+            &copy; 2026 <strong>merci-boilerlate</strong> — Base de código abierto bajo Licencia MIT.
         </div>
     </footer>
     <aside class="merci-ui" id="merci-ui" aria-label="Asistente virtual Merci">

@@ -13,9 +13,8 @@ from pathlib import Path
 try:
     from PIL import Image
 except ImportError:
-    print("[Merci Optimizer] Error: La librería Pillow no está instalada.", file=sys.stderr)
-    print("Por favor, ejecuta: pip install -r requirements.txt", file=sys.stderr)
-    sys.exit(1)
+    print("ℹ️ [Merci Info] La librería Pillow no está instalada (pip install Pillow). Omitiendo optimización de imágenes.")
+    sys.exit(0)
 
 # --- Configuración ---
 REPO_ROOT = Path(__file__).resolve().parents[2]

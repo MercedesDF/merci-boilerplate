@@ -22,14 +22,14 @@ from pathlib import Path
 try:
     import markdown
 except ImportError:
-    print("🛡️ [Merci Error] Falta la librería 'markdown'. Ejecuta: pip install markdown")
-    sys.exit(1)
+    print("ℹ️ [Merci Info] Falta la librería 'markdown' (pip install markdown). Omitiendo sincronización Headless.")
+    sys.exit(0)
 
 try:
     from weasyprint import HTML
 except ImportError:
-    print("🛡️ [Merci Error] Falta la librería 'weasyprint'. Ejecuta: pip install weasyprint")
-    sys.exit(1)
+    HTML = None
+    print("ℹ️ [Merci Info] Falta la librería 'weasyprint' (pip install weasyprint). No se generarán PDFs.")
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 ENV_FILE = REPO_ROOT / ".env"
@@ -254,12 +254,13 @@ def publicar_en_wordpress(filepath: str, creds: dict, verbose: bool = False):
     </div>
 </body>
 </html>"""
-                try:
-                    HTML(string=pdf_html_content, base_url=str(REPO_ROOT / "public")).write_pdf(out_pdf_path)
-                    if verbose: print(f"  📄 PDF generado con éxito: public/descargas/{out_pdf_filename}")
-                    pdf_msg = " (+ PDF)"
-                except Exception as e:
-                    print(f"  ❌ Error al generar PDF para {target_path.name}: {e}")
+                if HTML:
+                    try:
+                        HTML(string=pdf_html_content, base_url=str(REPO_ROOT / "public")).write_pdf(out_pdf_path)
+                        if verbose: print(f"  📄 PDF generado con éxito: public/descargas/{out_pdf_filename}")
+                        pdf_msg = " (+ PDF)"
+                    except Exception as e:
+                        print(f"  ❌ Error al generar PDF para {target_path.name}: {e}")
                     
             if not verbose and estado == "publicado":
                 print(f"  ✅ Sincronizado en WP: {target_path.name}{pdf_msg}")

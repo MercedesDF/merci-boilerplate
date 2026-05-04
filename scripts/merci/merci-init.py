@@ -62,6 +62,51 @@ def purge_directory(dir_path: Path, exclude: list = None):
         elif item.is_dir():
             shutil.rmtree(item)
 
+def anonimizar_cv(nuevo_nombre: str, nuevo_dominio: str):
+    """
+    QUÉ HACE: Vacía los datos personales y el JSON-LD de la página sobre-mi.
+    POR QUÉ: Data Leak Prevention (DLP). Transforma el currículum de la autora en una plantilla "Anti-ATS" genérica.
+    """
+    print("  🕵️‍♂️  Anonimizando el CV Semántico (Data Leak Prevention)...")
+    cv_path = REPO_ROOT / "public" / "sobre-mi" / "index.html"
+    if not cv_path.exists():
+        return
+        
+    content = cv_path.read_text(encoding="utf-8")
+    
+    json_ld_template = f'''{{
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "{nuevo_nombre}",
+      "jobTitle": "Tu Rol / Puesto",
+      "url": "https://{nuevo_dominio}/sobre-mi/",
+      "sameAs": [
+        "https://www.linkedin.com/in/tu-perfil/",
+        "https://github.com/tu-usuario"
+      ],
+      "knowsAbout": [
+        "Habilidad 1",
+        "Habilidad 2",
+        "Habilidad 3"
+      ],
+      "description": "Breve descripción profesional para los rastreadores ATS."
+    }}'''
+    
+    # 1. Purgar y reinyectar JSON-LD
+    content = re.sub(r'<script type="application/ld\+json">.*?</script>', f'<script type="application/ld+json">\n    {json_ld_template}\n    </script>', content, flags=re.DOTALL)
+    
+    # 2. Limpiar Meta Descripcion
+    content = re.sub(r'<meta name="description" content="[^"]*">', f'<meta name="description" content="Perfil técnico y currículum semántico de {nuevo_nombre}.">', content)
+    
+    # 3. Anonimizar Hero (Textos)
+    content = re.sub(r'<h1 class="hero__title">.*?</h1>', r'<h1 class="hero__title">Escribe aquí tu<br>declaración de intenciones.</h1>', content, flags=re.DOTALL)
+    content = re.sub(r'<p class="hero__subtitle">.*?</p>', r'<p class="hero__subtitle">Resume aquí tu propuesta de valor, tu enfoque técnico y la madurez que aportas a los proyectos. Sustituye este texto por un resumen de los problemas que resuelves.</p>', content, flags=re.DOTALL)
+    
+    # 4. Anonimizar el stack de ejemplo en el cuerpo
+    content = re.sub(r'<em>DevSecOps, Gobernanza LLM, Python, SSG</em>', r'<em>Stack Tecnológico 1, Habilidad 2, Framework 3</em>', content)
+    
+    cv_path.write_text(content, encoding="utf-8")
+
 def configure_ai_module(include_ai: bool):
     """Configura la Marca Blanca del asistente o ejecuta su amputación quirúrgica."""
     if include_ai:
@@ -148,6 +193,7 @@ def main():
     replace_in_files("mercedev", nuevo_nombre.lower().replace(" ", ""))
     replace_in_files("Mercedes", nuevo_nombre)
     
+    anonimizar_cv(nuevo_nombre, nuevo_dominio)
     configure_ai_module(incluir_ia)
 
     # 2. Purga de datos históricos
@@ -158,6 +204,10 @@ def main():
     purge_directory(REPO_ROOT / "public" / "biblioteca")
     purge_directory(REPO_ROOT / "public" / "descargas")
     purge_directory(REPO_ROOT / "public" / "art-de-cote")
+    
+    # QUÉ HACE: Purga incondicional de la base de conocimientos estática de la IA.
+    # POR QUÉ: DLP (Data Leak Prevention). Garantiza que la IA nazca con amnesia, sin arrastrar las respuestas cacheadas de la autora.
+    (REPO_ROOT / "public" / "js" / "brain_data.json").unlink(missing_ok=True)
     
     # QUÉ HACE: Reconstruye las carpetas estructurales (Matriz y Laboratorio).
     # POR QUÉ: Recrearlas vacías garantiza que no haya fugas de datos (borradores antiguos)

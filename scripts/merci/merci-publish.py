@@ -15,14 +15,14 @@ from pathlib import Path
 try:
     import markdown
 except ImportError:
-    print("🛡️ [Merci Error] Falta la librería 'markdown'. Ejecuta: pip install markdown")
-    sys.exit(1)
+    print("ℹ️ [Merci Info] Falta la librería 'markdown' (pip install markdown). Omitiendo compilación SSG estática.")
+    sys.exit(0)
 
 try:
     from weasyprint import HTML
 except ImportError:
-    print("🛡️ [Merci Error] Falta la librería 'weasyprint'. Ejecuta: pip install weasyprint")
-    sys.exit(1)
+    HTML = None
+    print("ℹ️ [Merci Info] Falta la librería 'weasyprint' (pip install weasyprint). No se generarán PDFs.")
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 BIBLIOTECA_DIR = REPO_ROOT / "biblioteca"
@@ -115,7 +115,7 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
         print(f"  ❌ Error: Falta el atributo 'alt_portada' obligatorio en {filepath.name}")
         return False
     
-    canonical_url = f"https://merci-boilerplate.es/biblioteca/{out_filename}"
+    canonical_url = f"https://merci-boilerlate.es/biblioteca/{out_filename}"
 
     # QUÉ HACE: Pre-procesador de multimedia. Busca sintaxis de imagen que apunte a un vídeo.
     # POR QUÉ: Markdown nativo no soporta la etiqueta <video>. Usamos expresiones regulares para transformar 
@@ -163,7 +163,7 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
     <div class="portada">
         <h1>{titulo}</h1>
         <p>{tipo.capitalize()} | Vol. {meta.get('volumen', 1)}</p>
-        <p><strong>merci-boilerplate.es</strong> — {meta.get('fecha', '')}</p>
+        <p><strong>merci-boilerlate.es</strong> — {meta.get('fecha', '')}</p>
     </div>
     <div class="contenido">
         {html_content}
@@ -175,12 +175,13 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
     # POR QUÉ: Sin el base_url, WeasyPrint no puede resolver rutas absolutas como /assets/images/... 
     # y las imágenes del Markdown aparecerían rotas o invisibles en el PDF descargable.
     # CONTROL DE ERRORES: WeasyPrint es propenso a fallar si las imágenes anidadas están corruptas.
-    try:
-        HTML(string=pdf_html_content, base_url=str(REPO_ROOT / "public")).write_pdf(out_pdf_path)
-    except Exception as e:
-        print(f"  ❌ Error crítico al generar PDF para {filepath.name}. Comprueba las imágenes: {e}")
-        # Continuamos con el proceso aunque falle el PDF para no dejar a la web sin HTML
-        pass
+    if HTML:
+        try:
+            HTML(string=pdf_html_content, base_url=str(REPO_ROOT / "public")).write_pdf(out_pdf_path)
+        except Exception as e:
+            print(f"  ❌ Error crítico al generar PDF para {filepath.name}. Comprueba las imágenes: {e}")
+            # Continuamos con el proceso aunque falle el PDF para no dejar a la web sin HTML
+            pass
 
     # 5. Generar el HTML final inyectando las clases BEM estructurales
     # QUÉ HACE: Asigna la clase CSS BEM dinámicamente basándose en el atributo 'tipo'.
@@ -192,7 +193,7 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{titulo} — merci-boilerplate.es</title>
+    <title>{titulo} — merci-boilerlate.es</title>
     <meta name="description" content="{descripcion}">
     <link rel="canonical" href="{canonical_url}">
     <link rel="stylesheet" href="/css/main.css?v={css_v}">
@@ -324,9 +325,9 @@ def generar_indice_biblioteca(publicaciones, header_html, footer_html, css_v: in
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Biblioteca — merci-boilerplate.es</title>
+    <title>Biblioteca — merci-boilerlate.es</title>
     <meta name="description" content="Índice de publicaciones técnicas y proyectos de la Biblioteca.">
-    <link rel="canonical" href="https://merci-boilerplate.es/biblioteca/">
+    <link rel="canonical" href="https://merci-boilerlate.es/biblioteca/">
     <link rel="stylesheet" href="/css/main.css?v={css_v}">
     <script src="/js/MerciController.js?v={js_c_v}" defer></script>
     <script src="/js/main.js?v={js_m_v}" defer></script>
@@ -334,9 +335,9 @@ def generar_indice_biblioteca(publicaciones, header_html, footer_html, css_v: in
     {{
       "@context": "https://schema.org",
       "@type": "CollectionPage",
-      "name": "La Biblioteca - merci-boilerplate.es",
+      "name": "La Biblioteca - merci-boilerlate.es",
       "description": "Índice de publicaciones técnicas y proyectos de la Biblioteca.",
-      "url": "https://merci-boilerplate.es/biblioteca/"
+      "url": "https://merci-boilerlate.es/biblioteca/"
     }}
     </script>
 </head>
