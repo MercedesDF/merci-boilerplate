@@ -18,6 +18,9 @@ Este documento define las reglas de arquitectura e interacción de esta plantill
 4. **Copias de Seguridad (Disaster Recovery):** Utilizar `python3 scripts/merci/merci-backup.py` antes de cualquier operación destructiva o reescritura de historial.
 5. **Convención de Commits:** Utilizar prefijos semánticos (`feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `perf:`).
 6. **Aislamiento de WordPress:** El CMS nunca debe escribir ni modificar archivos en el directorio `/public`. Su comunicación con el frontend es unidireccional y controlada por Nginx.
+7. **Filosofía de Dependencias:**
+   - **Runtime (Navegador):** 0 dependencias externas. Prohibido inyectar librerías JS o CSS externas.
+   - **Build-time (Pipeline):** Se permiten librerías Python para automatización, auditoría y compilación. Estas deben gestionarse siempre dentro de un entorno virtual (`.venv`) y estar declaradas en `requirements.txt`.
 7. **Higiene de Importaciones (PEP 8):** Todas las importaciones en scripts Python deben declararse estrictamente al principio del archivo. Queda terminantemente prohibido realizar importaciones en medio del código.
 
 ## 4. Flujo Maestro de Publicación (SOP Dual)

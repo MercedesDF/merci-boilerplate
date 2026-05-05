@@ -79,7 +79,31 @@
                 <!-- VISTA DE LECTURA (Artículo individual) -->
                 <?php while ( have_posts() ) : the_post(); ?>
                     <article class="card card--booklet">
-                        <a href="javascript:history.back()" class="card__back-link">← Volver</a>
+                        <?php 
+                        $back_link = '/blog/';
+                        $is_art_de_cote = false;
+                        
+                        // 1. ¿Está asignado directamente?
+                        if ( has_category('art-de-cote') ) {
+                            $is_art_de_cote = true;
+                        } else {
+                            // 2. ¿Pertenece a alguna subcategoría (hija) de Art de Coté?
+                            $art_term = get_category_by_slug('art-de-cote');
+                            if ( $art_term ) {
+                                foreach ( get_the_category() as $cat ) {
+                                    if ( cat_is_ancestor_of( $art_term, $cat ) ) {
+                                        $is_art_de_cote = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        
+                        if ( $is_art_de_cote ) {
+                            $back_link = '/blog/category/art-de-cote/';
+                        }
+                        ?>
+                        <a href="<?php echo esc_url($back_link); ?>" class="card__back-link">← Volver</a>
                         <header>
                             <?php if ( ! $header_title ) : ?>
                                 <h1 class="home-card__title--highlight"><?php the_title(); ?></h1>

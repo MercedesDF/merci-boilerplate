@@ -1,9 +1,13 @@
-# Merci Boilerplate v1.6.0
+# Merci Boilerplate v1.6.1
 
 Un entorno web híbrido, minimalista y seguro desde el diseño (Shift-Left). 
 Combina un núcleo estático ultrarrápido (HTML5, SASS, Vanilla JS y BEM (Block, Element, Modifier - Modificador de Elemento de Bloque)) con un motor dinámico aislado (WordPress). Diseñado para alcanzar un rendimiento perfecto (Core Web Vitals 100/100) y operar con 0 dependencias externas en el frontend.
 
 > 📖 **Historia y Arquitectura:** La justificación de las decisiones DevSecOps, el aislamiento del CMS y los manuales operativos se encuentran en la carpeta `/docs`.
+
+## 🚀 Novedades en la v1.6.1 (Hotfix Accesibilidad y UX Dinámica)
+- **Accesibilidad Quirúrgica (Scoped CSS):** Resolución de conflictos de contraste WCAG AA aplicando variables SASS dinámicas (`$color-regular`) con alcance limitado (`p a, li a`), logrando el 100/100 en herramientas automatizadas sin romper el diseño global.
+- **Robustez de Enrutamiento Dinámico:** Los enlaces de retroceso en las vistas individuales del CMS ya no dependen del frágil historial del navegador (JS). Ahora infieren estructuralmente la jerarquía de subcategorías mediante PHP, anclando al usuario en su contexto de navegación de forma infalible.
 
 ## 🚀 Novedades en la v1.6.0 (Autoridad Técnica y Zero Maintenance)
 
@@ -70,8 +74,13 @@ cd TU_REPOSITORIO
 # 2. Ejecuta la instanciación (¡Destructivo para la plantilla base!)
 python3 scripts/merci/merci-init.py
 
-# 3. Audita el código resultante
-python3 scripts/merci/merci-audit.py
+# 3. Aprovisiona el entorno de construcción (Build-time)
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+
+# 4. Ejecuta el pipeline completo
+merci total
 ```
 
 ## 📋 Requisitos del Sistema

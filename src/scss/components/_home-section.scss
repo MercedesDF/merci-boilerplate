@@ -1,0 +1,12 @@
+@use '../abstracts' as *;
+
+/* QUÉ HACE: Centraliza los estilos unificados de las secciones de la portada. */
+/* POR QUÉ: Separa las responsabilidades (Separation of Concerns) del componente hero, manteniendo un SASS modular y limpio. */
+.home-section {
+    padding: $spacing-lg;
+
+    &__title {
+        text-align: center;
+        margin-bottom: $spacing-lg;
+    }
+}

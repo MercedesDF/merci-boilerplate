@@ -256,9 +256,11 @@ def generar_indice_biblioteca(publicaciones, header_html, footer_html, css_v: in
     # Agrupar publicaciones por tema (Estanterías)
     estanterias = {}
     for pub in publicaciones:
-        tema = pub["tema"]
+        tema_original = pub["tema"]
+        tema = tema_original.casefold()  # normalización robusta: evita que una may. convierta el tema en dos diferentes.
         if tema not in estanterias:
             estanterias[tema] = []
+
         estanterias[tema].append(pub)
         
     secciones_html = ""

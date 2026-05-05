@@ -32,6 +32,15 @@ p {
     margin-bottom: $spacing-md;
 }
 
+// Enlaces en línea: Texto regular exige mayor contraste WCAG AA (>4.5:1)
+p, li {
+    a {
+        color: $color-regular;
+        text-decoration: underline;
+        text-underline-offset: 4px;
+    }
+}
+
 a {
     color: $color-primary;
     text-decoration: none;
