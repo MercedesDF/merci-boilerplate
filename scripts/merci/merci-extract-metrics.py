@@ -13,9 +13,9 @@ from pathlib import Path
 try:
     from pypdf import PdfReader
 except ImportError:
-    print("ℹ️ [Merci Info] Falta la librería 'pypdf'. Instálala con el comando:")
-    print("   pip install pypdf")
-    sys.exit(1)
+    print("ℹ️ [Merci Info] Falta la librería 'pypdf'. Omitiendo extracción de métricas automáticas.")
+    print("   💡 Para activarla, ejecuta: pip install pypdf")
+    sys.exit(0)
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
