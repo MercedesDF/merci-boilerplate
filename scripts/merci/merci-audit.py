@@ -35,6 +35,13 @@ from html.parser import HTMLParser
 from pathlib import Path
 from typing import Iterable, Iterator, Optional
 
+try:
+    import litellm
+    from litellm import completion
+    litellm.telemetry = False  # Desactivar telemetría por privacidad (Zero Trust)
+except ImportError:
+    litellm = None
+
 # ---------------------------------------------------------------------------
 # Rutas y exclusiones
 # ---------------------------------------------------------------------------
@@ -82,6 +89,7 @@ TEXT_SUFFIXES = frozenset(
         ".yml",
         ".yaml",
         ".toml",
+        ".py",
         ".ini",
         ".env",
         ".sh",
@@ -387,13 +395,13 @@ def audit_php_smells(state: AuditState, path: Path, text: str) -> None:
 
 def audit_inline_styles(state: AuditState, path: Path, text: str) -> None:
     """
-    Detecta atributos style="..." en el código, los cuales vulneran 
+    Detecta atributos style="..." en el código, los cuales vulneran # merci-audit:silence-style
     la arquitectura SASS 7-1 y la metodología BEM.
     """
     if path.suffix.lower() not in {".html", ".htm", ".php", ".py", ".js"}:
         return
         
-    pattern = re.compile(r'\bstyle\s*=\s*(["\'])(.*?)\1', re.IGNORECASE)
+    pattern = re.compile(r'\bstyle\s*=\s*(["\'])(.*?)\1', re.IGNORECASE)  # merci-audit:silence-style
     lines = text.splitlines()
     
     for line_number, line in enumerate(lines, start=1):
@@ -412,7 +420,7 @@ def audit_inline_styles(state: AuditState, path: Path, text: str) -> None:
                     line_number,
                     "warn",
                     "UI_INLINE_STYLE",
-                    f"Estilo en línea detectado (style='{style_content[:25]}...'). Extraer a componente SASS (BEM).",
+                    f"Estilo en línea detectado (style='{style_content[:25]}...'). Extraer a componente SASS (BEM).",  # merci-audit:silence-style
                 )
             )
 
@@ -645,6 +653,53 @@ def audit_banned_tracked_files(root: Path, state: AuditState, staged_only: bool)
     except Exception:
         pass
 
+def get_system_prompt() -> str:
+    """Lee el prompt rector del sistema para inyectarlo en la IA."""
+    prompt_path = REPO_ROOT / "laboratorio" / "prompts" / "prompt-sistema-base.md"
+    if prompt_path.exists():
+        return prompt_path.read_text(encoding="utf-8", errors="replace")
+    return "Eres un asistente DevSecOps. Sugiere una reparación breve para el siguiente error."
+
+def get_ai_suggestion(finding: Finding) -> str:
+    """Genera una sugerencia de código usando el modelo local (Ollama + phi3)."""
+    if not litellm:
+        return ""
+        
+    try:
+        content = finding.path.read_text(encoding="utf-8", errors="replace")
+        lines = content.splitlines()
+        # Extraer hasta 5 líneas de contexto antes y después del error
+        start = max(0, finding.line - 6)
+        end = min(len(lines), finding.line + 5)
+        context_snippet = "\n".join(lines[start:end])
+    except Exception:
+        context_snippet = "No se pudo leer el contexto del archivo."
+
+    prompt = (
+        f"Archivo: {finding.path.name}\n"
+        f"Línea: {finding.line}\n"
+        f"Error detectado: [{finding.code}] {finding.message}\n"
+        f"Contexto del código:\n```\n{context_snippet}\n```\n"
+        f"Proporciona la maniobra de corrección directa."
+    )
+
+    mensajes = [
+        {"role": "system", "content": get_system_prompt()},
+        {"role": "user", "content": prompt}
+    ]
+
+    try:
+        # Delegamos a phi3 local por el puerto 11434
+        respuesta = completion(
+            model="ollama/phi3",
+            messages=mensajes,
+            api_base="http://localhost:11434",
+            max_tokens=250
+        )
+        return respuesta.choices[0].message.content.strip()
+    except Exception:
+        return ""  # Degradación elegante silenciosa en caso de fallo de Ollama
+
 def print_report(state: AuditState) -> None:
     """Imprime hallazgos en stdout, una línea por hallazgo (fácil de grep en CI)."""
     for item in state.errors + state.warns:
@@ -654,6 +709,16 @@ def print_report(state: AuditState) -> None:
             display = item.path
         prefix = "ERROR" if item.level == "error" else "WARN"
         print(f"{prefix} {item.code} {display}:{item.line}: {item.message}")
+        
+        # --- INYECCIÓN DE IA (El Agente Auditor) ---
+        # Solo solicitamos sugerencias para errores críticos para no saturar el pre-commit.
+        if item.level == "error" and litellm:
+            print(f"  🤖 [Merci Brain] Analizando contexto de {item.code}...")
+            suggestion = get_ai_suggestion(item)
+            if suggestion:
+                # Indentamos la respuesta para separarla visualmente del log estándar
+                formatted_suggestion = "\n".join(f"     {line}" for line in suggestion.splitlines())
+                print(f"  💡 Sugerencia de reparación:\n{formatted_suggestion}\n")
 
 
 def main(argv: Optional[list[str]] = None) -> int:

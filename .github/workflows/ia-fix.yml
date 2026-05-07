@@ -1,0 +1,38 @@
+name: IA-Fix Workflow (Auto-Healing)
+
+on:
+  # QUÉ HACE: Permite disparar la IA de auto-reparación manualmente desde la interfaz de GitHub.
+  # POR QUÉ: Evitamos bucles infinitos no deseados en caso de que la IA cometa un error y vuelva a fallar el pre-commit.
+  workflow_dispatch:
+
+jobs:
+  auto-repair:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar Repositorio
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configurar Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Instalar Dependencias del Cerebro
+        run: |
+          python -m pip install --upgrade pip
+          pip install litellm google-generativeai
+
+      - name: Ejecutar Agente de Auto-Reparación (Merci Brain Cloud)
+        env:
+          # Inyección del secreto almacenado en GitHub Secrets
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python scripts/merci/merci-auto-fix.py
+
+      - name: Commit y Push del Parche Autónomo
+        run: |
+          git config --global user.name "Merci Auto-Fix [Bot]"
+          git config --global user.email "bot@mercedev.es"
+          git add .
+          git diff --quiet && git diff --staged --quiet || (git commit -m "fix: auto-reparación aplicada por Merci Brain 🤖" && git push)

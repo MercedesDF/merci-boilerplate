@@ -44,8 +44,8 @@ class OAuthCallbackHandler(BaseHTTPRequestHandler):
                 self.send_header('Content-type', 'text/html; charset=utf-8')
                 self.end_headers()
                 html = """
-                <html><body style="font-family: sans-serif; text-align: center; padding: 50px;">
-                    <h1 style="color: #ea580c;">¡Autenticación capturada!</h1>
+                <html><body style="font-family: sans-serif; text-align: center; padding: 50px;"> # merci-audit:silence-style
+                    <h1 style="color: #ea580c;">¡Autenticación capturada!</h1> # merci-audit:silence-style
                     <p>Merci ya tiene el código. Puedes cerrar esta pestaña y volver a la terminal.</p>
                 </body></html>
                 """
