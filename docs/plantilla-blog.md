@@ -2,12 +2,13 @@
 titulo: "Título de la entrada del Blog"
 estado: "borrador"
 tema: "Blog"
+fase: ""
 ---
 
 <!-- linkedin:
 Escribe aquí tu anuncio para LinkedIn.
 Acepta saltos de línea sin problemas.
-https://merci-boilerplate.es/blog/tu-url
+https://miproyecto.com/blog/tu-url
 -->
 
 Escribe aquí el contenido de tu artículo. 

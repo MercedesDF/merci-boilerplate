@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <!-- QUÉ HACE: Meta descripción enfocada a reclutadores técnicos e indexación. -->
-    <meta name="description" content="Perfil técnico y currículum semántico de merci-boilerplate.">
+    <meta name="description" content="Perfil técnico y currículum semántico de Mi Proyecto.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sobre Mí / CV — merci-boilerplate.es</title>
+    <title>Sobre Mí / CV — miproyecto.com</title>
     
     <link rel="icon" href="/favicon.ico?v=3" type="image/x-icon">
-    <link rel="stylesheet" href="/css/main.css?v=13">
-    <script src="/js/MerciController.js?v=13" defer></script>
-    <script src="/js/main.js?v=13" defer></script>
-    <link rel="canonical" href="https://merci-boilerplate.es/sobre-mi/">
+    <link rel="stylesheet" href="/css/main.css?v=14">
+    <script src="/js/MerciController.js?v=14" defer></script>
+    <script src="/js/main.js?v=14" defer></script>
+    <link rel="canonical" href="https://miproyecto.com/sobre-mi/">
 
     <!-- QUÉ HACE: El núcleo del "CV Anti-ATS". Datos estructurados listos para ser consumidos por IAs y rastreadores corporativos. -->
     <!-- POR QUÉ: Los ATS leen código, no diseño. Entregarles un JSON-LD estándar elimina los errores de parseo de los PDFs. -->
@@ -19,9 +19,9 @@
     {
       "@context": "https://schema.org",
       "@type": "Person",
-      "name": "merci-boilerplate",
+      "name": "Mi Proyecto",
       "jobTitle": "Tu Rol / Puesto",
-      "url": "https://mercedev.es/sobre-mi/",
+      "url": "https://miproyecto.com/sobre-mi/",
       "sameAs": [
         "https://www.linkedin.com/in/tu-perfil/",
         "https://github.com/tu-usuario"
@@ -42,7 +42,7 @@
     <!-- El header y footer serán gestionados automáticamente por merci-sync-pages.py en la próxima compilación -->
     <header class="header">
         <a href="/" class="header__brand">
-            <img src="/assets/images/logo.webp?v=2" alt="merci-boilerplate" class="header__logo" width="263" height="65">
+            <img src="/assets/images/logo.webp?v=2" alt="miproyecto" class="header__logo" width="263" height="65">
         </a>
         <button class="header__toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false">
             <span class="header__toggle-icon"></span>
@@ -56,39 +56,157 @@
             <!-- QUÉ HACE: Diferencia este enlace del autogenerado por WordPress en las tarjetas. -->
             <!-- POR QUÉ: Evita el error WAI-ARIA de "Enlaces idénticos con distinto destino". -->
             <a href="/blog/" class="nav__link" aria-label="Ir a la portada del Blog">Blog</a>
-            <a href="/blog/category/art-de-cote/" class="nav__link">Art de Coté</a>
+            <a href="/art-de-cote/" class="nav__link">Art de Coté</a>
             <a href="/blog/tienda/" class="nav__link">Tienda</a>
             <a href="/contacto/" class="nav__link">Contacto</a>
         </nav>
     </header>
 
     <main class="main" id="main">
+
+    <!-- ===================== -->
+    <!-- HERO (REPOSICIONADO) -->
+    <!-- ===================== -->
         <section class="hero">
             <h1 class="hero__title">Escribe aquí tu<br>declaración de intenciones.</h1>
+
+            <h2 class="hero__statement">
+                Gobernar la incertidumbre mediante ingeniería técnica aplicada a sistemas web ligeros, auditables y mantenibles
+            </h2>
+
             <p class="hero__subtitle">Resume aquí tu propuesta de valor, tu enfoque técnico y la madurez que aportas a los proyectos. Sustituye este texto por un resumen de los problemas que resuelves.</p>
+
+            <!-- Micro-prueba rápida -->
+            <ul class="hero__highlights">
+                <li>Automatización en Python (CLI)</li>
+                <li>Optimización Core Web Vitals</li>
+                <li>Arquitectura sin dependencias innecesarias</li>
+            </ul>
+
+            <!-- CTA directo -->
+            <div class="hero__cta">
+                <a href="https://miproyecto.com">Ver proyecto</a>
+                <a href="https://github.com/Mi ProyectoDF/PROYECTO_miproyecto.com">Repositorio</a>
+                <a href="/contacto/">Contactar</a>
+            </div>
         </section>
 
+        <!-- ===================== -->
+        <!-- VALOR -->
+        <!-- ===================== -->
         <section class="section home-section">
-            <h2 class="home-section__title">El CV "Anti-ATS" (Semantic Profile)</h2>
+            <h2 class="home-section__title">Qué aporto</h2>
+
             <div class="card">
                 <div class="card__content">
-                    <p>Como Arquitecta de Sistemas de IA y líder DevSecOps, mi misión es construir puentes entre la estrategia de negocio y la ejecución técnica impecable. Traduzco complejos requisitos de producto en infraestructuras resilientes, seguras y de rendimiento extremo.</p>
-                    <p>Mi trabajo no se cuenta, se demuestra. Este sitio web es en sí mismo la principal evidencia de mi filosofía: cada línea de código, cada decisión de arquitectura y cada script de automatización que lo impulsa está documentado y es auditable públicamente en la <a href="/biblioteca/">Biblioteca</a>.</p>
-                    <p>Incluso esta página está diseñada con un propósito dual. Para los rastreadores automáticos (ATS), ofrezco mi perfil en su idioma nativo (JSON-LD en la cabecera) para una precisión del 100%. Para ti, el lector humano, ofrezco la historia completa detrás del código.</p>
+                    <ul>
+                        <li>Reducción de errores mediante automatización</li>
+                        <li>Control técnico del sistema (menos dependencia externa)</li>
+                        <li>Optimización real de rendimiento web</li>
+                        <li>Documentación clara para mantenimiento y escalabilidad</li>
+                    </ul>
                 </div>
             </div>
         </section>
+
+        <!-- ===================== -->
+        <!-- EVIDENCIA -->
+        <!-- ===================== -->
+        <section class="section home-section">
+            <h2 class="home-section__title">Evidencia técnica</h2>
+
+            <div class="card">
+                <div class="card__content">
+                    <p>
+                        Optimización de rendimiento basada en métricas reales: Core Web Vitals con puntuaciones altas en PageSpeed Insights y tiempo de bloqueo total (TBT) mínimo en entorno controlado.
+                    </p>
+
+                    <ul>
+                        <li>Auditoría de seguridad (Shift-Left / SAST)</li>
+                        <li>Generación estática (SSG)</li>
+                        <li>Automatización de despliegues</li>
+                    </ul>
+
+                    <p>
+                        <a href="https://miproyecto.com">Ver proyecto en producción</a> ·
+                        <a href="https://github.com/Mi ProyectoDF/PROYECTO_miproyecto.com">Ver código</a>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================== -->
+        <!-- SISTEMA (MERCI) -->
+        <!-- ===================== -->
+        <section class="section home-section">
+            <h2 class="home-section__title">Sistema de trabajo</h2>
+
+            <div class="card">
+                <div class="card__content">
+                    <p>
+                        Desarrollo y evolución de <strong>Merci</strong>, un entorno propio de automatización basado en herramientas CLI en Python.
+                    </p>
+
+                    <p>
+                        Este sistema permite estandarizar procesos, reducir tareas manuales y mantener trazabilidad técnica desde fases tempranas del desarrollo.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================== -->
+        <!-- PERFIL (TU TEXTO REFINADO) -->
+        <!-- ===================== -->
+        <section class="section home-section">
+            <h2 class="home-section__title">Perfil técnico</h2>
+
+            <div class="card">
+                <div class="card__content">
+                    <p>
+                        Como <strong>Ingeniera Técnica Forestal</strong>, mi enfoque se basa en los cimientos: entender el sistema, reducir complejidad y minimizar errores.
+                    </p>
+
+                    <p>
+                        Tras más de 20 años en entornos industriales, aplico esa misma disciplina al desarrollo web mediante arquitecturas ligeras, especificación técnica clara (<em>spec-driven</em>) y automatización en Python.
+                    </p>
+
+                    <p>
+                        Mi trabajo no se cuenta, se demuestra. Este sitio web es evidencia directa: cada decisión, cada script y cada flujo están documentados en la <a href="/biblioteca/">Biblioteca</a>.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================== -->
+        <!-- MODALIDAD -->
+        <!-- ===================== -->
+        <section class="section home-section">
+            <h2 class="home-section__title">Modalidad de trabajo</h2>
+
+            <div class="card">
+                <div class="card__content">
+                    <p>
+                        Trabajo en remoto con alta flexibilidad, colaborando en proyectos por horas, mantenimiento técnico y optimización de sistemas existentes.
+                    </p>
+
+                    <p>
+                        Disponibilidad limitada, enfocada a entregables concretos y calidad técnica.
+                    </p>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <footer class="footer">
         <div class="footer__links">
             <a href="https://www.linkedin.com/in/mercedesdf-ingenieria/" target="_blank" rel="noopener noreferrer" class="footer__link">LinkedIn</a>
-            <a href="https://github.com/merci-boilerplateDF" target="_blank" rel="noopener noreferrer" class="footer__link">GitHub</a>
-            <a href="https://github.com/merci-boilerplateDF/merci-boilerplate" target="_blank" rel="noopener noreferrer" class="footer__link">Merci Boilerplate</a>
+            <a href="https://github.com/Mi ProyectoDF" target="_blank" rel="noopener noreferrer" class="footer__link">GitHub</a>
+            <a href="https://github.com/Mi ProyectoDF/merci-boilerplate" target="_blank" rel="noopener noreferrer" class="footer__link">Merci Boilerplate</a>
         </div>
         <div class="footer__text">
             <a href="#top">↑ Volver arriba</a><br>
-            &copy; 2026 <strong>merci-boilerplate</strong> — Base de código abierto bajo Licencia MIT.
+            &copy; 2026 <strong>miproyecto</strong> — Base de código abierto bajo Licencia MIT.
         </div>
     </footer>
 

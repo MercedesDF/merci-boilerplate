@@ -26,7 +26,9 @@ except ImportError:
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 BIBLIOTECA_DIR = REPO_ROOT / "biblioteca"
+ART_DE_COTE_DIR = REPO_ROOT / "art-de-cote"
 PUBLIC_BIBLIOTECA = REPO_ROOT / "public" / "biblioteca"
+PUBLIC_ART_DE_COTE = REPO_ROOT / "public" / "art-de-cote"
 PUBLIC_DESCARGAS = REPO_ROOT / "public" / "descargas"
 
 def slugify(texto: str) -> str:
@@ -50,7 +52,7 @@ def limpiar_directorio_salida():
     si un documento Markdown origen es renombrado o eliminado de la biblioteca.
     """
     print("🧹 [Merci Publish] Limpiando compilaciones anteriores (Clean Build)...")
-    for directorio in [PUBLIC_BIBLIOTECA, PUBLIC_DESCARGAS]:
+    for directorio in [PUBLIC_BIBLIOTECA, PUBLIC_ART_DE_COTE, PUBLIC_DESCARGAS]:
         if not directorio.exists():
             continue
         for item in directorio.iterdir():
@@ -64,7 +66,7 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
     content = filepath.read_text(encoding="utf-8")
     
     # 1. Extraer YAML Frontmatter y Cuerpo del Markdown
-    match = re.match(r"^---\n(.*?)\n---\n(.*)", content, re.DOTALL)
+    match = re.search(r"^\s*---\s*\n(.*?)\n---\s*(?:\n|$)(.*)", content, flags=re.DOTALL | re.MULTILINE)
     if not match:
         print(f"  ❌ Error: No se encontró YAML Frontmatter válido en {filepath.name}")
         return False
@@ -84,12 +86,19 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
     tema = meta.get("tema", "Estantería General")
     estado = meta.get("estado", "borrador").lower()
     alt_portada = meta.get("alt_portada", "")
+    fase = meta.get("fase", "")
     
     # QUÉ HACE: Genera los nombres de salida basándose en el título del YAML, no en el archivo.
     # POR QUÉ: Desacopla el sistema de archivos del routing web (Auto-nombrado).
     out_filename = slugify(titulo) + ".html"
     out_pdf_filename = slugify(titulo) + ".pdf"
-    html_target = PUBLIC_BIBLIOTECA / out_filename
+    
+    is_art = "art-de-cote" in filepath.parts
+    out_base_dir = PUBLIC_ART_DE_COTE if is_art else PUBLIC_BIBLIOTECA
+    base_url_path = "/art-de-cote/" if is_art else "/biblioteca/"
+    back_text = "← Volver a Art de Coté" if is_art else "← Volver a la Biblioteca"
+    
+    html_target = out_base_dir / out_filename
     pdf_target = PUBLIC_DESCARGAS / out_pdf_filename
 
     # [REGLA DE NEGOCIO]: Máquina de estados (Kill-Switch). Aisla o destruye borradores en producción.
@@ -101,7 +110,9 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
             
         # QUÉ HACE: Expulsa físicamente el archivo origen hacia el entorno de incubación.
         # POR QUÉ: Principio de segregación de entornos. La biblioteca no admite borradores.
-        destino_laboratorio = REPO_ROOT / "laboratorio" / filepath.name
+        rel_path = filepath.relative_to(REPO_ROOT)
+        destino_laboratorio = REPO_ROOT / "laboratorio" / rel_path
+        destino_laboratorio.parent.mkdir(parents=True, exist_ok=True)
         print(f"  🔙 Expulsando (Estado: {estado}): Moviendo '{filepath.name}' de vuelta al laboratorio.")
         try:
             shutil.move(str(filepath), str(destino_laboratorio))
@@ -115,7 +126,7 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
         print(f"  ❌ Error: Falta el atributo 'alt_portada' obligatorio en {filepath.name}")
         return False
     
-    canonical_url = f"https://merci-boilerplate.es/biblioteca/{out_filename}"
+    canonical_url = f"https://miproyecto.com{base_url_path}{out_filename}"
 
     # QUÉ HACE: Pre-procesador de multimedia. Busca sintaxis de imagen que apunte a un vídeo.
     # POR QUÉ: Markdown nativo no soporta la etiqueta <video>. Usamos expresiones regulares para transformar 
@@ -140,6 +151,8 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
     out_pdf_path = PUBLIC_DESCARGAS / out_pdf_filename
     PUBLIC_DESCARGAS.mkdir(parents=True, exist_ok=True)
     
+    fase_pdf_text = f" | Fase {fase}" if fase else ""
+    
     pdf_html_content = f"""<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -163,7 +176,7 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
     <div class="portada">
         <h1>{titulo}</h1>
         <p>{tipo.capitalize()} | Vol. {meta.get('volumen', 1)}</p>
-        <p><strong>merci-boilerplate.es</strong> — {meta.get('fecha', '')}</p>
+        <p><strong>miproyecto.com</strong> — {meta.get('fecha', '')}{fase_pdf_text}</p>
     </div>
     <div class="contenido">
         {html_content}
@@ -193,7 +206,7 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{titulo} — merci-boilerplate.es</title>
+    <title>{titulo} — miproyecto.com</title>
     <meta name="description" content="{descripcion}">
     <link rel="canonical" href="{canonical_url}">
     <link rel="stylesheet" href="/css/main.css?v={css_v}">
@@ -214,7 +227,7 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
     {header_html}
     <main class="main--padded section" id="main">
         <article class="card {clase_css}">
-            <a href="/biblioteca/" class="card__back-link">← Volver a la Biblioteca</a>
+            <a href="{base_url_path}" class="card__back-link">{back_text}</a>
             <header>
                 <h1 class="home-card__title--highlight">{titulo}</h1>
                 <a href="/descargas/{out_pdf_filename}" class="card__download" download>📄 Descargar Edición PDF</a>
@@ -229,13 +242,13 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
 </html>"""
 
     # 5. Escribir el documento final en el núcleo estático
-    out_path = PUBLIC_BIBLIOTECA / out_filename
-    PUBLIC_BIBLIOTECA.mkdir(parents=True, exist_ok=True)
+    out_path = out_base_dir / out_filename
+    out_base_dir.mkdir(parents=True, exist_ok=True)
     
     # CONTROL DE ERRORES: Escritura final en disco (riesgo de permisos I/O)
     try:
         out_path.write_text(html_final, encoding="utf-8")
-        print(f"  ✅ Publicado con éxito: public/biblioteca/{out_filename}")
+        print(f"  ✅ Publicado con éxito: public{base_url_path}{out_filename}")
     except IOError as e:
         print(f"  ❌ Error de permisos al guardar el HTML {out_filename}: {e}")
         return False
@@ -244,14 +257,15 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
     return {
         "titulo": titulo,
         "descripcion": descripcion,
-        "url": f"/biblioteca/{out_filename}",
+        "url": f"{base_url_path}{out_filename}",
         "tipo": tipo,
         "fecha": meta.get("fecha", "1970-01-01"),
-        "tema": tema
+        "tema": tema,
+        "fase": fase
     }
 
-def generar_indice_biblioteca(publicaciones, header_html, footer_html, css_v: int, js_c_v: int, js_m_v: int):
-    print("📖 Generando índice temático de la Biblioteca...")
+def generar_indice(publicaciones, out_path, title, meta_desc, hero_subtitle, canonical_url, header_html, footer_html, css_v: int, js_c_v: int, js_m_v: int):
+    print(f"📖 Generando índice temático para {title}...")
     
     # Agrupar publicaciones por tema (Estanterías)
     estanterias = {}
@@ -294,11 +308,12 @@ def generar_indice_biblioteca(publicaciones, header_html, footer_html, css_v: in
             
             clase_css = "card--booklet" if pub["tipo"].lower() == "cuadernillo" else "card--book"
             badge = pub["tipo"].capitalize()
+            fase_badge = f" &middot; Fase {pub['fase']}" if pub.get("fase") else ""
             
             cards_html += f"""
                 <article class="card {clase_css}" id="{pub_slug}">
                     <header>
-                        <span class="card__meta">{pub["fecha"]} — {badge}</span>
+                        <span class="card__meta">{pub["fecha"]} — {badge}{fase_badge}</span>
                         <h2 class="card__title"><a href="{pub["url"]}" aria-label="Leer artículo completo: {pub["titulo"]}">{pub["titulo"]}</a></h2>
                     </header>
                     <div class="card__content">
@@ -327,9 +342,9 @@ def generar_indice_biblioteca(publicaciones, header_html, footer_html, css_v: in
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Biblioteca — merci-boilerplate.es</title>
-    <meta name="description" content="Índice de publicaciones técnicas y proyectos de la Biblioteca.">
-    <link rel="canonical" href="https://merci-boilerplate.es/biblioteca/">
+    <title>{title} — miproyecto.com</title>
+    <meta name="description" content="{meta_desc}">
+    <link rel="canonical" href="{canonical_url}">
     <link rel="stylesheet" href="/css/main.css?v={css_v}">
     <script src="/js/MerciController.js?v={js_c_v}" defer></script>
     <script src="/js/main.js?v={js_m_v}" defer></script>
@@ -337,9 +352,9 @@ def generar_indice_biblioteca(publicaciones, header_html, footer_html, css_v: in
     {{
       "@context": "https://schema.org",
       "@type": "CollectionPage",
-      "name": "La Biblioteca - merci-boilerplate.es",
-      "description": "Índice de publicaciones técnicas y proyectos de la Biblioteca.",
-      "url": "https://merci-boilerplate.es/biblioteca/"
+      "name": "{title} - miproyecto.com",
+      "description": "{meta_desc}",
+      "url": "{canonical_url}"
     }}
     </script>
 </head>
@@ -349,8 +364,8 @@ def generar_indice_biblioteca(publicaciones, header_html, footer_html, css_v: in
     <main class="main" id="main">
         <!-- QUÉ HACE: Sección Hero unificada con el resto del ecosistema -->
         <section class="hero">
-            <h1 class="hero__title">La Biblioteca</h1>
-            <p class="hero__subtitle">Documentación técnica, proyectos DevSecOps y arquitectura de software. El activo de conocimiento central del ecosistema.</p>
+            <h1 class="hero__title">{title}</h1>
+            <p class="hero__subtitle">{hero_subtitle}</p>
         </section>
         
         <!-- QUÉ HACE: Índice Curado (Table of Contents) autogenerado -->
@@ -367,9 +382,8 @@ def generar_indice_biblioteca(publicaciones, header_html, footer_html, css_v: in
 </body>
 </html>"""
 
-    out_path = PUBLIC_BIBLIOTECA / "index.html"
     out_path.write_text(html_final, encoding="utf-8")
-    print("  ✅ Índice generado con éxito: public/biblioteca/index.html")
+    print(f"  ✅ Índice generado con éxito: {out_path.relative_to(REPO_ROOT)}")
 
 def main(): # type: ignore
     print("🚀 [Merci Publish] Iniciando orquestador de publicación...")
@@ -401,17 +415,31 @@ def main(): # type: ignore
     js_controller_version = int(js_controller_path.stat().st_mtime) if js_controller_path.exists() else '11'
     js_main_version = int(js_main_path.stat().st_mtime) if js_main_path.exists() else '11'
 
-    publicaciones_procesadas = []
+    publicaciones_bib = []
+    publicaciones_art = []
 
     # QUÉ HACE: Lee recursivamente todos los archivos .md en la biblioteca y sus subcarpetas.
     # POR QUÉ: Permite al autor organizar los archivos fuente en subdirectorios temáticos 
     # sin alterar la estructura plana de URLs de salida (/biblioteca/archivo.html).
-    for md_file in BIBLIOTECA_DIR.rglob("*.md"):
-        meta = procesar_archivo(md_file, header_html, footer_html, css_version, js_controller_version, js_main_version)
-        if meta:
-            publicaciones_procesadas.append(meta)
-            
-    generar_indice_biblioteca(publicaciones_procesadas, header_html, footer_html, css_version, js_controller_version, js_main_version)
+    if BIBLIOTECA_DIR.exists():
+        for md_file in BIBLIOTECA_DIR.rglob("*.md"):
+            meta = procesar_archivo(md_file, header_html, footer_html, css_version, js_controller_version, js_main_version)
+            if meta:
+                publicaciones_bib.append(meta)
+                
+    if ART_DE_COTE_DIR.exists():
+        for md_file in ART_DE_COTE_DIR.rglob("*.md"):
+            meta = procesar_archivo(md_file, header_html, footer_html, css_version, js_controller_version, js_main_version)
+            if meta:
+                publicaciones_art.append(meta)
+                
+    if publicaciones_bib:
+        PUBLIC_BIBLIOTECA.mkdir(parents=True, exist_ok=True)
+        generar_indice(publicaciones_bib, PUBLIC_BIBLIOTECA / "index.html", "La Biblioteca", "Índice de publicaciones técnicas y proyectos de la Biblioteca.", "Documentación técnica, proyectos DevSecOps y arquitectura de software. El activo de conocimiento central del ecosistema.", "https://miproyecto.com/biblioteca/", header_html, footer_html, css_version, js_controller_version, js_main_version)
+        
+    if publicaciones_art:
+        PUBLIC_ART_DE_COTE.mkdir(parents=True, exist_ok=True)
+        generar_indice(publicaciones_art, PUBLIC_ART_DE_COTE / "index.html", "Art de Coté", "Índice de scripts experimentales, andamiajes y código colateral.", "Scripts, flujos de automatización y código experimental preservado bajo la filosofía Zero Waste (Cero Desperdicio).", "https://miproyecto.com/art-de-cote/", header_html, footer_html, css_version, js_controller_version, js_main_version)
             
     print("🚀 [Merci Publish] Pipeline de conversión finalizado.")
 

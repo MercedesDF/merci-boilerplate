@@ -23,3 +23,7 @@ public/blog
 # Secretos y variables de entorno local (Shift-Left Security)
 .env
 .linkedin_token.json
+
+# Base de conocimiento personal y privada (Defensa de arquitectura)
+.privado/
+!.privado/.gitkeep

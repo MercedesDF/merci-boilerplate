@@ -1,3 +1,16 @@
-#comprobando
-Pillow==12.2.0
+# Dependencias de compilación y automatización (Build-time / Pipeline local).
+# Instalar dentro del entorno virtual: source .venv/bin/activate && pip install -r requirements.txt
+# Política: 0 dependencias en Runtime (navegador). Estas librerías solo operan en el pipeline local.
+
+# Generación de PDFs desde HTML (merci-publish.py, merci-wp.py)
 weasyprint==68.1
+
+# Optimización de imágenes a WebP responsivo (merci-optimizer.py)
+Pillow==12.2.0
+
+# Extracción de texto de PDFs de PageSpeed Insights (laboratorio/scripts_temporales/merci-extract-metrics.py)
+# Nota: script de laboratorio, no integrado en el pipeline principal (merci-total.py).
+pypdf==5.4.0
+
+# Librería de conversión Markdown a HTML (merci-publish.py, merci-wp.py)
+markdown==3.8

@@ -1,9 +1,17 @@
-# Merci Boilerplate v1.6.1
+# Merci Boilerplate v1.7.0
 
 Un entorno web híbrido, minimalista y seguro desde el diseño (Shift-Left). 
 Combina un núcleo estático ultrarrápido (HTML5, SASS, Vanilla JS y BEM (Block, Element, Modifier - Modificador de Elemento de Bloque)) con un motor dinámico aislado (WordPress). Diseñado para alcanzar un rendimiento perfecto (Core Web Vitals 100/100) y operar con 0 dependencias externas en el frontend.
 
 > 📖 **Historia y Arquitectura:** La justificación de las decisiones DevSecOps, el aislamiento del CMS y los manuales operativos se encuentran en la carpeta `/docs`.
+
+## 🚀 Novedades en la v1.7.0 (SSG Dual y Engineering Dashboard)
+
+- **Arquitectura SSG Dual:** `merci-publish.py` compila ahora dos secciones independientes en paralelo: `/biblioteca/` y `/art-de-cote/`, cada una con su propio índice autogenerado, flujo de publicación y PDFs descargables. Art de Coté abandona WordPress y pasa a ser un ciudadano de primera clase del motor estático.
+- **Desacoplamiento Art de Coté de WordPress:** `merci-wp.py` ya no procesa la carpeta `art-de-cote/`. `merci-promote.py` enruta correctamente hacia `merci total` en lugar de `merci wp` para este tipo de contenido. `merci-sync-pages.py` excluye `art-de-cote/` para no sobreescribir las páginas autogeneradas por el SSG (Static Site Generation - Generación de Sitios Estáticos).
+- **Robustez de Parseo YAML:** Las expresiones regulares de extracción de Frontmatter en `merci-publish.py`, `merci-promote.py` y `merci-wp.py` se han reforzado para tolerar espacios residuales, BOM (Byte Order Mark) y saltos de línea irregulares.
+- **Engineering Dashboard:** Nueva sección en la portada con 10 métricas de rendimiento extraídas de auditorías reales de Google PageSpeed Insights. Nuevos bloques SASS BEM: `hero__dashboard`, `hero__metric`, `hero__dashboard-legend`.
+- **Doctrina Art de Coté formalizada:** La Regla 10 de `instrucciones.md` se ha actualizado para establecer formalmente la taxonomía de preservación de artefactos funcionales descartados por decisiones de arquitectura.
 
 ## 🚀 Novedades en la v1.6.1 (Hotfix Accesibilidad y UX Dinámica)
 - **Accesibilidad Quirúrgica (Scoped CSS):** Resolución de conflictos de contraste WCAG AA aplicando variables SASS dinámicas (`$color-regular`) con alcance limitado (`p a, li a`), logrando el 100/100 en herramientas automatizadas sin romper el diseño global.

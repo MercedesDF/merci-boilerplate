@@ -3,7 +3,7 @@
 <head>
     <?php
     // Rompe-cachés dinámico para scripts: lee la fecha de modificación del archivo
-    $root_dir = dirname(ABSPATH) . '/merci-boilerplate.es/public';
+    $root_dir = dirname(ABSPATH) . '/miproyecto.com/public';
     $css_v = time();
     $js_merci_v = time();
     $js_main_v = time();
@@ -27,7 +27,7 @@
     <div id="top" tabindex="-1" style="position: absolute; top: 0; left: 0;"></div>
     <header class="header">
         <a href="/" class="header__brand">
-            <img src="/assets/images/logo.webp?v=2" alt="merci-boilerplate" class="header__logo" width="263" height="65">
+            <img src="/assets/images/logo.webp?v=2" alt="miproyecto" class="header__logo" width="263" height="65">
         </a>
         <button class="header__toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false">
             <span class="header__toggle-icon"></span>
@@ -37,7 +37,7 @@
             <a href="/biblioteca/" class="nav__link">Biblioteca</a>
             <a href="/sobre-mi/" class="nav__link">Sobre Mí</a>
             <a href="/blog/" class="nav__link" aria-label="Ir a la portada del Blog">Blog</a>
-            <a href="/blog/category/art-de-cote/" class="nav__link">Art de Coté</a>
+            <a href="/art-de-cote/" class="nav__link">Art de Coté</a>
             <a href="/blog/tienda/" class="nav__link">Tienda</a>
             <a href="/contacto/" class="nav__link">Contacto</a>
         </nav>
@@ -100,7 +100,7 @@
                         }
                         
                         if ( $is_art_de_cote ) {
-                            $back_link = '/blog/category/art-de-cote/';
+                            $back_link = '/art-de-cote/';
                         }
                         ?>
                         <a href="<?php echo esc_url($back_link); ?>" class="card__back-link">← Volver</a>
@@ -190,12 +190,12 @@
     <footer class="footer">
         <div class="footer__links">
             <a href="https://www.linkedin.com/in/mercedesdf-ingenieria/" target="_blank" rel="noopener noreferrer" class="footer__link">LinkedIn</a>
-            <a href="https://github.com/merci-boilerplateDF" target="_blank" rel="noopener noreferrer" class="footer__link">GitHub</a>
-            <a href="https://github.com/merci-boilerplateDF/merci-boilerplate" target="_blank" rel="noopener noreferrer" class="footer__link">Merci Boilerplate</a>
+            <a href="https://github.com/Mi ProyectoDF" target="_blank" rel="noopener noreferrer" class="footer__link">GitHub</a>
+            <a href="https://github.com/Mi ProyectoDF/merci-boilerplate" target="_blank" rel="noopener noreferrer" class="footer__link">Merci Boilerplate</a>
         </div>
         <div class="footer__text">
             <a href="#top">↑ Volver arriba</a><br>
-            &copy; 2026 <strong>merci-boilerplate</strong> — Base de código abierto bajo Licencia MIT.
+            &copy; 2026 <strong>miproyecto</strong> — Base de código abierto bajo Licencia MIT.
         </div>
     </footer>
 

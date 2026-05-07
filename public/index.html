@@ -2,29 +2,29 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <!-- QUÉ HACE: Actualiza la meta descripción para alinearla con el nuevo perfil Senior. -->
-    <!-- POR QUÉ: SEO Técnico. Esta es la tarjeta de presentación que leerán los crawlers y reclutadores en Google/LinkedIn. -->
-    <meta name="description" content="AI Systems Architect & DevSecOps Lead. Gobernanza de Inteligencia Artificial y Desarrollo Guiado por Especificaciones (Spec-Driven Development).">
+    <!-- QUÉ HACE: Actualiza la meta descripción para alinearla con el perfil de Performance y Spec as Source. -->
+    <!-- POR QUÉ: Refleja el valor real, demostrable y altamente demandado del ecosistema actual. -->
+    <meta name="description" content="Performance Engineer & Technical Writer. Especialista en metodología Spec as Source, DevSecOps y certificación 100/100 en Core Web Vitals.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- <meta name="googlebot" content="index, follow">
     <meta name="google" content="notranslate">
     <meta name="google" content="notranslate"> -->
-    <title>merci-boilerplate — AI Systems Architect & DevSecOps Lead</title>
+    <title>miproyecto — Spec as Source & Performance Engineering</title>
     
     <!-- Favicon y Mercí-->
     <link rel="icon" href="/favicon.ico?v=2" type="image/x-icon">
     <link rel="stylesheet" href="/css/main.css?v=13">
     <script src="/js/MerciController.js?v=13" defer></script>
     <script src="/js/main.js?v=13" defer></script>
-    <link rel="canonical" href="https://merci-boilerplate.es">
+    <link rel="canonical" href="https://miproyecto.com">
     
     <!-- JSON-LD Mínimo Fase 2 -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "WebSite",
-      "name": "merci-boilerplate",
-      "url": "https://merci-boilerplate.es"
+      "name": "miproyecto",
+      "url": "https://miproyecto.com"
     }
     </script>
 </head>
@@ -33,7 +33,7 @@
     <div id="top" tabindex="-1" style="position: absolute; top: 0; left: 0;"></div>
     <header class="header">
         <a href="/" class="header__brand">
-            <img src="/assets/images/logo.webp?v=2" alt="merci-boilerplate" class="header__logo" width="263" height="65">
+            <img src="/assets/images/logo.webp?v=2" alt="miproyecto" class="header__logo" width="263" height="65">
         </a>
         <button class="header__toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false">
             <span class="header__toggle-icon"></span>
@@ -47,68 +47,173 @@
             <!-- QUÉ HACE: Diferencia este enlace del autogenerado por WordPress en las tarjetas. -->
             <!-- POR QUÉ: Evita el error WAI-ARIA de "Enlaces idénticos con distinto destino". -->
             <a href="/blog/" class="nav__link" aria-label="Ir a la portada del Blog">Blog</a>
-            <a href="/blog/category/art-de-cote/" class="nav__link">Art de Coté</a>
+            <a href="/art-de-cote/" class="nav__link">Art de Coté</a>
             <a href="/blog/tienda/" class="nav__link">Tienda</a>
             <a href="/contacto/" class="nav__link">Contacto</a>
         </nav>
     </header>
     <main class="main" id="main">
+
+        <!-- ===================== -->
+        <!-- HERO + ENGINEERING DASHBOARD -->
+        <!-- ===================== -->
         <section class="hero" id="hero">
-            <!-- QUÉ HACE: Impone un H1 declarativo de autoridad técnica e invierte la relación con la máquina. -->
-            <!-- POR QUÉ: Desmitifica la IA como "magia" y la posiciona como infraestructura que tú gobiernas. -->
-            <h1 class="hero__title">La máquina ejecuta el código.<br>Yo diseño el sistema.</h1>
-            <p class="hero__subtitle">Soy merci-boilerplate, <strong>AI Systems Architect & DevSecOps Lead</strong>. Utilizo el Desarrollo Guiado por Especificaciones (Spec-Driven Development) para gobernar Inteligencia Artificial. Yo defino la arquitectura, los flujos CI/CD y los límites de seguridad; mis agentes ejecutan la táctica bajo auditoría estricta.</p>
+
+            <h1 class="hero__title">
+                Desarrollo web orientado a rendimiento<br>y automatización
+            </h1>
+
+            <p class="hero__subtitle">
+                Soy Mi Proyecto, Ingeniera Técnica. Diseño sistemas web ligeros, mantenibles y auditables, con foco en rendimiento, automatización en Python y control técnico del ciclo de desarrollo.
+            </p>
+
+            <p class="hero__subtitle">
+                Trabajo con un enfoque basado en especificaciones (spec-driven), donde la arquitectura se define desde el criterio técnico y no desde la complejidad de las herramientas.
+            </p>
+
+            <p class="hero__subtitle">
+                Resultado: sistemas predecibles, reducción de errores operativos y rendimiento medible en entornos reales.
+            </p>
+
+            <!-- ===================== -->
+            <!-- ENGINEERING DASHBOARD -->
+            <!-- ===================== -->
+            <div class="hero__dashboard" role="group" aria-label="Métricas de rendimiento del sistema">
+
+                <div class="hero__metric">
+                    <span class="hero__metric-label">FCP</span>
+                    <span class="hero__metric-value">0.8 s</span>
+                </div>
+
+                <div class="hero__metric">
+                    <span class="hero__metric-label">LCP</span>
+                    <span class="hero__metric-value">1.1 s</span>
+                </div>
+
+                <div class="hero__metric">
+                    <span class="hero__metric-label">INP</span>
+                    <span class="hero__metric-value">&lt;100ms</span>
+                </div>
+
+                <div class="hero__metric">
+                    <span class="hero__metric-label">CLS</span>
+                    <span class="hero__metric-value">0</span>
+                </div>
+
+                <div class="hero__metric">
+                    <span class="hero__metric-label">TBT</span>
+                    <span class="hero__metric-value">0 ms</span>
+                </div>
+
+                <div class="hero__metric">
+                    <span class="hero__metric-label">SI</span>
+                    <span class="hero__metric-value">1.2 s</span>
+                </div>
+
+                <div class="hero__metric">
+                    <span class="hero__metric-label">Payload</span>
+                    <span class="hero__metric-value">&lt;80KB</span>
+                </div>
+
+                <div class="hero__metric">
+                    <span class="hero__metric-label">Deps</span>
+                    <span class="hero__metric-value">0</span>
+                </div>
+
+                <div class="hero__metric">
+                    <span class="hero__metric-label">Automation</span>
+                    <span class="hero__metric-value">8 CLI</span>
+                </div>
+
+                <div class="hero__metric">
+                    <span class="hero__metric-label">Arch</span>
+                    <span class="hero__metric-value">3-layer</span>
+                </div>
+
+            </div>
+
+            <p class="hero__dashboard-legend">
+                * Datos extraídos de auditorías empíricas en Google PageSpeed Insights (Simulación Móvil 4G). Todos los valores de rendimiento, carga e interactividad se asientan en el rango de excelencia (Verde), certificando una puntuación perfecta de 100/100.
+            </p>
+
         </section>
 
+        <!-- ===================== -->
+        <!-- GOBERNANZA -->
+        <!-- ===================== -->
         <section class="section home-section" id="metodo">
-            <!-- QUÉ HACE: Transforma "Activos" en "Gobernanza", terminología propia de Arquitectura de Sistemas. -->
-            <!-- POR QUÉ: Eleva la percepción del contenido; ya no son simples "apuntes", son decisiones de ingeniería. -->
-            <h2 class="home-section__title">Gobernanza y Decisiones</h2>
+
+            <h2 class="home-section__title">Gobernanza y decisiones técnicas</h2>
+
             <div class="home-grid">
+
                 <article class="home-card">
-                    <h3 class="home-card__title">Registros de Arquitectura (ADR)</h3>
-                    <p class="home-card__text">Esta Biblioteca no es un blog. Es mi base de conocimiento documentada mediante un patrón de Diseño Atómico (Desafío, Maniobra y Aprendizaje). Aquí registro las decisiones técnicas irreversibles que dan forma a este ecosistema híbrido.</p>
+                    <h3 class="home-card__title">Registros de arquitectura (ADR)</h3>
+                    <p class="home-card__text">
+                        Cada decisión técnica relevante queda documentada y justificada. Esto permite mantener coherencia estructural y trazabilidad completa del sistema a lo largo del tiempo.
+                    </p>
                 </article>
+
                 <article class="home-card">
-                    <h3 class="home-card__title">Laboratorio I+D</h3>
-                    <p class="home-card__text">Art de Coté es el entorno donde exploro integraciones complejas y rompo cosas de forma controlada. Una bitácora de desviaciones técnicas resueltas manteniendo la política innegociable de cero dependencias externas bloqueantes.</p>
+                    <h3 class="home-card__title">Laboratorio de experimentación</h3>
+                    <p class="home-card__text">
+                        Entorno controlado donde valido enfoques técnicos antes de incorporarlos al sistema principal, reduciendo riesgos en producción y asegurando estabilidad arquitectónica.
+                    </p>
                 </article>
+
                 <article class="home-card">
-                    <h3 class="home-card__title">Ejecutor Táctico (Merci)</h3>
-                    <p class="home-card__text">Mi orquestador DevSecOps en Python puro. Audita el código en fase pre-commit (Shift-Left), gobierna el pipeline CI/CD local y provee respuestas generativas de Inteligencia Artificial con latencia cero. Haz clic sobre su avatar.</p>
+                    <h3 class="home-card__title">Automatización de procesos</h3>
+                    <p class="home-card__text">
+                        Desarrollo herramientas en Python para automatizar generación estática, despliegue, optimización de recursos y flujos repetitivos del sistema.
+                    </p>
                 </article>
+
             </div>
         </section>
 
+        <!-- ===================== -->
+        <!-- ARQUITECTURA -->
+        <!-- ===================== -->
         <section class="section home-section" id="ecosistema">
-            <h2 class="home-section__title">Arquitectura de Referencia</h2>
+
+            <h2 class="home-section__title">Arquitectura de referencia</h2>
+
             <div class="home-grid">
-                <article class="home-card" id="demo-static">
-                    <h3 class="home-card__title">Generación SSG Purista</h3>
-                    <p class="home-card__text">HTML5 semántico nativo, arquitectura SASS 7-1 (BEM) y Vanilla JS. Una capa de presentación ultraligera, sin frameworks reactivos, diseñada quirúrgicamente para garantizar un inquebrantable 100/100 en Core Web Vitals.</p>
+
+                <article class="home-card">
+                    <h3 class="home-card__title">Arquitectura estática optimizada</h3>
+                    <p class="home-card__text">
+                        HTML5 semántico, SASS estructurado y JavaScript modular. Sistema optimizado para rendimiento, control y mantenibilidad sin dependencias innecesarias.
+                    </p>
                 </article>
-                <article class="home-card" id="demo-dynamic">
-                    <h3 class="home-card__title">Aislamiento Headless CMS</h3>
-                    <p class="home-card__text">Integración por proxy inverso de un CMS pesado (WordPress/WooCommerce). Demuestra empíricamente la viabilidad de entrelazar gestión dinámica y transaccional aislando los vectores de ataque y sin penalizar el rendimiento.</p>
+
+                <article class="home-card">
+                    <h3 class="home-card__title">Integración headless</h3>
+                    <p class="home-card__text">
+                        CMS desacoplado mediante proxy inverso, permitiendo gestión dinámica sin impacto en el rendimiento del núcleo estático ni incremento de superficie de ataque.
+                    </p>
                 </article>
-                <!-- QUÉ HACE: Añade la tercera tarjeta sobre el currículum, balanceando la cuadrícula 3x2. -->
-                <!-- POR QUÉ: Anticipa la página '/sobre-mi/' vendiendo tu perfil técnico como un logro más de infraestructura. -->
-                <article class="home-card" id="anti-ats">
-                    <h3 class="home-card__title">El Perfil "Anti-ATS"</h3>
-                    <p class="home-card__text">Los Sistemas de Seguimiento (ATS) leen datos, no diseño. Mi currículum no es un PDF, es una declaración de intenciones: mi perfil técnico expuesto en HTML5 puro con microdatos JSON-LD. Porque la mejor forma de hablar con una máquina, es en su idioma.</p>
+
+                <article class="home-card">
+                    <h3 class="home-card__title">Perfil técnico estructurado</h3>
+                    <p class="home-card__text">
+                        Exposición del perfil mediante HTML semántico y JSON-LD, optimizado para interpretación por sistemas automatizados sin dependencia de formatos cerrados.
+                    </p>
                 </article>
+
             </div>
         </section>
+
     </main>
     <footer class="footer">
         <div class="footer__links">
             <a href="https://www.linkedin.com/in/mercedesdf-ingenieria/" target="_blank" rel="noopener noreferrer" class="footer__link">LinkedIn</a>
-            <a href="https://github.com/merci-boilerplateDF" target="_blank" rel="noopener noreferrer" class="footer__link">GitHub</a>
-            <a href="https://github.com/merci-boilerplateDF/merci-boilerplate" target="_blank" rel="noopener noreferrer" class="footer__link">Merci Boilerplate</a>
+            <a href="https://github.com/Mi ProyectoDF" target="_blank" rel="noopener noreferrer" class="footer__link">GitHub</a>
+            <a href="https://github.com/Mi ProyectoDF/merci-boilerplate" target="_blank" rel="noopener noreferrer" class="footer__link">Merci Boilerplate</a>
         </div>
         <div class="footer__text">
             <a href="#top">↑ Volver arriba</a><br>
-            &copy; 2026 <strong>merci-boilerplate</strong> — Base de código abierto bajo Licencia MIT.
+            &copy; 2026 <strong>miproyecto</strong> — Base de código abierto bajo Licencia MIT.
         </div>
     </footer>
 

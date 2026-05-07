@@ -23,7 +23,7 @@ def main():
 
     # 2. Escaneo Global: Laboratorio (nuevos) y Directorios Raíz (despublicados / huérfanos)
     # QUÉ HACE: Usa rglob para buscar también en subcarpetas (ej. laboratorio/blog/).
-    borradores_lab = [f for f in LABORATORIO_DIR.rglob("*.md") if f.name != "bitacora-merci-boilerplate.md" and "evidencias" not in f.parts]
+    borradores_lab = [f for f in LABORATORIO_DIR.rglob("*.md") if f.name != "bitacora-miproyecto.md" and "evidencias" not in f.parts]
     borradores_dest = []
 
     for dest_dir in DESTINOS_DIR:
@@ -31,8 +31,8 @@ def main():
             continue
         for f in dest_dir.rglob("*.md"):
             content = f.read_text(encoding="utf-8", errors="replace")
-            # QUÉ HACE: Tolera saltos de línea Windows (\r\n) y espacios/BOM iniciales.
-            match = re.match(r"^\s*---\r?\n(.*?)\r?\n---", content, re.DOTALL)
+            # QUÉ HACE: Expresión regular robusta tolerante a espacios residuales.
+            match = re.search(r"^\s*---\s*\n(.*?)\n---\s*(?:\n|$)", content, flags=re.DOTALL | re.MULTILINE)
             if match:
                 estado_match = re.search(r"^estado:\s*[\"']?(.*?)[\"']?\s*$", match.group(1), re.MULTILINE)
                 estado = estado_match.group(1).lower() if estado_match else "borrador"
@@ -71,8 +71,8 @@ def main():
 
     # 4. Extracción de Metadatos usando expresiones regulares
     # Extrae el bloque entre los dos --- iniciales
-    # QUÉ HACE: \r?\n hace que el retorno de carro sea opcional, volviendo el parser multiplataforma.
-    match = re.match(r"^\s*---\r?\n(.*?)\r?\n---\r?\n?(.*)", contenido, re.DOTALL)
+    # QUÉ HACE: Expresión regular robusta y tolerante a espacios y saltos de línea irregulares.
+    match = re.search(r"^\s*---\s*\n(.*?)\n---\s*(?:\n|$)(.*)", contenido, flags=re.DOTALL | re.MULTILINE)
     if not match:
         print(f"  ❌ Error: El archivo {borrador_elegido.name} no tiene un YAML Frontmatter válido.")
         print("  Por favor, añade la estructura base (plantilla) antes de promoverlo.")
@@ -95,6 +95,7 @@ def main():
     nuevo_tema = input(f"  🏷️  Tema/Estantería [{meta.get('tema', 'General')}]: ").strip() or meta.get('tema', 'General')
     nueva_desc = input(f"  📝 Descripción [{meta.get('descripcion', '')}]: ").strip() or meta.get('descripcion', '')
     nuevo_alt = input(f"  👁️  Alt de la portada [{meta.get('alt_portada', '')}]: ").strip() or meta.get('alt_portada', '')
+    nueva_fase = input(f"  🏗️  Fase del Roadmap [{meta.get('fase', '')}]: ").strip() or meta.get('fase', '')
     
     # Al republicar, permitimos conservar la fecha original o sobreescribirla con la actual
     fecha_defecto = meta.get('fecha', datetime.now().strftime("%Y-%m-%d"))
@@ -109,6 +110,7 @@ def main():
     meta['tema'] = nuevo_tema
     meta['descripcion'] = nueva_desc
     meta['alt_portada'] = nuevo_alt
+    meta['fase'] = nueva_fase
     meta['estado'] = 'publicado'  # Cambio de estado automatizado
     meta['fecha'] = nueva_fecha
 
@@ -131,7 +133,7 @@ def main():
         comando_sugerido = "merci wp"
     elif "art-de-cote" in rel_path.parts[:-1]:
         directorio_destino = REPO_ROOT / "art-de-cote"
-        comando_sugerido = "merci wp"
+        comando_sugerido = "merci total"
     else:
         directorio_destino = REPO_ROOT / "biblioteca"
         comando_sugerido = "merci total"

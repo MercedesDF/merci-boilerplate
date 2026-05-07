@@ -1,0 +1,113 @@
+Informe desde el 7 may 2026, 1:08:58 a.m.
+Se muestran los resultados para la URL: https://mercedev.es/biblioteca/
+Ejecutar con la URL original
+Descubre lo que experim entan tus usuarios reales No hay datos
+Diagnostica problem as de rendim iento
+https://mercedev.es/biblioteca Analizar
+Los valores son estim ados y pueden variar. La m edición del rendim iento se
+calcula directam ente a partir de estas m étricas.Consulta la calculadora.
+0–49 50–89 90–100
+Rendim iento
+100
+Accesibilidad
+100
+Recom endaciones
+100
+SEO
+100
+1 0 0
+Rendim iento
+100
+ Celulares  Escritorio
+PageSpeed Insights Copiar vínculo Documentos
+Mostrar las auditorías relevantes para la m étrica: All FCP LCP
+M ÉT RICAS Expandir vista
+First Contentful Paint
+0.8 s
+Largest Contentful Paint
+1.1 s
+T otal Blocking T im e
+0 m s
+Cum ulative Layout Shift
+0
+Speed Index
+1.2 s
+Captured at 7 m ay 2026, 1:09
+a.m . GMT +2
+Moto G Power em ulado with
+Lighthouse 13.0.1
+Sesión de una sola página
+Carga inicial de la página
+ Lim itación de la red 4G lenta
+ Using HeadlessChrom ium
+146.0.7680.177 with lr
+EST ADÍST ICAS
+Solicitudes de bloqueo de renderización — Ahorro estim ado de 120 m s
+Mejora la entrega de im ágenes — Ahorro estim ado de 65 KiB
+PageSpeed Insights Copiar vínculo Documentos
+Estas com probaciones destacan las oportunidades para m ejorar la
+accesibilidad de tu app web. La detección autom ática solo puede detectar
+un subconjunto de problem as y no garantiza la accesibilidad de tu app
+web, por lo que tam bién se recom ienda hacer pruebas m anuales.
+Árbol de dependencias de red
+Desglose de LCP
+Estas estadísticas tam bién están disponibles en el panel de rendim iento de las Herram ientas para desarrolladores de
+Chrom e: graba un registro para ver inform ación m ás detallada.
+AUDIT ORÍAS APROBADAS(23) Mostrar
+Accesibilidad
+100
+ELEM ENT OS ADICIONALES QUE SE DEBEN COM PROBAR M ANUALM ENT E (10) O cultar
+Interactive controls are keyboard focusable
+Interactive elem ents indicate their purpose and state
+T he page has a logical tab order
+Visual order on the page follows DO M order
+User focus is not accidentally trapped in a region
+T he user's focus is directed to new content added to the page
+HT ML5 landm ark elem ents are used to im prove navigation
+O ffscreen content is hidden from  assistive technology
+PageSpeed Insights Copiar vínculo Documentos
+Custom  controls have associated labels
+Custom  controls have ARIA roles
+Estos elem entos abarcan áreas que las herram ientas de prueba autom áticas no contem plan. O btén m ás inform ación en
+nuestra guía sobre cóm o revisar los aspectos de accesibilidad.
+AUDIT ORÍAS APROBADAS(21) Mostrar
+NO APLICABLE (39) Mostrar
+Recom endaciones
+100
+CONFIANZA Y SEGURIDAD
+Asegúrate de que la CSP sea eficaz contra los ataques XSS
+Mitiga el XSS basado en DO M con T rusted T ypes
+AUDIT ORÍAS APROBADAS(13) Mostrar
+NO APLICABLE (5) Mostrar
+PageSpeed Insights Copiar vínculo Documentos
+Más información acerca de PageSpeed Insights
+Novedades
+Documentación
+Más información sobre el rendimiento de la Web
+Haz preguntas en Stack Overflow
+Lista de distribución
+Contenido relacionado
+Actualizaciones
+Fundamentos de la Web
+Casos de éxito
+Podcasts
+Conectar
+Twitter
+YouTube
+Chrome Firebase Todos los productos
+Condiciones y Política de Privacidad
+Estas com probaciones aseguran que tu página esté siguiendo la
+sugerencia básica de optim ización por m otores de búsqueda. Existen
+m uchos factores adicionales que Lighthouse no registra y que pueden
+afectar su clasificación en la búsqueda, com o el rendim iento en las
+Métricas web esenciales. O btén m ás inform ación sobre los conceptos
+básicos de la Búsqueda de Google.
+SEO
+100
+ELEM ENT OS ADICIONALES QUE SE DEBEN COM PROBAR M ANUALM ENT E (1) O cultar
+Los datos estructurados son válidos
+Ejecuta estos validadores adicionales en tu sitio web para com probar m ás prácticas recom endadas de SEO .
+AUDIT ORÍAS APROBADAS(10) Mostrar
+PageSpeed Insights Copiar vínculo Documentos
+Para obtener más detalles, consulta las Políticas del Sitio de Google Developers.
+PageSpeed Insights Copiar vínculo Documentos

@@ -15,7 +15,7 @@ from pathlib import Path
 
 # Definición de rutas absolutas basadas en la ubicación del script
 REPO_ROOT = Path(__file__).resolve().parents[2]
-BITACORA_PATH = REPO_ROOT / "laboratorio" / "bitacora-merci-boilerplate.md"
+BITACORA_PATH = REPO_ROOT / "laboratorio" / "bitacora-miproyecto.md"
 
 def check_repo_changes():
     """Verifica si hay algún cambio en el repositorio (staged, unstaged o untracked)."""

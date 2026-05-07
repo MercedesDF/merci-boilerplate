@@ -5,6 +5,7 @@ tipo: "proyecto" # Valores recomendados: "proyecto", "libro" o "bitacora"
 tema: "DevSecOps y Automatización" # Estantería donde se agrupará en el índice
 volumen: 1
 fecha: "2026-MM-DD"
+fase: ""
 estado: "borrador" # Valores permitidos: "borrador" | "publicado"
 portada: "portada-generica.webp"
 alt_portada: "Descripción visual de la imagen para accesibilidad estricta WAI-ARIA."

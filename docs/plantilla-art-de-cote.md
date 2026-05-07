@@ -2,12 +2,13 @@
 titulo: "Título de la exploración o cuadernillo"
 estado: "borrador"
 tema: "Art de Coté"
+fase: ""
 ---
 
 <!-- linkedin:
 Escribe aquí tu anuncio para LinkedIn.
 Acepta saltos de línea sin problemas.
-https://merci-boilerplate.es/blog/tu-url
+https://miproyecto.com/blog/tu-url
 -->
 
 Escribe aquí el contenido de tu exploración colateral.

@@ -4,6 +4,7 @@ descripcion: "Descripción breve y directa del problema y la solución para el S
 tipo: "cuadernillo"
 tema: "DevSecOps y Gobernanza"
 fecha: "2026-05-01"
+fase: ""
 estado: "borrador"
 alt_portada: "Descripción visual de la imagen de portada para accesibilidad WAI-ARIA."
 ---

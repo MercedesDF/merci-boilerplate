@@ -17,7 +17,7 @@ PUBLIC_DIR = REPO_ROOT / "public"
 INDEX_PATH = PUBLIC_DIR / "index.html"
 
 # Exclusiones: biblioteca (merci-publish), blog (WordPress), descargas (PDFs)
-EXCLUDED_DIRS = {"biblioteca", "blog", "descargas"}
+EXCLUDED_DIRS = {"biblioteca", "art-de-cote", "blog", "descargas"}
 
 def discover_target_pages() -> list[Path]:
     """

@@ -25,5 +25,103 @@
         color: color.scale($color-text-base, $lightness: 30%);
         max-width: 60ch;
         margin: 0 auto $spacing-lg;
+        opacity: 0.9;
+    }
+
+
+    &__statement {
+        font-size: 1.75rem; // Ligeramente más pequeño que el H1
+        font-weight: 400;   // Peso normal para que la cursiva se vea elegante
+        font-style: italic; // El toque visual que pediste
+        color: $color-text-base; // Negro / Azul muy oscuro
+        margin-bottom: $spacing-md;
+        line-height: 1.3;
+    }
+
+
+/* ===================== */
+/* ENGINEERING DASHBOARD */
+/* ===================== */
+
+    &__dashboard {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr)); // 2 columnas en móvil
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+
+        @media (min-width: 768px) {
+            grid-template-columns: repeat(5, minmax(0, 1fr)); // 5 columnas en escritorio para 10 métricas
+        }
+    }
+
+    &__metric {
+        padding: 0.75rem;
+        border: 1px solid rgba($color-text-base, 0.1); // Visible en Modo Claro
+        border-radius: 4px;
+    }
+
+    &__metric-label {
+        display: block;
+        font-size: 0.7rem;
+        opacity: 0.6;
+        margin-bottom: 0.25rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    &__metric-value {
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    &__dashboard-legend {
+        font-size: 0.75rem;
+        opacity: 0.7;
+        margin: 0.75rem 0 0;
+        text-align: left;
+        max-width: 80ch;
+        line-height: 1.5;
+    }
+
+    &__highlights {
+        list-style: none;
+        padding: 0;
+        margin: 0 auto $spacing-lg;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        justify-content: center;
+        max-width: 80ch;
+
+        li {
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            border: 1px solid rgba($color-text-base, 0.1);
+            background: rgba($color-bg-base, 0.5);
+        }
+    }
+
+    &__cta {
+        display: flex;
+        gap: 1.5rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-bottom: $spacing-md;
+
+        a {
+            font-weight: 600;
+            color: $color-primary;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border: 1px solid $color-primary;
+            border-radius: 4px;
+            transition: background-color 0.2s ease, color 0.2s ease;
+
+            &:hover {
+                background-color: $color-primary;
+                color: $color-bg-base;
+            }
+        }
     }
 }

@@ -34,8 +34,7 @@ except ImportError:
 REPO_ROOT = Path(__file__).resolve().parents[2]
 ENV_FILE = REPO_ROOT / ".env"
 WP_DIRS = [
-    REPO_ROOT / "blog",
-    REPO_ROOT / "art-de-cote"
+    REPO_ROOT / "blog"
 ]
 
 def slugify(texto: str) -> str:
@@ -144,7 +143,7 @@ def publicar_en_wordpress(filepath: str, creds: dict, verbose: bool = False):
 
     # 2. Extraer metadatos YAML y contenido
     content = target_path.read_text(encoding="utf-8")
-    match = re.match(r"^---\n(.*?)\n---\n(.*)", content, re.DOTALL)
+    match = re.search(r"^\s*---\s*\n(.*?)\n---\s*(?:\n|$)(.*)", content, flags=re.DOTALL | re.MULTILINE)
     if not match:
         print(f"  ❌ Error: El archivo {target_path.name} no tiene un YAML Frontmatter válido.")
         return False
