@@ -8,9 +8,11 @@ weasyprint==68.1
 # Optimización de imágenes a WebP responsivo (merci-optimizer.py)
 Pillow==12.2.0
 
-# Extracción de texto de PDFs de PageSpeed Insights (laboratorio/scripts_temporales/merci-extract-metrics.py)
-# Nota: script de laboratorio, no integrado en el pipeline principal (merci-total.py).
+# Extracción de texto de PDFs de PageSpeed Insights (merci-extract-metrics.py)
 pypdf==5.4.0
 
 # Librería de conversión Markdown a HTML (merci-publish.py, merci-wp.py)
 markdown==3.8
+
+# Orquestador unificado de IA (Ollama local / Gemini de contingencia)
+litellm==1.35.0

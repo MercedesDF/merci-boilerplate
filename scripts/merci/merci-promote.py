@@ -23,7 +23,7 @@ def main():
 
     # 2. Escaneo Global: Laboratorio (nuevos) y Directorios Raíz (despublicados / huérfanos)
     # QUÉ HACE: Usa rglob para buscar también en subcarpetas (ej. laboratorio/blog/).
-    borradores_lab = [f for f in LABORATORIO_DIR.rglob("*.md") if f.name != "bitacora-miproyecto.md" and "evidencias" not in f.parts]
+    borradores_lab = [f for f in LABORATORIO_DIR.rglob("*.md") if f.name != "bitacora-merci-boilerplate.md" and "evidencias" not in f.parts]
     borradores_dest = []
 
     for dest_dir in DESTINOS_DIR:

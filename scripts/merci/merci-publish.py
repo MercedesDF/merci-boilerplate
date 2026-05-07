@@ -126,7 +126,7 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
         print(f"  ❌ Error: Falta el atributo 'alt_portada' obligatorio en {filepath.name}")
         return False
     
-    canonical_url = f"https://miproyecto.com{base_url_path}{out_filename}"
+    canonical_url = f"https://merci-boilerplate.es{base_url_path}{out_filename}"
 
     # QUÉ HACE: Pre-procesador de multimedia. Busca sintaxis de imagen que apunte a un vídeo.
     # POR QUÉ: Markdown nativo no soporta la etiqueta <video>. Usamos expresiones regulares para transformar 
@@ -176,7 +176,7 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
     <div class="portada">
         <h1>{titulo}</h1>
         <p>{tipo.capitalize()} | Vol. {meta.get('volumen', 1)}</p>
-        <p><strong>miproyecto.com</strong> — {meta.get('fecha', '')}{fase_pdf_text}</p>
+        <p><strong>merci-boilerplate.es</strong> — {meta.get('fecha', '')}{fase_pdf_text}</p>
     </div>
     <div class="contenido">
         {html_content}
@@ -206,7 +206,7 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{titulo} — miproyecto.com</title>
+    <title>{titulo} — merci-boilerplate.es</title>
     <meta name="description" content="{descripcion}">
     <link rel="canonical" href="{canonical_url}">
     <link rel="stylesheet" href="/css/main.css?v={css_v}">
@@ -285,8 +285,10 @@ def generar_indice(publicaciones, out_path, title, meta_desc, hero_subtitle, can
         # QUÉ HACE: Genera un ID válido para el ancla (ej. 'devsecops-y-gobernanza')
         tema_slug = slugify(tema)
         
-        # Ordenamos los artículos dentro de un mismo tema del más nuevo al más antiguo
-        pubs_tema = sorted(estanterias[tema], key=lambda x: x["fecha"], reverse=True)
+        # QUÉ HACE: Ordena los artículos: Primero los "Compendios" (True), luego por fecha del más nuevo al más antiguo.
+        # POR QUÉ: Otorga un trato preferente (arriba de la lista) a los documentos de alto nivel 
+        # para que el usuario encuentre la visión global antes de descender a los cuadernillos tácticos.
+        pubs_tema = sorted(estanterias[tema], key=lambda x: (x["tipo"].lower() == "compendio", x["fecha"]), reverse=True)
         
         # Construimos el contenedor principal de la estantería (con diseño de columnas responsivo)
         enlaces_indice_html += f'                <li class="library-nav__item">\n'
@@ -342,7 +344,7 @@ def generar_indice(publicaciones, out_path, title, meta_desc, hero_subtitle, can
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{title} — miproyecto.com</title>
+    <title>{title} — merci-boilerplate.es</title>
     <meta name="description" content="{meta_desc}">
     <link rel="canonical" href="{canonical_url}">
     <link rel="stylesheet" href="/css/main.css?v={css_v}">
@@ -352,7 +354,7 @@ def generar_indice(publicaciones, out_path, title, meta_desc, hero_subtitle, can
     {{
       "@context": "https://schema.org",
       "@type": "CollectionPage",
-      "name": "{title} - miproyecto.com",
+      "name": "{title} - merci-boilerplate.es",
       "description": "{meta_desc}",
       "url": "{canonical_url}"
     }}
@@ -391,11 +393,28 @@ def main(): # type: ignore
     # 0. Limpieza previa (Evitar archivos zombis)
     limpiar_directorio_salida()
     
+    # QUÉ HACE: Implementa "Cache Busting" dinámico usando la fecha de modificación del archivo.
+    # POR QUÉ: Obliga a los navegadores móviles a descargar la última versión de los assets.
+    css_path = REPO_ROOT / "public/css/main.css"
+    js_controller_path = REPO_ROOT / "public/js/MerciController.js"
+    js_main_path = REPO_ROOT / "public/js/main.js"
+    css_version = int(css_path.stat().st_mtime) if css_path.exists() else '11'
+    js_controller_version = int(js_controller_path.stat().st_mtime) if js_controller_path.exists() else '11'
+    js_main_version = int(js_main_path.stat().st_mtime) if js_main_path.exists() else '11'
+
     # 0. Extraer Header y Footer dinámicamente de la portada (Single Source of Truth)
     header_html, footer_html = "", ""
     index_path = REPO_ROOT / "public" / "index.html"
     if index_path.exists():
         index_content = index_path.read_text(encoding="utf-8")
+        
+        # QUÉ HACE: Autoinyecta las nuevas versiones en el index.html (Single Source of Truth)
+        # POR QUÉ: Automatiza el Cache Busting. Las páginas satélite lo heredarán a través de merci-sync-pages.py.
+        index_content = re.sub(r'(href="/css/main\.css\?v=)\d+', rf'\g<1>{css_version}', index_content)
+        index_content = re.sub(r'(src="/js/MerciController\.js\?v=)\d+', rf'\g<1>{js_controller_version}', index_content)
+        index_content = re.sub(r'(src="/js/main\.js\?v=)\d+', rf'\g<1>{js_main_version}', index_content)
+        index_path.write_text(index_content, encoding="utf-8")
+
         h_match = re.search(r"(<header.*?</header>)", index_content, re.DOTALL | re.IGNORECASE)
         f_match = re.search(r"(<footer.*?</footer>)", index_content, re.DOTALL | re.IGNORECASE)
         m_match = re.search(r"(<!-- Asistente Virtual -->.*?</aside>)", index_content, re.DOTALL | re.IGNORECASE)
@@ -405,15 +424,6 @@ def main(): # type: ignore
         # QUÉ HACE: Añade el bloque de Merci al footer extraído para inyectarlo en todas las páginas generadas
         if m_match:
             footer_html += f"\n\n    {m_match.group(1)}"
-
-    # QUÉ HACE: Implementa "Cache Busting" dinámico usando la fecha de modificación del archivo.
-    # POR QUÉ: Obliga a los navegadores móviles a descargar la última versión de los assets.
-    css_path = REPO_ROOT / "public/css/main.css"
-    js_controller_path = REPO_ROOT / "public/js/MerciController.js"
-    js_main_path = REPO_ROOT / "public/js/main.js"
-    css_version = int(css_path.stat().st_mtime) if css_path.exists() else '11'
-    js_controller_version = int(js_controller_path.stat().st_mtime) if js_controller_path.exists() else '11'
-    js_main_version = int(js_main_path.stat().st_mtime) if js_main_path.exists() else '11'
 
     publicaciones_bib = []
     publicaciones_art = []
@@ -435,11 +445,11 @@ def main(): # type: ignore
                 
     if publicaciones_bib:
         PUBLIC_BIBLIOTECA.mkdir(parents=True, exist_ok=True)
-        generar_indice(publicaciones_bib, PUBLIC_BIBLIOTECA / "index.html", "La Biblioteca", "Índice de publicaciones técnicas y proyectos de la Biblioteca.", "Documentación técnica, proyectos DevSecOps y arquitectura de software. El activo de conocimiento central del ecosistema.", "https://miproyecto.com/biblioteca/", header_html, footer_html, css_version, js_controller_version, js_main_version)
+        generar_indice(publicaciones_bib, PUBLIC_BIBLIOTECA / "index.html", "La Biblioteca", "Índice de publicaciones técnicas y proyectos de la Biblioteca.", "Documentación técnica, proyectos DevSecOps y arquitectura de software. El activo de conocimiento central del ecosistema.", "https://merci-boilerplate.es/biblioteca/", header_html, footer_html, css_version, js_controller_version, js_main_version)
         
     if publicaciones_art:
         PUBLIC_ART_DE_COTE.mkdir(parents=True, exist_ok=True)
-        generar_indice(publicaciones_art, PUBLIC_ART_DE_COTE / "index.html", "Art de Coté", "Índice de scripts experimentales, andamiajes y código colateral.", "Scripts, flujos de automatización y código experimental preservado bajo la filosofía Zero Waste (Cero Desperdicio).", "https://miproyecto.com/art-de-cote/", header_html, footer_html, css_version, js_controller_version, js_main_version)
+        generar_indice(publicaciones_art, PUBLIC_ART_DE_COTE / "index.html", "Art de Coté", "Índice de scripts experimentales, andamiajes y código colateral.", "Scripts, flujos de automatización y código experimental preservado bajo la filosofía Zero Waste (Cero Desperdicio).", "https://merci-boilerplate.es/art-de-cote/", header_html, footer_html, css_version, js_controller_version, js_main_version)
             
     print("🚀 [Merci Publish] Pipeline de conversión finalizado.")
 

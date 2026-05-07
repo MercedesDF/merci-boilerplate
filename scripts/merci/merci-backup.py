@@ -23,7 +23,7 @@ EXCLUDE_PATHS = {
     REPO_ROOT / "backups",
     REPO_ROOT / ".assets-raw",
     REPO_ROOT / "laboratorio" / "evidencias",
-    REPO_ROOT / "laboratorio" / "auditorias-pagespeed.web.dev",
+    REPO_ROOT / "auditorias-pagespeed.web.dev",
     REPO_ROOT / "public" / "descargas",
     REPO_ROOT / "public" / "blog",
     REPO_ROOT / "public" / "tienda",

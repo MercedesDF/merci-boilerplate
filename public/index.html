@@ -9,22 +9,24 @@
     <!-- <meta name="googlebot" content="index, follow">
     <meta name="google" content="notranslate">
     <meta name="google" content="notranslate"> -->
-    <title>miproyecto — Spec as Source & Performance Engineering</title>
+    <title>merci-boilerplate — Spec as Source & Performance Engineering</title>
     
     <!-- Favicon y Mercí-->
     <link rel="icon" href="/favicon.ico?v=2" type="image/x-icon">
-    <link rel="stylesheet" href="/css/main.css?v=13">
-    <script src="/js/MerciController.js?v=13" defer></script>
-    <script src="/js/main.js?v=13" defer></script>
-    <link rel="canonical" href="https://miproyecto.com">
+    <!-- QUÉ HACE: Cache Busting dinámico incrementado a v14 -->
+    <!-- POR QUÉ: Obliga a Varnish y a navegadores móviles a purgar la caché y descargar la nueva rejilla de 5 columnas. -->
+    <link rel="stylesheet" href="/css/main.css?v=1778178950">
+    <script src="/js/MerciController.js?v=1777729228" defer></script>
+    <script src="/js/main.js?v=1777153888" defer></script>
+    <link rel="canonical" href="https://merci-boilerplate.es">
     
     <!-- JSON-LD Mínimo Fase 2 -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "WebSite",
-      "name": "miproyecto",
-      "url": "https://miproyecto.com"
+      "name": "merci-boilerplate",
+      "url": "https://merci-boilerplate.es"
     }
     </script>
 </head>
@@ -33,7 +35,7 @@
     <div id="top" tabindex="-1" style="position: absolute; top: 0; left: 0;"></div>
     <header class="header">
         <a href="/" class="header__brand">
-            <img src="/assets/images/logo.webp?v=2" alt="miproyecto" class="header__logo" width="263" height="65">
+            <img src="/assets/images/logo.webp?v=2" alt="merci-boilerplate" class="header__logo" width="263" height="65">
         </a>
         <button class="header__toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false">
             <span class="header__toggle-icon"></span>
@@ -64,7 +66,7 @@
             </h1>
 
             <p class="hero__subtitle">
-                Soy Mi Proyecto, Ingeniera Técnica. Diseño sistemas web ligeros, mantenibles y auditables, con foco en rendimiento, automatización en Python y control técnico del ciclo de desarrollo.
+                Soy merci-boilerplate, Ingeniera Técnica. Diseño sistemas web ligeros, mantenibles y auditables, con foco en rendimiento, automatización en Python y control técnico del ciclo de desarrollo.
             </p>
 
             <p class="hero__subtitle">
@@ -107,7 +109,7 @@
 
                 <div class="hero__metric">
                     <span class="hero__metric-label">SI</span>
-                    <span class="hero__metric-value">1.2 s</span>
+                    <span class="hero__metric-value">0.8 s</span>
                 </div>
 
                 <div class="hero__metric">
@@ -208,12 +210,12 @@
     <footer class="footer">
         <div class="footer__links">
             <a href="https://www.linkedin.com/in/mercedesdf-ingenieria/" target="_blank" rel="noopener noreferrer" class="footer__link">LinkedIn</a>
-            <a href="https://github.com/Mi ProyectoDF" target="_blank" rel="noopener noreferrer" class="footer__link">GitHub</a>
-            <a href="https://github.com/Mi ProyectoDF/merci-boilerplate" target="_blank" rel="noopener noreferrer" class="footer__link">Merci Boilerplate</a>
+            <a href="https://github.com/merci-boilerplateDF" target="_blank" rel="noopener noreferrer" class="footer__link">GitHub</a>
+            <a href="https://github.com/merci-boilerplateDF/merci-boilerplate" target="_blank" rel="noopener noreferrer" class="footer__link">Merci Boilerplate</a>
         </div>
         <div class="footer__text">
             <a href="#top">↑ Volver arriba</a><br>
-            &copy; 2026 <strong>miproyecto</strong> — Base de código abierto bajo Licencia MIT.
+            &copy; 2026 <strong>merci-boilerplate</strong> — Base de código abierto bajo Licencia MIT.
         </div>
     </footer>
 

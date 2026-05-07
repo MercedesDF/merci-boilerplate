@@ -1,4 +1,4 @@
-# Checklist de Hardening (Endurecimiento) de miproyecto.com
+# Checklist de Hardening (Endurecimiento) de merci-boilerplate.es
 
 Este documento consolida las medidas de seguridad aplicadas en la arquitectura híbrida del proyecto (Núcleo Estático + WordPress aislado). Actúa como lista de verificación de obligado cumplimiento antes de cualquier paso a producción.
 
@@ -22,7 +22,7 @@ Este documento consolida las medidas de seguridad aplicadas en la arquitectura h
 ## 3. Capa de Infraestructura (Servidor LEMP (Linux, Nginx, MySQL/MariaDB, PHP))
 
 - [x] **Principio de Mínimo Privilegio (Usuarios):**
-  - Base de datos (`wp_miproyecto_local`): Accedida mediante un usuario de MySQL dedicado (`wp_user_local`), sin privilegios globales.
+  - Base de datos (`wp_merci-boilerplate_local`): Accedida mediante un usuario de MySQL dedicado (`wp_user_local`), sin privilegios globales.
   - WordPress no usa el usuario por defecto "admin".
 - [x] **Permisos de Sistema de Archivos (CHMOD/CHOWN):**
   - Directorio base: Propiedad exclusiva de `www-data:www-data`.
@@ -31,7 +31,7 @@ Este documento consolida las medidas de seguridad aplicadas en la arquitectura h
   - Archivo crítico (`wp-config.php` a `600`): Lectura y escritura **solo** para `www-data`.
 - [x] **Fronteras Inmutables (Nginx):**
   - El entorno dinámico (`/blog`) se sirve mediante un `alias` en Nginx desde un directorio físico separado (`/var/www/wordpress`).
-  - WordPress no tiene permisos de escritura sobre la raíz estática (`/var/www/miproyecto/public`).
+  - WordPress no tiene permisos de escritura sobre la raíz estática (`/var/www/merci-boilerplate/public`).
 - [x] **Hardening de Cabeceras HTTP (VHost Nginx / CloudPanel):**
   - **CSP:** Implementada como cabecera. Bloquea XSS (Cross-Site Scripting - Secuencias de Comandos en Sitios Cruzados) definiendo orígenes permitidos (incluye whitelist criptográfico mediante Hash SHA-256 para scripts benignos residuales de WP).
   - **HSTS (HTTP Strict Transport Security - Seguridad de Transporte Estricta HTTP):** Fuerza comunicaciones exclusivamente por HTTPS (incluyendo directiva `preload` para precarga en navegadores) para mitigar ataques de intermediario (*Man-in-the-Middle*).

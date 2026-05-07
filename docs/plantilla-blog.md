@@ -8,7 +8,7 @@ fase: ""
 <!-- linkedin:
 Escribe aquí tu anuncio para LinkedIn.
 Acepta saltos de línea sin problemas.
-https://miproyecto.com/blog/tu-url
+https://merci-boilerplate.es/blog/tu-url
 -->
 
 Escribe aquí el contenido de tu artículo. 

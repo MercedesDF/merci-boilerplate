@@ -15,14 +15,28 @@ from pathlib import Path
 
 # Definición de rutas absolutas basadas en la ubicación del script
 REPO_ROOT = Path(__file__).resolve().parents[2]
-BITACORA_PATH = REPO_ROOT / "laboratorio" / "bitacora-miproyecto.md"
+
+# QUÉ HACE: Lista de bitácoras activas permitidas para gobernar los commits
+# POR QUÉ: Permite tener múltiples "libros" (Infraestructura, IA) sin romper la automatización.
+BITACORAS_ACTIVAS = [
+    REPO_ROOT / "laboratorio" / "bitacora-merci-boilerplate-orquestacion-ia.md",
+    REPO_ROOT / "laboratorio" / "bitacora-merci-boilerplate.md"
+]
 
 def check_repo_changes():
     """Verifica si hay algún cambio en el repositorio (staged, unstaged o untracked)."""
     result = subprocess.run(["git", "status", "--porcelain"], cwd=REPO_ROOT, capture_output=True, text=True)
     return len(result.stdout.strip()) > 0
 
-def check_bitacora_updated():
+def obtener_bitacora_activa():
+    """Devuelve la bitácora que ha sido modificada físicamente más recientemente."""
+    activas = [b for b in BITACORAS_ACTIVAS if b.exists()]
+    if not activas:
+        return None
+    # Compara la fecha de modificación (st_mtime) y devuelve la más reciente
+    return max(activas, key=lambda p: p.stat().st_mtime)
+
+def check_bitacora_updated(bitacora_path):
     """
     Verifica si la bitácora ha sido modificada desde el último commit.
     Devuelve True si hay cambios, False si no.
@@ -31,7 +45,7 @@ def check_bitacora_updated():
     # Usamos `HEAD` para comparar contra el último commit.
     try:
         result = subprocess.run(
-            ["git", "diff", "--quiet", "HEAD", "--", str(BITACORA_PATH)],
+            ["git", "diff", "--quiet", "HEAD", "--", str(bitacora_path)],
             cwd=REPO_ROOT,
             capture_output=True # Evitar que imprima errores si el archivo no existe aún
         )
@@ -81,8 +95,13 @@ def main():
         print("\n[Merci Info] El repositorio está limpio. No hay archivos modificados para comitear.")
         sys.exit(0)
 
+    bitacora_path = obtener_bitacora_activa()
+    if not bitacora_path:
+        print("[Merci Error] No se ha encontrado ninguna bitácora activa en el laboratorio.")
+        sys.exit(1)
+
     # 1. Verificación de seguridad: ¿Se ha actualizado la bitácora?
-    if not check_bitacora_updated():
+    if not check_bitacora_updated(bitacora_path):
         # Usamos códigos de color ANSI para la alerta. \033[93m es amarillo. \033[0m lo resetea.
         print("\n\033[93m[Merci Alerta] La bitácora no ha sido actualizada desde el último commit.\033[0m")
         print("Se han detectado archivos modificados, pero falta la justificación técnica.")
@@ -99,11 +118,7 @@ def main():
         commit_subject = custom_subject
         commit_body = "Mantenimiento o parche menor sin entrada en bitácora."
     else:
-        if not BITACORA_PATH.exists():
-            print(f"[Merci Error] Archivo de bitácora no localizado en {BITACORA_PATH}")
-            sys.exit(1)
-
-        content = BITACORA_PATH.read_text(encoding="utf-8")
+        content = bitacora_path.read_text(encoding="utf-8")
         title, context, hecho = parse_latest_entry(content)
 
         # QUÉ HACE: Actualiza automáticamente la fecha de revisión al final del documento.
@@ -111,7 +126,7 @@ def main():
         today = datetime.now().strftime("%Y-%m-%d")
         updated_content = re.sub(r"\*Última revisión de la bitácora:.*?\*", f"*Última revisión de la bitácora: {today}.*", content)
         if updated_content != content:
-            BITACORA_PATH.write_text(updated_content, encoding="utf-8")
+            bitacora_path.write_text(updated_content, encoding="utf-8")
 
         # Formateo del mensaje para Git
         commit_subject = title

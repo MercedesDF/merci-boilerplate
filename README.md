@@ -1,9 +1,15 @@
-# Merci Boilerplate v1.7.0
+# Merci Boilerplate v1.8.0
 
 Un entorno web híbrido, minimalista y seguro desde el diseño (Shift-Left). 
 Combina un núcleo estático ultrarrápido (HTML5, SASS, Vanilla JS y BEM (Block, Element, Modifier - Modificador de Elemento de Bloque)) con un motor dinámico aislado (WordPress). Diseñado para alcanzar un rendimiento perfecto (Core Web Vitals 100/100) y operar con 0 dependencias externas en el frontend.
 
 > 📖 **Historia y Arquitectura:** La justificación de las decisiones DevSecOps, el aislamiento del CMS y los manuales operativos se encuentran en la carpeta `/docs`.
+
+## 🚀 Novedades en la v1.8.0 (Automatización de Rendimiento y Multi-Bitácora)
+
+- **Cache Busting Dinámico (Fricción Cero):** El motor SSG (`merci-publish.py`) ahora lee automáticamente la fecha de modificación física (`st_mtime`) de los archivos CSS y JS para auto-inyectar marcas de tiempo (ej. `?v=X`) directamente en el código de la portada estática. Esto purga la caché de forma 100% automatizada tras cada compilación.
+- **Extracción de Métricas Nativa:** El script `merci-extract-metrics.py` se ha promovido al núcleo DevSecOps e inyectado en el orquestador maestro (`merci-total.py`). Los datos del Engineering Dashboard ahora se auto-actualizan durante la fase de Build, previniendo el Data Drift (Deriva de Datos).
+- **Soporte Multi-Bitácora en Pipeline:** El orquestador de commits atómicos (`merci-commit.py`) ahora cuenta con autodescubrimiento de contexto. Detecta de forma inteligente la "bitácora activa" leyendo las fechas de modificación más recientes, lo que permite dividir la documentación en ramas temáticas (Roadmap IA vs Ecosistema Base) sin destruir el flujo de Git.
 
 ## 🚀 Novedades en la v1.7.0 (SSG Dual y Engineering Dashboard)
 

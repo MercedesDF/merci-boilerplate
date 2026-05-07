@@ -22,16 +22,19 @@ SCRIPTS_DIR = Path(__file__).resolve().parent
 # 3. Publish: SSG que compila la Biblioteca desde Markdown a HTML/PDF.
 # 4. WP Headless: Sincroniza los markdowns locales dinámicos hacia WordPress.
 # 5. Sync Pages: Propaga el header/footer maestro a las páginas secundarias.
+# 6. Extract Metrics: Inyecta las últimas estadísticas de PageSpeed Insight en home.
 # --- FASE DE QA (QUALITY ASSURANCE) ---
-# 6. Sitemap: Escanea todos los HTML finales generados y actualiza el mapa XML.
-# 7. Audit: Auditoría estricta de seguridad, SEO y sintaxis sobre el código final.
-# 8. Linkcheck: Rastreo dinámico de enlaces rotos sobre el HTML final compilado.
+# 7. Sitemap: Escanea todos los HTML finales generados y actualiza el mapa XML.
+# 8. Audit: Auditoría estricta de seguridad, SEO y sintaxis sobre el código final.
+# 9. Linkcheck: Rastreo dinámico de enlaces rotos sobre el HTML final compilado.
+
 PIPELINE = [
     "merci-optimizer.py",
     "merci-styles.py",
     "merci-publish.py",
     "merci-wp.py",
     "merci-sync-pages.py",
+    "merci-extract-metrics.py",
     "merci-brain.py",
     "merci-sitemap.py",
     "merci-audit.py",
