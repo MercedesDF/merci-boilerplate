@@ -10,7 +10,7 @@ Pillow==12.2.0
 
 # Extracción de texto de PDFs de PageSpeed Insights (laboratorio/scripts_temporales/merci-extract-metrics.py)
 # Nota: script de laboratorio, no integrado en el pipeline principal (merci-total.py).
-pypdf==5.4.0
+pypdf==6.10.2
 
 # Librería de conversión Markdown a HTML (merci-publish.py, merci-wp.py)
 markdown==3.8
