@@ -1,9 +1,15 @@
-# Merci Boilerplate v1.8.0
+# Merci Boilerplate v1.9.0
 
 Un entorno web híbrido, minimalista y seguro desde el diseño (Shift-Left). 
 Combina un núcleo estático ultrarrápido (HTML5, SASS, Vanilla JS y BEM (Block, Element, Modifier - Modificador de Elemento de Bloque)) con un motor dinámico aislado (WordPress). Diseñado para alcanzar un rendimiento perfecto (Core Web Vitals 100/100) y operar con 0 dependencias externas en el frontend.
 
 > 📖 **Historia y Arquitectura:** La justificación de las decisiones DevSecOps, el aislamiento del CMS y los manuales operativos se encuentran en la carpeta `/docs`.
+
+## 🚀 Novedades en la v1.9.0 (Self-Healing System y WebP Automation)
+
+- **El Agente Auditor (IA Local):** El orquestador de calidad (`merci-audit.py`) ha sido dotado de un lóbulo frontal en Python conectándose a Ollama/phi3 vía LiteLLM. Ahora no solo intercepta errores de código, sino que sugiere por terminal la maniobra de reparación exacta siguiendo las directrices de la arquitectura. Funciona con *Degradación Elegante* (Fail Gracefully) si la IA no está instalada o activada.
+- **Auto-Healing en la Nube (CI/CD):** Nuevo flujo en GitHub Actions (`ia-fix.yml`) y agente autónomo (`merci-auto-fix.py`). Intercepta fallos del linter en la nube, delega la reparación a Gemini Flash API (*Hybrid Stack*) y aplica un auto-commit con el parche sin intervención humana.
+- **WebP Automation (Fricción Cero):** Introducción de `merci-assets-watcher.py`, un agente local que vigila la carpeta `.assets-raw` en segundo plano. Al detectar nuevas imágenes en bruto, despierta a `merci-optimizer.py` para generar variantes WebP mágicamente.
 
 ## 🚀 Novedades en la v1.8.0 (Automatización de Rendimiento y Multi-Bitácora)
 

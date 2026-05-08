@@ -98,7 +98,10 @@ def main():
     nueva_fase = input(f"  🏗️  Fase del Roadmap [{meta.get('fase', '')}]: ").strip() or meta.get('fase', '')
     
     # Al republicar, permitimos conservar la fecha original o sobreescribirla con la actual
-    fecha_defecto = meta.get('fecha', datetime.now().strftime("%Y-%m-%d"))
+    fecha_defecto = meta.get('fecha', '').strip()
+    if not fecha_defecto or fecha_defecto == "AAAA-MM-DD" or "YYYY" in fecha_defecto:
+        fecha_defecto = datetime.now().strftime("%Y-%m-%d")
+        
     nueva_fecha = input(f"  📅 Fecha de publicación [{fecha_defecto}]: ").strip() or fecha_defecto
 
     # Bloqueo estricto si falta el atributo de accesibilidad
