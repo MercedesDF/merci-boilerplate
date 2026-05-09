@@ -185,7 +185,11 @@ def publicar_en_wordpress(filepath: str, creds: dict, verbose: bool = False):
             payload["categories"] = [cat_id]
             if verbose: print(f"  🏷️  Categoría vinculada (ID: {cat_id})")
         else:
+            # QUÉ HACE: Provee la URL exacta y las instrucciones para resolver la falta de categoría.
+            # POR QUÉ: Mejora la Developer Experience (DX) evitando que el usuario deba recordar rutas o buscar manuales.
             print(f"  ⚠️ La categoría '{tema}' no existe en WP. Quedará sin categorizar.")
+            print(f"     👉 Solución: Entra en {wp_url}/wp-admin/edit-tags.php?taxonomy=category")
+            print(f"     crea la categoría '{tema}' y vuelve a ejecutar este comando para enlazarla.")
 
     data = json.dumps(payload).encode("utf-8")
     

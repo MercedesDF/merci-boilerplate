@@ -24,20 +24,20 @@ Este documento define el proceso estandarizado para desplegar la arquitectura h�
 ## PASO 2: Despliegue de Código (Git)
 1. Generar clave SSH para el usuario del sitio en CloudPanel.
 2. Vincular la clave en GitHub (Deploy Key) para permitir acceso de lectura.
-3. Clonar el repositorio en el Document Root asignado (ej. `/home/usuario-php/htdocs/dominio.com`).
+3. Clonar el repositorio en el Document Root asignado (ej. `/home/tu_usuario/htdocs/tu_dominio.com`).
 
 ## PASO 3: Aislamiento del CMS (WordPress)
 1. Crear base de datos y usuario asociado desde la interfaz de CloudPanel.
-2. Descargar y extraer WordPress en una carpeta hermana a la web (`/home/merci-boilerplate-php/htdocs/wordpress`).
+2. Descargar y extraer WordPress en una carpeta hermana a la web (`/home/tu_usuario/htdocs/wordpress`).
 3. Configurar `wp-config.php` de forma manual, generando Salts criptográficos y aplicando restricciones de seguridad (`chmod 600`).
 4. Crear los enlaces simbólicos físicos (Symlinks) para orquestar la arquitectura híbrida:
-   - **Puente del CMS:** `ln -s /home/merci-boilerplate-php/htdocs/wordpress /home/merci-boilerplate-php/htdocs/merci-boilerplate.es/public/blog`
-   - **Puente del Tema:** `ln -s /home/merci-boilerplate-php/htdocs/merci-boilerplate.es/src/wp-theme/merci-theme /home/merci-boilerplate-php/htdocs/wordpress/wp-content/themes/merci-theme`
-   - **Puente de Assets:** `ln -s /home/merci-boilerplate-php/htdocs/merci-boilerplate.es/assets /home/merci-boilerplate-php/htdocs/merci-boilerplate.es/public/assets`
+   - **Puente del CMS:** `ln -s /home/tu_usuario/htdocs/wordpress /home/tu_usuario/htdocs/tu_proyecto/public/blog`
+   - **Puente del Tema:** `ln -s /home/tu_usuario/htdocs/tu_proyecto/src/wp-theme/merci-theme /home/tu_usuario/htdocs/wordpress/wp-content/themes/merci-theme`
+   - **Puente de Assets:** `ln -s /home/tu_usuario/htdocs/tu_proyecto/assets /home/tu_usuario/htdocs/tu_proyecto/public/assets`
 
 ## PASO 4: Enrutamiento y SSL (CloudPanel)
 1. Emitir el Certificado SSL/TLS (Secure Sockets Layer / Transport Layer Security) gratuito (Let's Encrypt) desde la pestaña SSL de CloudPanel.
-2. Configurar la frontera estática: En la pestaña **Settings**, modificar el *Document Root* añadiendo `/public` al final (`/home/merci-boilerplate-php/htdocs/merci-boilerplate.es/public`).
+2. Configurar la frontera estática: En la pestaña **Settings**, modificar el *Document Root* añadiendo `/public` al final (`/home/tu_usuario/htdocs/tu_proyecto/public`).
 3. Configurar el enrutador dinámico: En la pestaña **VHost**, localizar el bloque `server` del puerto **8080** (procesamiento PHP), eliminar la regla global `try_files` e inyectar los bloques lógicos (`location /` y `location /blog`) definidos en `docs/integracion-wordpress.md`.
 4. Inyectar el bloque de cabeceras HTTP de seguridad (CSP, HSTS, COOP, etc.) en el mismo bloque `server` del puerto 8080 para blindar el frontend contra ataques XSS y *Clickjacking*.
 5. Acceder a la ruta `/blog` en el navegador, completar la instalación de WordPress, guardar los **Enlaces Permanentes** ("Nombre de la entrada") y activar el Child Theme.

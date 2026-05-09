@@ -22,34 +22,41 @@ def main():
     print("🚀 [Merci Promote] Iniciando flujo de promoción de conocimiento...")
 
     # 2. Escaneo Global: Laboratorio (nuevos) y Directorios Raíz (despublicados / huérfanos)
-    # QUÉ HACE: Usa rglob para buscar también en subcarpetas (ej. laboratorio/blog/).
-    borradores_lab = [f for f in LABORATORIO_DIR.rglob("*.md") if f.name != "bitacora-merci-boilerplate.md" and "evidencias" not in f.parts]
-    borradores_dest = []
+    # QUÉ HACE: Usa rglob para buscar en subcarpetas, pero aplica un filtro estricto de estado YAML.
+    # POR QUÉ: Evita listar bitácoras, roadmaps, prompts o notas crudas sin YAML.
+    borradores_totales = []
+    directorios_a_escanear = [LABORATORIO_DIR] + DESTINOS_DIR
 
-    for dest_dir in DESTINOS_DIR:
-        if not dest_dir.exists():
+    for dir_base in directorios_a_escanear:
+        if not dir_base.exists():
             continue
-        for f in dest_dir.rglob("*.md"):
+        for f in dir_base.rglob("*.md"):
+            # Exclusión de infraestructura (nunca se promueven)
+            if f.name.startswith("bitacora-") or "ROADMAP" in f.name or "prompts" in f.parts or "historico" in f.parts or "evidencias" in f.parts:
+                continue
+
             content = f.read_text(encoding="utf-8", errors="replace")
-            # QUÉ HACE: Expresión regular robusta tolerante a espacios residuales.
             match = re.search(r"^\s*---\s*\n(.*?)\n---\s*(?:\n|$)", content, flags=re.DOTALL | re.MULTILINE)
             if match:
                 estado_match = re.search(r"^estado:\s*[\"']?(.*?)[\"']?\s*$", match.group(1), re.MULTILINE)
-                estado = estado_match.group(1).lower() if estado_match else "borrador"
-                if estado != "publicado":
-                    borradores_dest.append(f)
-            else:
-                borradores_dest.append(f)
-    
-    borradores_totales = borradores_lab + borradores_dest
+                estado = estado_match.group(1).lower() if estado_match else ""
+                
+                # Máquina de Estados estricta: Solo lo que dice explícitamente "borrador"
+                if estado == "borrador":
+                    borradores_totales.append(f)
+
     if not borradores_totales:
         print("  ℹ️ No se encontraron borradores pendientes de curación.")
         return
 
     print("\n📄 Borradores pendientes de curación:")
     for idx, f in enumerate(borradores_totales, start=1):
-        # QUÉ HACE: Identifica visualmente si el archivo viene del laboratorio o si es una despublicación de la raíz.
-        origen = "Laboratorio" if LABORATORIO_DIR in f.parents else f"Raíz: {f.parent.name} (Despublicado)"
+        # QUÉ HACE: Identifica visualmente la subcarpeta exacta de origen o si es una despublicación de la raíz.
+        if LABORATORIO_DIR in f.parents:
+            subcarpeta = f.parent.relative_to(LABORATORIO_DIR)
+            origen = str(subcarpeta) if str(subcarpeta) != "." else "raíz"
+        else:
+            origen = f"Despublicado: {f.parent.name}"
         print(f"  [{idx}] {f.name} ({origen})")
 
     # 3. Interfaz de selección por consola

@@ -6,17 +6,20 @@ merci-brain.py — Lóbulo frontal de Inteligencia Artificial (Shift-Left AI).
 Conecta con la API REST de Google Gemini utilizando cero dependencias externas.
 Se encarga de procesar el contexto de la web en tiempo de compilación para 
 generar respuestas estáticas inteligentes, protegiendo el rendimiento (100/100)
-y evitando la exposición de claves en el frontend.
+y operando de forma 100% offline y gratuita.
 """
 
 import sys
 import json
 import re
 import unicodedata
-import time
 import urllib.request
 import urllib.error
 from pathlib import Path
+import warnings
+
+# Silenciamos advertencias de deprecación de librerías de terceros (ej. google.generativeai) para mantener la consola limpia
+warnings.filterwarnings("ignore", category=FutureWarning)
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 ENV_PATH = REPO_ROOT / ".env"
@@ -29,67 +32,31 @@ def slugify(texto: str) -> str:
     texto = re.sub(r'[^\w\s-]', '', texto.lower())
     return re.sub(r'[-\s]+', '-', texto).strip('-_')
 
-def cargar_api_key():
-    """Lee la clave de Gemini desde el entorno local seguro."""
-    if not ENV_PATH.exists():
-        return None
-    for linea in ENV_PATH.read_text(encoding="utf-8").splitlines():
-        if linea.startswith("GEMINI_API_KEY="):
-            return linea.split("=", 1)[1].strip().strip('"\'')
-    return None
-
-def auto_descubrir_modelo(api_key):
-    """
-    QUÉ HACE: Interroga a Google para saber qué modelos exactos están disponibles.
-    POR QUÉ: Resuelve los errores 404 por restricciones regionales (UE) o cambios 
-    de alias en la API, buscando dinámicamente el modelo más rápido permitido.
-    """
-    url = f"https://generativelanguage.googleapis.com/v1beta/models?key={api_key}"
+def consultar_ia_local(prompt):
+    """Realiza una petición POST nativa a la API local de Ollama (qwen2.5-coder)."""
+    # QUÉ HACE: Envía el prompt de generación de texto al endpoint de la API local de Ollama.
+    # POR QUÉ: Aísla el proceso de la nube, garantizando cero latencia de red y privacidad total.
     try:
-        with urllib.request.urlopen(url) as response:
-            data = json.loads(response.read().decode("utf-8"))
-            validos = [
-                m["name"].split("/")[-1] for m in data.get("models", [])
-                if "generateContent" in m.get("supportedGenerationMethods", [])
-                and "gemini" in m.get("name", "").lower()
-            ]
-            # Búsqueda flexible por subcadena para atrapar sufijos (-001, -002) y garantizar cuota de 1500/día
-            for familia in ["1.5-flash", "1.5-pro", "2.0-flash"]:
-                for v in validos:
-                    if familia in v: return v
-            # Si no encuentra ninguna familia prioritaria, coge la última para evitar las experimentales recientes
-            return validos[-1] if validos else "gemini-pro"
-    except Exception:
-        return "gemini-pro"
+        local_url = "http://localhost:11434/api/generate"
+        local_payload = {
+            "model": "qwen2.5-coder",
+            "prompt": prompt,
+            "stream": False,
+            "options": {"temperature": 0.4}
+        }
+        local_req = urllib.request.Request(local_url, data=json.dumps(local_payload).encode("utf-8"), method="POST")
+        local_req.add_header("Content-Type", "application/json")
+        with urllib.request.urlopen(local_req, timeout=120) as local_response:
+            local_data = json.loads(local_response.read().decode("utf-8"))
+            return local_data["response"].strip()
+    except Exception as e_local:
+        return f"Error HTTP Local: {e_local}"
 
-def consultar_gemini(prompt, api_key, modelo="gemini-pro"):
-    """Realiza una petición POST nativa a la API de Gemini."""
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{modelo}:generateContent?key={api_key}"
-    payload = {
-        "contents": [{"parts": [{"text": prompt}]}],
-        # Ajustamos la temperatura para respuestas concisas y precisas
-        "generationConfig": {"temperature": 0.4}
-    }
-    
-    data = json.dumps(payload).encode("utf-8")
-    req = urllib.request.Request(url, data=data, method="POST")
-    req.add_header("Content-Type", "application/json")
-
-    try:
-        with urllib.request.urlopen(req) as response:
-            res_data = json.loads(response.read().decode("utf-8"))
-            return res_data["candidates"][0]["content"]["parts"][0]["text"].strip()
-    except urllib.error.HTTPError as e:
-        error_info = e.read().decode("utf-8")
-        return f"Error HTTP {e.code}: {e.reason}\nDetalle de la API: {error_info}"
-    except Exception as e:
-        return f"Error de conexión sináptica: {e}"
-
-def generar_cerebro_estatico(api_key, modelo, force_clean=False):
+def generar_cerebro_estatico(force_clean=False):
     """
-    QUÉ HACE: Escanea la biblioteca, pide saludos contextuales a Gemini y los guarda en un JSON.
+    QUÉ HACE: Escanea la biblioteca, pide saludos contextuales a Ollama local y los guarda en un JSON.
     POR QUÉ: Permite a Merci tener respuestas inteligentes en cada artículo sin consumir
-    tiempo de red (0 ms latencia) ni exponer la clave API en el navegador.
+    tiempo de red (0 ms latencia) ni depender de servicios externos de terceros.
     """
     print("\n📚 [Merci Brain] Iniciando escaneo de la Biblioteca...")
     biblioteca_dir = REPO_ROOT / "biblioteca"
@@ -111,7 +78,7 @@ def generar_cerebro_estatico(api_key, modelo, force_clean=False):
         except Exception:
             pass
     
-    cuota_agotada = False
+    fallo_local = False
     
     for md_file in biblioteca_dir.rglob("*.md"):
         content = md_file.read_text(encoding="utf-8")
@@ -136,8 +103,8 @@ def generar_cerebro_estatico(api_key, modelo, force_clean=False):
         if url in brain_data and not brain_data[url].startswith("Error HTTP") and not brain_data[url].startswith("[Fallback]"):
             continue
             
-        # Circuit Breaker: Si la cuota ya se agotó en esta ejecución, mantenemos/creamos el fallback en silencio
-        if cuota_agotada:
+        # Circuit Breaker: Si el servidor local falló en esta ejecución, mantenemos/creamos el fallback en silencio
+        if fallo_local:
             if url not in brain_data or brain_data[url].startswith("Error HTTP"):
                 brain_data[url] = f"[Fallback] Bienvenido a la lectura de: {titulo}."
             continue
@@ -145,18 +112,14 @@ def generar_cerebro_estatico(api_key, modelo, force_clean=False):
         print(f"  🧠 Pensando saludo para: {titulo}...")
         prompt = f"Eres un asistente virtual técnico de la web merci-boilerplate.es (Arquitectura DevSecOps). El usuario acaba de entrar a leer el artículo titulado '{titulo}' (Contexto: {desc}). Escribe un saludo directo, inteligente y con un sutil toque 'geek' o de ingeniería (una sola frase, máximo 15 palabras) dándole la bienvenida a este contenido concreto. No uses comillas."
         
-        respuesta = consultar_gemini(prompt, api_key, modelo)
+        respuesta = consultar_ia_local(prompt)
         
-        # Degradación elegante con Circuit Breaker
-        if respuesta.startswith("Error HTTP"):
-            print(f"  ⚠️ Cuota de API agotada. Suspendiendo peticiones y aplicando contingencia...")
-            cuota_agotada = True
+        if respuesta.startswith("Error HTTP Local"):
+            print(f"  ⚠️ Error de conexión con Ollama. Suspendiendo peticiones y aplicando contingencia...")
+            fallo_local = True
             brain_data[url] = f"[Fallback] Bienvenido a la lectura de: {titulo}."
         else:
             brain_data[url] = respuesta.replace('"', '').strip()
-            # Respetar el límite estricto de la API gratuita (5 RPM)
-            print("  ⏳ Enfriando sinapsis (15s) para evitar bloqueos por cuota de red...")
-            time.sleep(15)
 
     # Guardar el JSON (Base de conocimientos estática)
     PUBLIC_JS_DIR.mkdir(parents=True, exist_ok=True)
@@ -166,19 +129,10 @@ def generar_cerebro_estatico(api_key, modelo, force_clean=False):
     # Reporte final de contingencias
     fallbacks_count = sum(1 for v in brain_data.values() if v.startswith("[Fallback]"))
     if fallbacks_count > 0:
-        print(f"  ℹ️  Info: Quedan {fallbacks_count} artículos pendientes de IA por límite de cuota. Se reintentarán automáticamente en el próximo 'merci total'.")
+        print(f"  ℹ️  Info: Quedan {fallbacks_count} artículos pendientes de IA por fallo de conexión local. Verifica Ollama.")
 
 if __name__ == "__main__":
-    print("🧠 [Merci Brain] Despertando lóbulo frontal...")
+    print("🧠 [Merci Brain] Despertando lóbulo frontal (Motor 100% Local)...")
     force_clean = "--clean" in sys.argv
-    api_key = cargar_api_key()
     
-    if not api_key:
-        print("  ⚠️ WARN: GEMINI_API_KEY no encontrada en el archivo .env.")
-        print("  ℹ️  El asistente Merci utilizará sus respuestas genéricas por defecto.")
-        sys.exit(0)
-        
-    modelo_activo = auto_descubrir_modelo(api_key)
-    print(f"  📡 Conectando a la red neuronal (Modelo auto-descubierto: {modelo_activo})...")
-    
-    generar_cerebro_estatico(api_key, modelo_activo, force_clean)
+    generar_cerebro_estatico(force_clean)

@@ -5,7 +5,7 @@ tipo: "cuadernillo"
 tema: "DevSecOps y Gobernanza"
 fecha: "2026-05-01"
 fase: ""
-estado: "borrador"
+estado: "incubacion"
 alt_portada: "Descripción visual de la imagen de portada para accesibilidad WAI-ARIA."
 ---
 

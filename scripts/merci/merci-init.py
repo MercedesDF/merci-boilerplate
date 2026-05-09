@@ -217,10 +217,15 @@ def main():
     # POR QUÉ: Recrearlas vacías garantiza que no haya fugas de datos (borradores antiguos)
     # pero asegura que el andamiaje del Headless CMS esté listo para el nuevo usuario.
     for dir_name in ["blog", "art-de-cote"]:
-        for base in ["laboratorio", ""]:
-            dir_path = REPO_ROOT / base / dir_name if base else REPO_ROOT / dir_name
-            dir_path.mkdir(parents=True, exist_ok=True)
-            (dir_path / ".gitkeep").touch(exist_ok=True)
+        dir_path = REPO_ROOT / dir_name
+        dir_path.mkdir(parents=True, exist_ok=True)
+        (dir_path / ".gitkeep").touch(exist_ok=True)
+
+    # Reconstrucción del andamiaje interno del laboratorio
+    for lab_dir in ["blog", "art-de-cote", "incubacion", "notas_rapidas", "prompts", "historico"]:
+        dir_path = REPO_ROOT / "laboratorio" / lab_dir
+        dir_path.mkdir(parents=True, exist_ok=True)
+        (dir_path / ".gitkeep").touch(exist_ok=True)
 
     # QUÉ HACE: Purga el material multimedia personal del autor original.
     # POR QUÉ: Evita engordar el Boilerplate con fotos propias, pero preserva 

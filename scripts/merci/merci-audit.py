@@ -39,6 +39,9 @@ try:
     import litellm
     from litellm import completion
     litellm.telemetry = False  # Desactivar telemetría por privacidad (Zero Trust)
+    # QUÉ HACE: Desactiva los mensajes de soporte y depuración internos de la librería.
+    # POR QUÉ: Preserva la limpieza de la terminal (DX) al realizar la degradación elegante.
+    litellm.suppress_debug_info = True
 except ImportError:
     litellm = None
 
@@ -655,13 +658,17 @@ def audit_banned_tracked_files(root: Path, state: AuditState, staged_only: bool)
 
 def get_system_prompt() -> str:
     """Lee el prompt rector del sistema para inyectarlo en la IA."""
+    # QUÉ HACE: Lee físicamente el documento de directrices base del ecosistema.
+    # POR QUÉ: Mantiene las reglas de la IA desacopladas del código Python, facilitando su evolución.
     prompt_path = REPO_ROOT / "laboratorio" / "prompts" / "prompt-sistema-base.md"
     if prompt_path.exists():
         return prompt_path.read_text(encoding="utf-8", errors="replace")
     return "Eres un asistente DevSecOps. Sugiere una reparación breve para el siguiente error."
 
 def get_ai_suggestion(finding: Finding) -> str:
-    """Genera una sugerencia de código usando el modelo local (Ollama + phi3)."""
+    """Genera una sugerencia de código usando el modelo local (Ollama + qwen2.5-coder)."""
+    # QUÉ HACE: Extrae contexto del archivo roto y pide al modelo local una corrección específica.
+    # POR QUÉ: Reduce la fricción operativa al proporcionar la solución directamente en consola.
     if not litellm:
         return ""
         
@@ -689,9 +696,9 @@ def get_ai_suggestion(finding: Finding) -> str:
     ]
 
     try:
-        # Delegamos a phi3 local por el puerto 11434
+        # Delegamos a qwen2.5-coder local por el puerto 11434
         respuesta = completion(
-            model="ollama/phi3",
+            model="ollama/qwen2.5-coder",
             messages=mensajes,
             api_base="http://localhost:11434",
             max_tokens=250

@@ -1,6 +1,6 @@
 ---
 titulo: "Título de la exploración o cuadernillo"
-estado: "borrador"
+estado: "incubacion"
 tema: "Art de Coté"
 fase: ""
 ---

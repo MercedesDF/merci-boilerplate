@@ -1,6 +1,6 @@
 ---
 titulo: "Título de la entrada del Blog"
-estado: "borrador"
+estado: "incubacion"
 tema: "Blog"
 fase: ""
 ---

@@ -1,9 +1,19 @@
-# Merci Boilerplate v1.9.0
+# Merci Boilerplate v1.10.0
 
-Un entorno web híbrido, minimalista y seguro desde el diseño (Shift-Left). 
-Combina un núcleo estático ultrarrápido (HTML5, SASS, Vanilla JS y BEM (Block, Element, Modifier - Modificador de Elemento de Bloque)) con un motor dinámico aislado (WordPress). Diseñado para alcanzar un rendimiento perfecto (Core Web Vitals 100/100) y operar con 0 dependencias externas en el frontend.
+Un ecosistema DevSecOps autónomo impulsado por Inteligencia Artificial Local (Shift-Left AI) y Desarrollo Guiado por Especificaciones (Spec-Driven Development). 
 
-> 📖 **Historia y Arquitectura:** La justificación de las decisiones DevSecOps, el aislamiento del CMS y los manuales operativos se encuentran en la carpeta `/docs`.
+Combina un orquestador local en Python puro (Sistema Merci) que automatiza la calidad del código, un núcleo estático ultrarrápido (HTML5, SASS, Vanilla JS, BEM) y un motor dinámico aislado opcional (WordPress Headless). Diseñado para alcanzar un rendimiento perfecto (Core Web Vitals 100/100) con 0 dependencias externas bloqueantes en el pipeline.
+
+> 🤖 **Inteligencia y Gobernanza:** El boilerplate incluye agentes de IA locales que auto-reparan código, auto-documentan el Roadmap y generan bases de conocimiento estáticas con coste cero y privacidad total. La justificación de las decisiones DevSecOps reside en la carpeta `/docs`.
+
+## 🚀 Novedades en la v1.10.0 (Autonomía Local y Self-Healing Docs)
+
+- **Lóbulo Frontal 100% Local (Zero Dependencies):** El agente `merci-brain.py` ha sido refactorizado para operar exclusivamente offline utilizando SLM (Small Language Models - Modelos de Lenguaje Pequeños) locales (Ollama). Esto erradica la latencia de red, elimina dependencias de claves de API (Application Programming Interface - Interfaz de Programación de Aplicaciones) y acelera radicalmente el tiempo de compilación.
+- **Agente SSOT (Sincronización Documental Autónoma):** Introducción de `merci-ssot.py`. Este agente analiza semánticamente la bitácora activa y detecta deriva documental (Document Drift), auto-sanando y actualizando el Roadmap del proyecto para garantizar una SSOT (Single Source of Truth - Única Fuente de Verdad) sin intervención manual.
+- **Automatización Social con Gatekeeper:** El publicador `merci-linkedin.py` ahora integra autenticación nativa OIDC (OpenID Connect) y un escudo interactivo (*Gatekeeper*). Exige confirmación humana antes de disparar peticiones a la API, previniendo publicación accidental (Spam) mientras automatiza la extracción de metadatos YAML.
+- **Clean DX (Experiencia del Desarrollador Limpia):** Se ha reforzado la limpieza de consola silenciando los avisos internos de depuración de la capa de abstracción LiteLLM en todos los agentes, respetando la filosofía "Silence is Golden".
+- **Máquina de Estados y Patrón Inbox (Zero-Code):** El entorno de incubación (`laboratorio/`) ha sido reestructurado. Se introduce el subdirectorio `incubacion/` como "Bandeja de Entrada" unificada para borradores crudos. Se formaliza el estado temporal `incubacion` en el YAML para ocultar documentos inmaduros del orquestador de promoción (`merci-promote.py`), el cual ahora también informa visualmente de la subcarpeta de origen exacta, reduciendo la fricción cognitiva a cero.
+- **Agente Bibliotecario (Zero-Friction Formatting):** Rescatado y convertido en un orquestador 100% local. Transforma notas crudas en documentos YAML perfectamente estructurados. Se le ha inyectado una política "Zero-Hallucination" para que no invente código, actuando como un sintetizador de formato en lugar de un expansor de conocimiento.
 
 ## 🚀 Novedades en la v1.9.0 (Self-Healing System y WebP Automation)
 

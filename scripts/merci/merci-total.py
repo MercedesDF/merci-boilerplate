@@ -24,9 +24,10 @@ SCRIPTS_DIR = Path(__file__).resolve().parent
 # 5. Sync Pages: Propaga el header/footer maestro a las páginas secundarias.
 # 6. Extract Metrics: Inyecta las últimas estadísticas de PageSpeed Insight en home.
 # --- FASE DE QA (QUALITY ASSURANCE) ---
-# 7. Sitemap: Escanea todos los HTML finales generados y actualiza el mapa XML.
-# 8. Audit: Auditoría estricta de seguridad, SEO y sintaxis sobre el código final.
-# 9. Linkcheck: Rastreo dinámico de enlaces rotos sobre el HTML final compilado.
+# 7. SSOT: Agente que sincroniza el Roadmap.
+# 8. Sitemap: Escanea todos los HTML finales generados y actualiza el mapa XML.
+# 9. Audit: Auditoría estricta de seguridad, SEO y sintaxis sobre el código final.
+# 10. Linkcheck: Rastreo dinámico de enlaces rotos sobre el HTML final compilado.
 
 PIPELINE = [
     "merci-optimizer.py",
@@ -37,6 +38,7 @@ PIPELINE = [
     "merci-extract-metrics.py",
     "merci-brain.py",
     "merci-sitemap.py",
+    "merci-ssot.py",
     "merci-audit.py",
     "merci-linkcheck.py"
 ]

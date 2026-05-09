@@ -174,6 +174,9 @@ def publicar_texto_linkedin(access_token, author_urn, texto):
             res = json.loads(response.read().decode("utf-8"))
             return res.get("id") # Retorna el ID único del post en LinkedIn
     except urllib.error.HTTPError as e:
+        if e.code == 401:
+            print("  ⚠️ [Merci Warn] Token expirado (HTTP 401). Borrando .linkedin_token.json para forzar re-autenticación.")
+            TOKEN_PATH.unlink(missing_ok=True)
         print(f"❌ Error API LinkedIn: {e.read().decode('utf-8')}")
         return None
 
@@ -186,7 +189,8 @@ def publicar_articulos_pendientes():
     
     if not author_urn: return
 
-    directorios = [REPO_ROOT / "blog", REPO_ROOT / "art-de-cote"]
+    # Añadimos la biblioteca para poder promocionar también Cuadernillos y Compendios estáticos
+    directorios = [REPO_ROOT / "blog", REPO_ROOT / "art-de-cote", REPO_ROOT / "biblioteca"]
     yaml_pattern = re.compile(r"^\s*---\r?\n(.*?)\r?\n---\r?\n", re.DOTALL)
     
     publicados = 0
@@ -201,25 +205,31 @@ def publicar_articulos_pendientes():
             yaml_block = match.group(1)
             estado = re.search(r'^estado:\s*["\']?([^"\'\n]+)["\']?', yaml_block, re.MULTILINE)
             
-            wp_id_match = re.search(r'^wp_id:', yaml_block, re.MULTILINE)
             linkedin_id = re.search(r'^linkedin_id:', yaml_block, re.MULTILINE)
             
             # NUEVA LÓGICA: Leer el texto de LinkedIn desde un comentario HTML en el cuerpo del Markdown
             linkedin_text_match = re.search(r'<!--\s*linkedin:\s*(.*?)\s*-->', content, re.DOTALL | re.IGNORECASE)
             
-            # REGLA ESTRICTA: Solo publica si existe en la web, tiene el bloque HTML y no se ha publicado antes
-            if estado and estado.group(1) == "publicado" and linkedin_text_match and wp_id_match and not linkedin_id:
+            # REGLA ESTRICTA: Solo publica si está publicado, tiene el bloque HTML y no se ha publicado en LinkedIn antes
+            if estado and estado.group(1) == "publicado" and linkedin_text_match and not linkedin_id:
                 texto_post = linkedin_text_match.group(1).strip()
-                print(f"  📝 Publicando en LinkedIn post de: {archivo.name}...")
-                post_id = publicar_texto_linkedin(access_token, author_urn, texto_post)
+                print(f"\n  📝 Post pendiente detectado: {archivo.name}")
+                print(f"  💬 Previsualización: {texto_post[:70]}...")
                 
-                if post_id:
-                    # Inyectamos el sello de LinkedIn en el YAML para no duplicar jamás
-                    nuevo_yaml = yaml_block + f'\nlinkedin_id: "{post_id}"'
-                    nuevo_contenido = content.replace(yaml_block, nuevo_yaml)
-                    archivo.write_text(nuevo_contenido, encoding="utf-8")
-                    print(f"  ✅ ¡Éxito! Post sellado con ID de LinkedIn.")
-                    publicados += 1
+                # BARRERA DE SEGURIDAD: Preguntar antes de disparar a la red social
+                confirmacion = input("  👉 ¿Publicar esto en tu perfil de LinkedIn ahora? (s/N): ").strip().lower()
+                if confirmacion == 's':
+                    post_id = publicar_texto_linkedin(access_token, author_urn, texto_post)
+                    
+                    if post_id:
+                        # Inyectamos el sello de LinkedIn en el YAML para no duplicar jamás
+                        nuevo_yaml = yaml_block + f'\nlinkedin_id: "{post_id}"'
+                        nuevo_contenido = content.replace(yaml_block, nuevo_yaml)
+                        archivo.write_text(nuevo_contenido, encoding="utf-8")
+                        print(f"  ✅ ¡Éxito! Post sellado con ID de LinkedIn.")
+                        publicados += 1
+                else:
+                    print("  ⏭️ Publicación omitida por el usuario.")
 
     if publicados == 0:
         print("  🤷‍♀️ Ningún artículo nuevo pendiente de publicar en LinkedIn.")

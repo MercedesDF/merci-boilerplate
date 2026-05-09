@@ -11,21 +11,65 @@ Markdown estructurados en el directorio de incubación (`laboratorio/`).
 import os
 import sys
 from datetime import datetime
+import json
+import urllib.request
 from pathlib import Path
+import warnings
+import re
 
-try:
-    from litellm import completion
-    import litellm
-    litellm.telemetry = False  # Telemetría desactivada por DevSecOps
-except ImportError:
-    print("ℹ️ [Merci Librarian] LiteLLM no está instalado. Omitiendo agente bibliotecario.")
-    sys.exit(0)
+# Silenciamos advertencias de deprecación de librerías de terceros (ej. google.generativeai) para mantener la consola limpia
+warnings.filterwarnings("ignore", category=FutureWarning)
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 NOTES_DIR = REPO_ROOT / "laboratorio" / "notas_rapidas"
 PROCESADAS_DIR = NOTES_DIR / "_procesadas"
 LAB_DIR = REPO_ROOT / "laboratorio"
 PROMPT_PATH = REPO_ROOT / "laboratorio" / "prompts" / "prompt-bibliotecario.md"
+ENV_PATH = REPO_ROOT / ".env"
+
+def consultar_ia_local(prompt, system_prompt):
+    """Realiza una petición POST nativa a la API local de Ollama."""
+    # QUÉ HACE: Envía el prompt y el molde mental (system) al endpoint de la API local de Ollama sin librerías externas.
+    # POR QUÉ: Erradica la dependencia de LiteLLM y la nube, consolidando la arquitectura 100% local.
+    try:
+        local_url = "http://localhost:11434/api/generate"
+        local_payload = {
+            "model": "qwen2.5-coder",
+            "prompt": prompt,
+            "system": system_prompt,
+            "stream": False,
+            "options": {
+                "temperature": 0.0,
+                "num_ctx": 4096
+            }
+        }
+        local_req = urllib.request.Request(local_url, data=json.dumps(local_payload).encode("utf-8"), method="POST")
+        local_req.add_header("Content-Type", "application/json")
+        with urllib.request.urlopen(local_req, timeout=600) as local_response:
+            local_data = json.loads(local_response.read().decode("utf-8"))
+            return local_data["response"].strip()
+    except Exception as e_local:
+        return f"Error HTTP Local: {e_local}"
+
+def get_bitacora_context(nota_cruda: str) -> str:
+    """Extrae palabras clave de la nota y filtra entradas relevantes de la bitácora (RAG Optimizado)."""
+    bitacoras = [LAB_DIR / "bitacora-merci-boilerplate-orquestacion-ia.md", LAB_DIR / "bitacora-merci-boilerplate.md"]
+    contexto = ""
+    palabras_clave = [p.lower() for p in re.findall(r'\b[a-zA-Z]{5,}\b', nota_cruda)]
+
+    for bitacora in bitacoras:
+        if bitacora.exists():
+            texto = bitacora.read_text(encoding="utf-8", errors="replace")
+            entradas = re.split(r'(?=### \d{4}-\d{2}-\d{2})', texto)
+            relevantes = []
+            for entrada in entradas:
+                if not entrada.strip(): continue
+                if any(kw in entrada.lower() for kw in palabras_clave):
+                    relevantes.append(entrada.strip())
+                    if len(relevantes) >= 2: break # Solo las 2 más relevantes por archivo
+            if relevantes:
+                contexto += f"\n--- Entradas relevantes de {bitacora.name} ---\n" + "\n\n".join(relevantes) + "\n"
+    return contexto[:3000] # Límite estricto de seguridad para modelos locales
 
 def get_system_prompt() -> str:
     """Extrae el rol innegociable y las reglas editoriales del Agente."""
@@ -36,16 +80,16 @@ def get_system_prompt() -> str:
 
 def clean_markdown(text: str) -> str:
     """
-    QUÉ HACE: Elimina los delimitadores de bloque de código (```markdown) que la IA 
-    suele inyectar alrededor de sus respuestas.
-    POR QUÉ: Garantiza que el archivo resultante tenga el YAML Frontmatter en la primera línea.
+    QUÉ HACE: Elimina texto conversacional previo ("Here is the output:") y delimitadores.
+    POR QUÉ: Garantiza que el archivo comience estrictamente por el YAML Frontmatter (---).
     """
+    # 1. Buscar el inicio real del YAML Frontmatter y amputar la basura conversacional
+    inicio_yaml = text.find("---\n")
+    if inicio_yaml != -1:
+        text = text[inicio_yaml:]
+    
+    # 2. Limpiar cierres de bloque de código al final
     text = text.strip()
-    if text.startswith("```markdown"):
-        text = text[11:].strip()
-    elif text.startswith("```"):
-        text = text[3:].strip()
-        
     if text.endswith("```"):
         text = text[:-3].strip()
         
@@ -62,38 +106,44 @@ def process_note(note_path: Path):
     
     tipo_doc = "cuadernillo"
     prefijo = "cuadernillo-borrador"
-    destino_dir = LAB_DIR
+    # QUÉ HACE: Centraliza la salida de todos los documentos en una única bandeja de entrada.
+    # POR QUÉ: Separa los documentos recién creados por la IA de los borradores maduros listos para promoción.
+    destino_dir = LAB_DIR / "incubacion"
+    destino_dir.mkdir(parents=True, exist_ok=True)
     instrucciones_extra = ""
+    plantilla_path = REPO_ROOT / "docs" / "plantilla-cuadernillo.md"
 
     if opcion == "2":
         tipo_doc = "compendio"
         prefijo = "compendio-borrador"
         instrucciones_extra = "ATENCIÓN: Estás redactando un COMPENDIO estratégico de alto nivel. Agrupa los conceptos con visión arquitectónica en lugar de centrarte en un solo bug."
+        plantilla_path = REPO_ROOT / "docs" / "plantilla-proyecto.md"
     elif opcion == "3":
         prefijo = "art-de-cote-borrador"
-        destino_dir = LAB_DIR / "art-de-cote"
-        destino_dir.mkdir(parents=True, exist_ok=True)
         instrucciones_extra = "ATENCIÓN: Estás redactando un ART DE COTÉ. Enfatiza el valor del código descartado o el experimento realizado para que quede como registro."
-    
+        plantilla_path = REPO_ROOT / "docs" / "plantilla-art-de-cote.md"
+
+    if plantilla_path.exists():
+        plantilla_content = plantilla_path.read_text(encoding="utf-8", errors="replace")
+        instrucciones_extra += f"\n\nREGLA ESTRICTA DE FORMATO: Tu respuesta DEBE ser un calco exacto de la siguiente plantilla. Debes rellenar los valores del YAML Frontmatter y seguir la estructura de cabeceras mostrada a continuación:\n\n{plantilla_content}\n"
+
     fecha_hoy = datetime.now().strftime("%Y-%m-%d")
     note_content = note_path.read_text(encoding="utf-8", errors="replace")
-    prompt = f"La fecha actual es {fecha_hoy}. {instrucciones_extra}\n\nTransforma las siguientes notas en bruto en un documento estructurado:\n\n{note_content}"
+    bitacora_context = get_bitacora_context(note_content)
+    prompt = f"La fecha actual es {fecha_hoy}. {instrucciones_extra}\n\nREGLA DE IDIOMA INNEGOCIABLE: Todo el texto generado, incluyendo el mensaje para LinkedIn, DEBE estar redactado exclusivamente en Castellano (Español de España). Queda estrictamente prohibido el uso del inglés.\n\nREGLA DE ESTRUCTURACIÓN (Zero-Hallucination): Tu objetivo principal es DAR FORMATO a la 'NOTA CRUDA' encajándola en la plantilla solicitada. NO inventes código, NO inventes soluciones técnicas ni comandos que no estén explícitamente en la nota o en la bitácora. Limítate a estructurar la información en los '3 átomos' y crear el texto para LinkedIn.\n\n--- NOTA CRUDA (TEMA PRINCIPAL) ---\n{note_content}\n\n--- CONTEXTO DE LA BITÁCORA (MATERIAL DE APOYO SECUNDARIO) ---\n{bitacora_context}"
     
     # Inyectamos el tipo de documento dinámicamente en el molde mental (System Prompt)
     system_prompt = get_system_prompt().replace('tipo: "cuadernillo"', f'tipo: "{tipo_doc}"')
     
+    print(f"  🧠 [Merci Librarian] Solicitando redacción a Ollama local (qwen2.5-coder)...")
+    respuesta = consultar_ia_local(prompt, system_prompt)
+    
+    if respuesta.startswith("Error HTTP Local"):
+        print(f"  ❌ [Merci Error] Fallo total de IA Local: {respuesta}")
+        return
+            
     try:
-        respuesta = completion(
-            model="ollama/phi3",
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": prompt}
-            ],
-            api_base="http://localhost:11434",
-            max_tokens=1500
-        )
-        
-        md_final = clean_markdown(respuesta.choices[0].message.content)
+        md_final = clean_markdown(respuesta)
         output_path = destino_dir / f"{prefijo}-{note_path.stem}.md"
         output_path.write_text(md_final, encoding="utf-8")
         
@@ -104,7 +154,7 @@ def process_note(note_path: Path):
         note_path.rename(PROCESADAS_DIR / note_path.name)
         
     except Exception as e:
-        print(f"  ❌ [Merci Error] Fallo al consultar la IA: {e}")
+        print(f"  ❌ [Merci Error] Fallo procesando la respuesta de la IA: {e}")
 
 if __name__ == "__main__":
     # Creamos los directorios si es la primera ejecución
