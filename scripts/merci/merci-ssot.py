@@ -4,7 +4,7 @@
 merci-ssot.py — Agente Sync SSOT (Fase 3).
 
 Objetivo: Analiza las últimas entradas de la bitácora activa y verifica si el 
-ROADMAP-AI-ORQUESTACION-SELF-HEALING-SYSTEM.md necesita ser actualizado 
+ROADMAP.md (Roadmap Maestro) necesita ser actualizado 
 (marcar tareas como completadas [x] o deprecadas). Si detecta deriva documental, 
 auto-sana el archivo del Roadmap reescribiéndolo automáticamente.
 """
@@ -29,8 +29,9 @@ except ImportError:
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 ENV_PATH = REPO_ROOT / ".env"
-ROADMAP_PATH = REPO_ROOT / "laboratorio" / "ROADMAP-AI-ORQUESTACION-SELF-HEALING-SYSTEM.md"
+ROADMAP_PATH = REPO_ROOT / "ROADMAP.md"
 BITACORA_PATH = REPO_ROOT / "laboratorio" / "bitacora-merci-boilerplate-orquestacion-ia.md"
+PROMPT_PATH = REPO_ROOT / "laboratorio" / "prompts" / "prompt-ssot.md"
 
 def cargar_api_key():
     if not ENV_PATH.exists():
@@ -53,23 +54,15 @@ def auto_descubrir_modelo(api_key):
     except Exception:
         return "gemini-1.5-flash"
 
-def clean_markdown(text: str) -> str:
-    """Limpia el código de salida de la IA para que sea Markdown puro."""
-    # Buscar el inicio real del Markdown y amputar la basura conversacional
-    inicio_md = text.find("# 🗺️ ROADMAP")
-    if inicio_md == -1:
-        inicio_md = text.find("# ")
-    if inicio_md != -1:
-        text = text[inicio_md:]
-        
-    text = text.strip()
-    if text.startswith("```markdown"):
-        text = text[11:]
-    elif text.startswith("```"):
-        text = text[3:]
-    if text.endswith("```"):
-        text = text[:-3]
-    return text.strip() + "\n"
+def extract_json_array(text: str) -> list:
+    """Extrae un array JSON de la respuesta de la IA, ignorando texto basura."""
+    match = re.search(r'\[.*?\]', text, re.DOTALL)
+    if match:
+        try:
+            return json.loads(match.group(0))
+        except json.JSONDecodeError:
+            pass
+    return []
 
 def main():
     print("\n🤖 [Merci SSOT] Analizando deriva documental entre Bitácora y Roadmap...")
@@ -81,6 +74,13 @@ def main():
     roadmap_content = ROADMAP_PATH.read_text(encoding="utf-8")
     bitacora_full = BITACORA_PATH.read_text(encoding="utf-8")
     
+    # Extraer estrictamente las tareas pendientes del roadmap
+    pending_tasks = re.findall(r'- \[ \] (.*)', roadmap_content)
+    if not pending_tasks:
+        print("  ℹ️ [Merci Info] No hay tareas pendientes en el Roadmap. Ya está 100% completado.")
+        return
+    pending_list_str = "\n".join([f"- {t}" for t in pending_tasks])
+
     # Extraer solo las últimas 2 entradas de la bitácora para ser precisos y evitar diluir el prompt
     entradas = re.split(r'(?=### \d{4}-\d{2}-\d{2})', bitacora_full)
     bitacora_reciente = "".join(entradas[1:3]) if len(entradas) > 1 else bitacora_full[:2000]
@@ -90,20 +90,12 @@ def main():
     hechos = re.findall(r'\*\*Hecho:\*\*(.*?)(?=\*\*Detalle técnico:|\*\*Motivo / criterio:|\*\*Siguiente paso o deuda:|### |$)', bitacora_reciente, re.DOTALL)
     bitacora_filtrada = "\n".join([h.strip() for h in hechos]) if hechos else "No hay acciones registradas."
 
-    system_prompt = """Eres el Agente SSOT de un ecosistema DevSecOps.
-Tu misión es actualizar el ROADMAP basándote en los últimos avances de la BITÁCORA.
+    if not PROMPT_PATH.exists():
+        print("  ❌ [Merci Error] Falta el archivo rector: prompt-ssot.md")
+        return
+    system_prompt = PROMPT_PATH.read_text(encoding="utf-8")
 
-INSTRUCCIONES DE RAZONAMIENTO PREVIO (Piensa paso a paso):
-1. Analiza los "Hechos" extraídos de la Bitácora.
-2. Busca qué tareas pendientes `- [ ]` del Roadmap se corresponden con esos hechos (algo descartado o relegado a cloud también se considera completado).
-3. Escribe en texto plano qué tareas vas a actualizar de `[ ]` a `[x]`. Si no hay evidencia en "Hecho", no marques nada nuevo. Si se menciona un círculo rojo en la bitácora, añade 🔴.
-4. Si NO hay coincidencias, declara explícitamente la palabra clave "SIN_CAMBIOS" y detente por completo.
-
-INSTRUCCIONES DE SALIDA:
-- Si hubo avances: Imprime todo el código del Roadmap actualizado. DEBES REESCRIBIR EL ROADMAP ENTERO DE PRINCIPIO A FIN.
-- Si NO hubo avances: NO escribas el Roadmap. Limítate a emitir tu razonamiento y la palabra clave "SIN_CAMBIOS"."""
-
-    prompt = f"--- ESTADO ACTUAL DEL ROADMAP ---\n{roadmap_content}\n\n--- ÚLTIMOS HECHOS EXTRAÍDOS ---\n{bitacora_filtrada}"
+    prompt = f"--- ÚLTIMOS HECHOS EXTRAÍDOS ---\n{bitacora_filtrada}\n\n--- TAREAS PENDIENTES ---\n{pending_list_str}"
 
     api_key = cargar_api_key()
     raw_response = None
@@ -150,39 +142,27 @@ INSTRUCCIONES DE SALIDA:
             return
 
     try:
-        if "SIN_CAMBIOS" in raw_response or "No hay tareas completadas" in raw_response:
-            print("  ℹ️ [Merci Info] Sin avances en roadmap-ai. Ya está perfectamente sincronizado.")
+        tareas_completadas = extract_json_array(raw_response)
+
+        if not tareas_completadas:
+            print("  ℹ️ [Merci Info] Sin avances en el Roadmap Maestro. Ya está perfectamente sincronizado.")
             return
 
-        nuevo_roadmap = clean_markdown(raw_response)
+        nuevo_roadmap = roadmap_content
+        cambios_aplicados = 0
         
-        # ESCUDO ANTI-ALUCINACIONES (Sanity Checks)
-        if len(nuevo_roadmap) < len(roadmap_content) * 0.5:
-            print("  ❌ [Merci Error] La IA devolvió un resumen en lugar del documento completo. Destrucción evitada.")
-            return
-        if "# " not in nuevo_roadmap:
-            print("  ❌ [Merci Error] La IA no devolvió un formato Markdown válido. Destrucción evitada.")
-            return
-        
-        if nuevo_roadmap.strip() != roadmap_content.strip():
-            # Identificar qué fases han sido actualizadas comparando líneas
-            old_lines = roadmap_content.strip().splitlines()
-            new_lines = nuevo_roadmap.strip().splitlines()
-            fases_modificadas = set()
-            fase_actual = "Fase General"
-            
-            for i, new_line in enumerate(new_lines):
-                if new_line.startswith("## "):
-                    fase_actual = new_line.replace("##", "").strip()
-                if i >= len(old_lines) or new_line != old_lines[i]:
-                    fases_modificadas.add(fase_actual)
-                    
+        for tarea in tareas_completadas:
+            target = f"- [ ] {tarea}"
+            replacement = f"- [x] {tarea}"
+            if target in nuevo_roadmap:
+                nuevo_roadmap = nuevo_roadmap.replace(target, replacement)
+                cambios_aplicados += 1
+                
+        if cambios_aplicados > 0:
             ROADMAP_PATH.write_text(nuevo_roadmap, encoding="utf-8")
-            print("  ✅ [Éxito] Deriva documental sanada. Roadmap reescrito automáticamente.")
-            if fases_modificadas:
-                print(f"  🗺️  Avance registrado en: {', '.join(fases_modificadas)}")
+            print(f"  ✅ [Éxito] Deriva documental sanada. {cambios_aplicados} tarea(s) marcada(s) como completada(s).")
         else:
-            print("  ℹ️ [Merci Info] Sin avances en roadmap-ai. Ya está perfectamente sincronizado.")
+            print("  ℹ️ [Merci Info] La IA sugirió tareas pero no hubo coincidencia exacta. Sin cambios.")
             
     except Exception as e:
         print(f"  ❌ [Merci Error] Fallo procesando la respuesta de la IA: {e}")

@@ -3,50 +3,66 @@
 """
 merci-sitemap.py — Automatización del mantenimiento del sitemap.xml.
 
-Este script busca la etiqueta <lastmod> y la actualiza con la fecha actual
-en formato AAAA-MM-DD para asegurar que los motores de búsqueda detecten
-los cambios recientes en el núcleo estático.
+Escanea recursivamente la carpeta public/ y auto-descubre las nuevas páginas 
+generadas, construyendo el sitemap.xml desde cero con URLs amigables 
+(limpias) y prioridades dinámicas.
 """
 
-import re
+import os
 import sys
 from datetime import datetime
 from pathlib import Path
 
-# Configuración de rutas relativas a la raíz del proyecto
 REPO_ROOT = Path(__file__).resolve().parents[2]
-SITEMAP_PATH = REPO_ROOT / "public" / "sitemap.xml"
+PUBLIC_DIR = REPO_ROOT / "public"
+SITEMAP_PATH = PUBLIC_DIR / "sitemap.xml"
+DOMAIN = "https://merci-boilerplate.es"
 
-def update_lastmod():
-    """Actualiza la fecha de última modificación en el archivo sitemap.xml."""
-    if not SITEMAP_PATH.exists():
-        print(f"Error: No se encuentra el archivo en {SITEMAP_PATH}")
-        sys.exit(1)
+def generar_sitemap():
+    print("🗺️ [Merci Sitemap] Escaneando páginas webs estáticas...")
+    ahora = datetime.now().strftime("%Y-%m-%d")
+    bloques_url = []
 
-    # Obtener la fecha de hoy en formato ISO 8601 (AAAA-MM-DD)
-    today = datetime.now().strftime("%Y-%m-%d")
-    
-    # Leer el contenido actual del archivo
-    content = SITEMAP_PATH.read_text(encoding="utf-8")
-    
-    # Expresión regular para encontrar la etiqueta <lastmod> y su contenido
-    # XML (Extensible Markup Language - Lenguaje de Marcado Extensible)
-    pattern = r"<lastmod>.*?</lastmod>"
-    replacement = f"<lastmod>{today}</lastmod>"
-    
-    # Realizar la sustitución
-    new_content = re.sub(pattern, replacement, content)
-    
-    if content == new_content:
-        print("✅ El sitemap ya está actualizado con la fecha de hoy.")
-    else:
-        # Escribir los cambios de vuelta al archivo
-        SITEMAP_PATH.write_text(new_content, encoding="utf-8")
-        print(f"✅ Sitemap actualizado: <lastmod> establecido en {today}")
+    # QUÉ HACE: Escanea recursivamente buscando todos los archivos .html
+    # POR QUÉ: Auto-descubre las nuevas páginas sin intervención humana.
+    for html_file in PUBLIC_DIR.rglob("*.html"):
+        rel_path = html_file.relative_to(PUBLIC_DIR).as_posix()
+        
+        # QUÉ HACE: Limpia las extensiones para generar URLs amigables (Clean URLs).
+        if rel_path == "index.html":
+            url_path = ""
+            prioridad = "1.0"
+        elif rel_path.endswith("/index.html"):
+            url_path = rel_path[:-10]
+            prioridad = "0.8"
+        elif rel_path.endswith(".html"):
+            url_path = rel_path[:-5]
+            prioridad = "0.7"
+        else:
+            continue
+
+        full_url = f"{DOMAIN}/{url_path}"
+
+        bloque = f"""   <url>
+      <loc>{full_url}</loc>
+      <lastmod>{ahora}</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>{prioridad}</priority>
+   </url>"""
+        bloques_url.append(bloque)
+
+    # Ensambla y sobrescribe el documento XML final
+    xml_final = f"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+{chr(10).join(bloques_url)}
+</urlset>"""
+
+    SITEMAP_PATH.write_text(xml_final, encoding="utf-8")
+    print(f"  ✅ sitemap.xml regenerado con éxito ({len(bloques_url)} URLs auto-descubiertas).")
 
 if __name__ == "__main__":
     try:
-        update_lastmod()
+        generar_sitemap()
     except Exception as e:
         print(f"Error técnico en el sitemap: {e}", file=sys.stderr)
         sys.exit(1)

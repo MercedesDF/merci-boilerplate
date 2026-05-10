@@ -1,4 +1,4 @@
-Informe desde el 7 may 2026, 2:17:26 p.m.
+Informe desde el 9 may 2026, 12:03:15 p.m.
 Descubre lo que experimentan tus usuarios reales No hay datos
 Diagnostica problemas de rendimiento
 https://mercedev.es/ Analizar
@@ -29,7 +29,7 @@ Cumulative Layout Shift
 0
 Speed Index
 0.8 s
-Captured at 7 may 2026, 2:17
+Captured at 9 may 2026, 12:03
 p.m. GMT+2
 Moto G Power emulado with
 Lighthouse 13.0.1
@@ -39,8 +39,8 @@ Carga inicial de la página
  Using HeadlessChromium
 146.0.7680.177 with lr
 ESTADÍSTICAS
-Solicitudes de bloqueo de renderización —Ahorro estimado de 150 ms
-Mejora la entrega de imágenes —Ahorro estimado de 65 KiB
+Solicitudes de bloqueo de renderización —Ahorro estimado de 130 ms
+Mejora la entrega de imágenes —Ahorro estimado de 67 KiB
 PageSpeed Insights Copiar vínculo Documentos
 Estas comprobaciones destacan las oportunidades para mejorar la
 accesibilidad de tu app web. La detección automática solo puede detectar

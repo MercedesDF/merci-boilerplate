@@ -1,10 +1,16 @@
-# Merci Boilerplate v1.10.0
+# Merci Boilerplate v1.11.0
 
 Un ecosistema DevSecOps autónomo impulsado por Inteligencia Artificial Local (Shift-Left AI) y Desarrollo Guiado por Especificaciones (Spec-Driven Development). 
 
 Combina un orquestador local en Python puro (Sistema Merci) que automatiza la calidad del código, un núcleo estático ultrarrápido (HTML5, SASS, Vanilla JS, BEM) y un motor dinámico aislado opcional (WordPress Headless). Diseñado para alcanzar un rendimiento perfecto (Core Web Vitals 100/100) con 0 dependencias externas bloqueantes en el pipeline.
 
 > 🤖 **Inteligencia y Gobernanza:** El boilerplate incluye agentes de IA locales que auto-reparan código, auto-documentan el Roadmap y generan bases de conocimiento estáticas con coste cero y privacidad total. La justificación de las decisiones DevSecOps reside en la carpeta `/docs`.
+
+## 🚀 Novedades en la v1.11.0 (Zero Maintenance & AI Optimization)
+
+- **Auto-descubrimiento de Sitemap:** `merci-sitemap.py` ahora escanea recursivamente la carpeta `public/` y autogenera el mapa XML desde cero, asignando prioridades dinámicas sin intervención humana.
+- **Propagación de Cache Busting:** `merci-sync-pages.py` sincroniza automáticamente las marcas de tiempo (`?v=TIMESTAMP`) de CSS y JS desde la portada hacia las páginas secundarias, asegurando invalidación de caché global.
+- **Inyección JSON en Agente SSOT:** El orquestador documental ahora utiliza "Targeted Payload Extraction". La IA decide qué tareas completar y devuelve un array JSON, mientras que Python ejecuta el reemplazo matemático, reduciendo el consumo de tokens en un 90% y eliminando el riesgo de mutilación de archivos.
 
 ## 🚀 Novedades en la v1.10.0 (Autonomía Local y Self-Healing Docs)
 
@@ -123,28 +129,33 @@ merci total
 Para mantener la separación de responsabilidades y la alta velocidad (0 ms de latencia), el desarrollo se divide en dos fases con servidores y ecosistemas distintos:
 
 ### 1. Desarrollo UI/UX (User Interface / User Experience - Interfaz de Usuario / Experiencia de Usuario) Estático (Python)
-Para maquetar HTML5, Vanilla JS y compilar SASS. Abre dos terminales:
+Para maquetar HTML5, Vanilla JS y compilar SASS, se requieren dos terminales:
 1. `python3 scripts/merci/merci-watcher.py` (Vigila y compila SASS)
 2. `cd public && python3 -m http.server 8000` (Servidor Web Efímero)
 
 ### 2. Integración Dinámica WP (WordPress) (Nginx / LEMP (Linux, Nginx, MariaDB, PHP))
-El servidor nativo de Python **no procesa PHP (Hypertext Preprocessor - Preprocesador de Hipertexto)**. Cuando llegues a la fase de integrar el CMS (Content Management System - Sistema de Gestión de Contenidos), levanta un entorno Nginx local y crea los enlaces simbólicos tal y como se detalla en `docs/integracion-wordpress.md`.
+El servidor nativo de Python **no procesa PHP (Hypertext Preprocessor - Preprocesador de Hipertexto)**. Para la integración del CMS (Content Management System - Sistema de Gestión de Contenidos), se debe levantar un entorno Nginx local y crear los enlaces simbólicos tal y como se detalla en `docs/integracion-wordpress.md`.
 
 ## 🛠️ El Ecosistema "Merci" (DevSecOps Local)
 
 Este boilerplate incluye su propia cadena de suministro CI/CD (Continuous Integration / Continuous Deployment - Integración Continua / Despliegue Continuo) local basada íntegramente en Python puro:
 
 - `merci-audit.py`: Auditoría estática y bloqueo de secretos (SAST - Static Application Security Testing - Pruebas Estáticas de Seguridad de Aplicaciones).
+- `merci-auto-fix.py`: Agente autónomo de auto-reparación de código en la nube (GitHub Actions).
 - `merci-commit.py`: Automatización de commits empaquetados atómicamente e impulsados por la lectura de la bitácora.
 - `merci-total.py`: Orquestador maestro del pipeline (Build y QA).
 - `merci-brain.py`: Generador de base de conocimientos estática (Shift-Left AI).
+- `merci-ssot.py`: Agente Sync SSOT (Self-Healing Docs) para la curación autónoma de la deriva documental.
+- `merci-librarian.py`: Agente Bibliotecario (Zero-Hallucination) para el formateo estricto de cuadernillos.
 - `merci-publish.py` y `merci-promote.py`: Motor SSG (Static Site Generation - Generación de Sitios Estáticos) y curación de contenidos.
 - `merci-backup.py`: Creación instantánea de copias de seguridad locales en formato ZIP.
-- `merci-optimizer.py`: Optimización de imágenes a WebP.
+- `merci-optimizer.py` y `merci-assets-watcher.py`: Optimizador WebP y agente vigilante de activos multimedia en segundo plano.
 - `merci-sitemap.py` y `merci-linkcheck.py`: Rastreo DAST de enlaces rotos y actualización de XML.
 - `merci-sync-pages.py`: Sincronizador de estructuras estáticas (SSOT).
+- `merci-extract-metrics.py`: Extractor de métricas Core Web Vitals desde informes PDF.
 - `merci-wp.py`: Publicador Headless masivo para integración nativa con WordPress.
 - `merci-styles.py` y `merci-watcher.py`: Compilador y vigilante de SASS local.
+- `merci-linkedin.py`: Motor de autenticación OIDC (OpenID Connect) y publicación automatizada en LinkedIn.
 - `merci-init.py`: Inicializador destructivo para nuevos proyectos.
 
 ---

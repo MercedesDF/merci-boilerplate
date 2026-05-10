@@ -24,6 +24,7 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 REPO_ROOT = Path(__file__).resolve().parents[2]
 ENV_PATH = REPO_ROOT / ".env"
 PUBLIC_JS_DIR = REPO_ROOT / "public" / "js"
+PROMPT_PATH = REPO_ROOT / "laboratorio" / "prompts" / "prompt-brain.md"
 
 def slugify(texto: str) -> str:
     """Convierte un texto en una cadena segura para URLs (slug)."""
@@ -42,7 +43,7 @@ def consultar_ia_local(prompt):
             "model": "qwen2.5-coder",
             "prompt": prompt,
             "stream": False,
-            "options": {"temperature": 0.4}
+            "options": {"temperature": 0.65}
         }
         local_req = urllib.request.Request(local_url, data=json.dumps(local_payload).encode("utf-8"), method="POST")
         local_req.add_header("Content-Type", "application/json")
@@ -110,7 +111,8 @@ def generar_cerebro_estatico(force_clean=False):
             continue
         
         print(f"  🧠 Pensando saludo para: {titulo}...")
-        prompt = f"Eres un asistente virtual técnico de la web merci-boilerplate.es (Arquitectura DevSecOps). El usuario acaba de entrar a leer el artículo titulado '{titulo}' (Contexto: {desc}). Escribe un saludo directo, inteligente y con un sutil toque 'geek' o de ingeniería (una sola frase, máximo 15 palabras) dándole la bienvenida a este contenido concreto. No uses comillas."
+        plantilla_prompt = PROMPT_PATH.read_text(encoding="utf-8") if PROMPT_PATH.exists() else "Eres Merci. Saluda sobre: {titulo}."
+        prompt = plantilla_prompt.replace("{titulo}", titulo).replace("{desc}", desc)
         
         respuesta = consultar_ia_local(prompt)
         

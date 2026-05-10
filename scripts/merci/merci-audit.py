@@ -647,7 +647,7 @@ def audit_banned_tracked_files(root: Path, state: AuditState, staged_only: bool)
             # Ignorar líneas vacías y marcadores de estructura permitidos
             if not line or line.endswith(".gitkeep"): continue
             
-            if line.startswith("laboratorio/evidencias/") or line.startswith(".assets-raw/") or line == ".linkedin_token.json":
+            if line.startswith("laboratorio/evidencias/") or line.startswith(".assets-raw/") or line.startswith(".privado/") or line.startswith("docs/matriz/") or line == ".linkedin_token.json":
                 path = root / line
                 state.add(Finding(
                     path, 1, "error", "BANNED_TRACKED_FILE",

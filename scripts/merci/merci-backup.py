@@ -27,6 +27,7 @@ EXCLUDE_PATHS = {
     REPO_ROOT / "public" / "descargas",
     REPO_ROOT / "public" / "blog",
     REPO_ROOT / "public" / "tienda",
+    REPO_ROOT / ".privado",
     REPO_ROOT / "scripts" / "merci" / "bin"
 }
 

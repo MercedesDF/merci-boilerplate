@@ -68,11 +68,17 @@ def main():
     header_pattern = r'(<header class="header">.*?</header>)'
     footer_pattern = r'(<footer class="footer".*?</footer>)'
     aside_pattern = r'(<aside class="merci-ui".*?</aside>)'
+    css_pattern = r'(<link rel="stylesheet" href="/css/main\.css\?v=\d+">)'
+    jsc_pattern = r'(<script src="/js/MerciController\.js\?v=\d+"\s*defer></script>)'
+    jsm_pattern = r'(<script src="/js/main\.js\?v=\d+"\s*defer></script>)'
     
     # 2. Extraer de la portada
     header_content = extract_block(index_html, header_pattern, "Header")
     footer_content = extract_block(index_html, footer_pattern, "Footer")
     aside_content = extract_block(index_html, aside_pattern, "Aside (Merci)")
+    css_content = extract_block(index_html, css_pattern, "CSS Cache Busting")
+    jsc_content = extract_block(index_html, jsc_pattern, "JS Controller Cache")
+    jsm_content = extract_block(index_html, jsm_pattern, "JS Main Cache")
     
     # 3. Iterar e inyectar en todas las páginas de destino
     if not target_pages:
@@ -87,6 +93,9 @@ def main():
         nuevo_html = replace_block(target_html, header_pattern, header_content, "Header")
         nuevo_html = replace_block(nuevo_html, footer_pattern, footer_content, "Footer")
         nuevo_html = replace_block(nuevo_html, aside_pattern, aside_content, "Aside (Merci)")
+        nuevo_html = replace_block(nuevo_html, css_pattern, css_content, "CSS Cache Busting")
+        nuevo_html = replace_block(nuevo_html, jsc_pattern, jsc_content, "JS Controller Cache")
+        nuevo_html = replace_block(nuevo_html, jsm_pattern, jsm_content, "JS Main Cache")
         
         target_path.write_text(nuevo_html, encoding="utf-8")
         print(f"✅ {page_name.capitalize()} sincronizado con la portada.")

@@ -198,7 +198,7 @@ def main():
 
     # 2. Purga de datos históricos
     purge_directory(REPO_ROOT / "biblioteca")
-    purge_directory(REPO_ROOT / "laboratorio", exclude=["bitacora-merci-boilerplate.md"])
+    purge_directory(REPO_ROOT / "laboratorio", exclude=["bitacora-merci-boilerplate.md", "prompts"])
     purge_directory(REPO_ROOT / "blog")
     purge_directory(REPO_ROOT / "art-de-cote")
     purge_directory(REPO_ROOT / "public" / "biblioteca")

@@ -27,3 +27,5 @@ public/blog
 # Base de conocimiento personal y privada (Defensa de arquitectura)
 .privado/
 !.privado/.gitkeep
+docs/matriz/
+!docs/matriz/.gitkeep

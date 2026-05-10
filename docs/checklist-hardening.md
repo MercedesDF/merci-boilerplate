@@ -45,11 +45,14 @@ Este documento consolida las medidas de seguridad aplicadas en la arquitectura h
 - [x] **Auditoría Pre-Commit (`merci-audit.py`):**
   - Bloqueo automático (Código de salida `1`) si se detectan:
     - Patrones de secretos expuestos (Tokens, claves privadas, API (Application Programming Interface - Interfaz de Programación de Aplicaciones) Keys).
+    - Fuga de datos (DLP): Archivos prohibidos rastreados por Git (`.linkedin_token.json`, `.assets-raw`, `.privado`, `docs/matriz`).
     - Errores de sintaxis en Python o JSON.
     - Ausencia de etiquetas SEO (Search Engine Optimization - Optimización para Motores de Búsqueda) críticas (lang, title, description).
+  - Bloqueo arquitectónico: Detección de estilos en línea (`style="..."`) para proteger la metodología BEM.
   - Detección de "PHP (Hypertext Preprocessor - Preprocesador de Hipertexto) Smells" (Advertencias por uso de funciones peligrosas como `eval()`, `exec()`, `shell_exec()`).
+  - Detección de "JS Smells" (Uso de `eval` o `new Function`).
 - [x] **Auditoría Estandarizada Pre-Merge:**
   - Obligatoriedad de ejecutar `python3 scripts/merci/merci-audit.py --strict-json-ld` para garantizar la presencia de datos estructurados antes de pasar a producción.
 
 ---
-*Última revisión: Fase 11 Completada (2026-05-06). CI/CD, Lighthouse CI y Gobernanza Open Source.*
+*Última revisión: Épica 2 Completada (2026-05-10). Orquestación IA, Auto-Healing y DLP Avanzado.*
