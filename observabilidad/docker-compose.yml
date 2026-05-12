@@ -1,0 +1,28 @@
+# QUÉ HACE: Define un clúster aislado con Prometheus (recolección de métricas) y Grafana (visualización).
+# POR QUÉ: Permite monitorizar el ecosistema DevSecOps sin instalar paquetes globales que ensucien el sistema Ubuntu anfitrión (Zero Bloat).
+
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: merci-prometheus
+    network_mode: "host"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: merci-grafana
+    network_mode: "host"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./provisioning:/etc/grafana/provisioning
+      - ./dashboards:/var/lib/grafana/dashboards
+    restart: unless-stopped
+
+volumes:
+  prometheus_data:
+  grafana_data:

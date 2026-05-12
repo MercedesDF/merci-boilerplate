@@ -272,6 +272,9 @@ def main():
     WP_APP_PASSWORD="tu_contraseña_de_aplicacion"
 """
     (REPO_ROOT / ".env").write_text(env_content, encoding="utf-8")
+    
+    if os.name != 'nt':
+        (REPO_ROOT / ".env").chmod(0o600)
 
     print("\n🎉 ¡Inicialización completada! Bienvenido a tu nuevo proyecto.")
 

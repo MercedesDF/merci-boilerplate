@@ -1,81 +1,81 @@
-Informe desde el 9 may 2026, 12:03:15 p.m.
-Descubre lo que experimentan tus usuarios reales No hay datos
-Diagnostica problemas de rendimiento
+Informe desde el 10 may 2026, 3:05:48 p.m.
+Descubre lo que experim entan tus usuarios reales No hay datos
+Diagnostica problem as de rendim iento
 https://mercedev.es/ Analizar
-Los valores son estimados y pueden variar. La medición del rendimiento se
-calcula directamente a partir de estas métricas.Consulta la calculadora.
+Los valores son estim ados y pueden variar. La m edición del rendim iento se
+calcula directam ente a partir de estas m étricas.Consulta la calculadora.
 0–49 50–89 90–100
-Rendimiento
-1 0 0 
+Rendim iento
+100
 Accesibilidad
-1 0 0 
-Recomendaciones
-1 0 0 
+100
+Recom endaciones
+100
 SEO
-1 0 0 
-1 0 0 
-Rendimiento
+100
+1 0 0
+Rendim iento
  Celulares  Escritorio
 PageSpeed Insights Copiar vínculo Documentos
-Mostrar las auditorías relevantes para la métrica: All FCP LCP
-MÉTRICAS Expandir vista
+Mostrar las auditorías relevantes para la m étrica: All FCP LCP
+M ÉT RICAS Expandir vista
 First Contentful Paint
 0.8 s
 Largest Contentful Paint
 1.1 s
-Total Blocking Time
-0 ms
-Cumulative Layout Shift
+T otal Blocking T im e
+0 m s
+Cum ulative Layout Shift
 0
 Speed Index
 0.8 s
-Captured at 9 may 2026, 12:03
-p.m. GMT+2
-Moto G Power emulado with
+Captured at 10 m ay 2026, 3:05
+p.m . GMT +2
+Moto G Power em ulado with
 Lighthouse 13.0.1
 Sesión de una sola página
 Carga inicial de la página
- Limitación de la red 4G lenta
- Using HeadlessChromium
+ Lim itación de la red 4G lenta
+ Using HeadlessChrom ium
 146.0.7680.177 with lr
-ESTADÍSTICAS
-Solicitudes de bloqueo de renderización —Ahorro estimado de 130 ms
-Mejora la entrega de imágenes —Ahorro estimado de 67 KiB
+EST ADÍST ICAS
+Solicitudes de bloqueo de renderización — Ahorro estim ado de 120 m s
+Mejora la entrega de im ágenes — Ahorro estim ado de 65 KiB
 PageSpeed Insights Copiar vínculo Documentos
-Estas comprobaciones destacan las oportunidades para mejorar la
-accesibilidad de tu app web. La detección automática solo puede detectar
-un subconjunto de problemas y no garantiza la accesibilidad de tu app
-web, por lo que también se recomienda hacer pruebas manuales.
+Estas com probaciones destacan las oportunidades para m ejorar la
+accesibilidad de tu app web. La detección autom ática solo puede detectar
+un subconjunto de problem as y no garantiza la accesibilidad de tu app
+web, por lo que tam bién se recom ienda hacer pruebas m anuales.
 Árbol de dependencias de red
 Desglose de LCP
-Estas estadísticas también están disponibles en el panel de rendimiento de las Herramientas para desarrolladores de
-Chrome: graba un registro para ver información más detallada.
-AUDITORÍAS APROBADAS(23) Mostrar
+Estas estadísticas tam bién están disponibles en el panel de rendim iento de las Herram ientas para desarrolladores de
+Chrom e: graba un registro para ver inform ación m ás detallada.
+AUDIT ORÍAS APROBADAS(23) Mostrar
 Accesibilidad
-1 0 0 
-ELEMENTOS ADICIONALES QUE SE DEBEN COMPROBAR MANUALMENTE(10) Ocultar
+100
+ELEM ENT OS ADICIONALES QUE SE DEBEN COM PROBAR M ANUALM ENT E (10) O cultar
 Interactive controls are keyboard focusable
-Interactive elements indicate their purpose and state
-The page has a logical tab order
-Visual order on the page follows DOM order
+Interactive elem ents indicate their purpose and state
+T he page has a logical tab order
+Visual order on the page follows DO M order
 User focus is not accidentally trapped in a region
-The user's focus is directed to new content added to the page
-HTML5 landmark elements are used to improve navigation
-Offscreen content is hidden from assistive technology
+T he user's focus is directed to new content added to the page
+HT ML5 landm ark elem ents are used to im prove navigation
+O ffscreen content is hidden from  assistive technology
 PageSpeed Insights Copiar vínculo Documentos
-Custom controls have associated labels
-Custom controls have ARIA roles
-Estos elementos abarcan áreas que las herramientas de prueba automáticas no contemplan. Obtén más información en
-nuestra guía sobre cómo revisar los aspectos de accesibilidad.
-AUDITORÍAS APROBADAS(22) Mostrar
-NO APLICABLE(38) Mostrar
-Recomendaciones
-1 0 0 
+Custom  controls have associated labels
+Custom  controls have ARIA roles
+Estos elem entos abarcan áreas que las herram ientas de prueba autom áticas no contem plan. O btén m ás inform ación en
+nuestra guía sobre cóm o revisar los aspectos de accesibilidad.
+AUDIT ORÍAS APROBADAS(22) Mostrar
+NO APLICABLE (38) Mostrar
+Recom endaciones
+100
 CONFIANZA Y SEGURIDAD
 Asegúrate de que la CSP sea eficaz contra los ataques XSS
-Mitiga el XSS basado en DOM con Trusted Types
-AUDITORÍAS APROBADAS(13) Mostrar
-NO APLICABLE(5) Mostrar
+Mitiga el XSS basado en DO M con T rusted T ypes
+AUDIT ORÍAS APROBADAS(13) Mostrar
+NO APLICABLE (5) Mostrar
 PageSpeed Insights Copiar vínculo Documentos
 Más información acerca de PageSpeed Insights
 Novedades
@@ -93,18 +93,18 @@ Twitter
 YouTube
 Chrome Firebase Todos los productos
 Condiciones y Política de Privacidad
-Estas comprobaciones aseguran que tu página esté siguiendo la
-sugerencia básica de optimización por motores de búsqueda. Existen
-muchos factores adicionales que Lighthouse no registra y que pueden
-afectar su clasificación en la búsqueda, como el rendimiento en las
-Métricas web esenciales. Obtén más información sobre los conceptos
+Estas com probaciones aseguran que tu página esté siguiendo la
+sugerencia básica de optim ización por m otores de búsqueda. Existen
+m uchos factores adicionales que Lighthouse no registra y que pueden
+afectar su clasificación en la búsqueda, com o el rendim iento en las
+Métricas web esenciales. O btén m ás inform ación sobre los conceptos
 básicos de la Búsqueda de Google.
 SEO
-1 0 0 
-ELEMENTOS ADICIONALES QUE SE DEBEN COMPROBAR MANUALMENTE(1) Ocultar
+100
+ELEM ENT OS ADICIONALES QUE SE DEBEN COM PROBAR M ANUALM ENT E (1) O cultar
 Los datos estructurados son válidos
-Ejecuta estos validadores adicionales en tu sitio web para comprobar más prácticas recomendadas de SEO.
-AUDITORÍAS APROBADAS(10) Mostrar
+Ejecuta estos validadores adicionales en tu sitio web para com probar m ás prácticas recom endadas de SEO .
+AUDIT ORÍAS APROBADAS(10) Mostrar
 PageSpeed Insights Copiar vínculo Documentos
 Para obtener más detalles, consulta las Políticas del Sitio de Google Developers.
 PageSpeed Insights Copiar vínculo Documentos

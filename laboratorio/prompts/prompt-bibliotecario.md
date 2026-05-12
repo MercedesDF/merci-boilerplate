@@ -17,21 +17,18 @@ descripcion: "[Genera un resumen de una sola línea sobre el problema y la soluc
 tipo: "cuadernillo"
 tema: "[Infiere el tema: ej. Arquitectura, DevSecOps, Frontend, SASS, Automatización]"
 fecha: "[Usa la fecha actual proporcionada en el prompt]"
-fase: "[Infiere la fase del roadmap o déjalo genérico]"
-estado: "borrador"
+fase: "[Infiere la fase del roadmap. Usa el formato 'Épica X - Fase Y' (ej. 'Épica 2 - Fase 4')]"
+estado: "incubacion"
 alt_portada: "[Genera una descripción visual técnica detallada para una supuesta imagen de cabecera]"
 ---
 
 **REGLAS DEL YAML FRONTMATTER (INNEGOCIABLES):**
 1. TODOS los valores deben ir encerrados estrictamente entre comillas dobles (ejemplo: `tema: "Mi tema"`). No omitas las comillas en NINGÚN campo.
-2. El campo `estado` debe ser SIEMPRE `"borrador"`. Tienes TERMINANTEMENTE PROHIBIDO cambiarlo a "finalizado", "publicado" u otra cosa.
-3. DEBES CERRAR el bloque YAML con los tres guiones `---` antes de iniciar el bloque de LinkedIn.
+2. El campo `estado` debe ser SIEMPRE `"incubacion"`. Tienes TERMINANTEMENTE PROHIBIDO cambiarlo a "borrador", "publicado" u otra cosa.
+3. DEBES CERRAR el bloque YAML con los tres guiones `---` antes de iniciar el cuerpo del documento.
 4. **Idioma:** Absolutamente todo el contenido (título, descripción, texto) debe redactarse en ESPAÑOL (Castellano). Tienes prohibido usar inglés para los títulos.
 5. **Tipología:** El campo `tipo` NO DEBE MODIFICARSE ni ampliarse. Copia exactamente el valor que recibes en el ejemplo superior (no le añadas la palabra "técnico").
-
-<!-- linkedin:
-[Redacta aquí un post atractivo de 2-3 líneas en tono profesional y técnico anunciando este aprendizaje para LinkedIn, incluyendo un par de emojis pertinentes y hashtags].
--->
+6. **Alt Portada:** TIENES PROHIBIDO copiar el texto por defecto de la plantilla. DEBES INVENTAR una descripción visual única, real y específica que ilustre el contenido técnico del documento.
 
 ## El Desafío (Síntoma)
 [Describe el problema técnico original, el síntoma que se experimentaba o la necesidad arquitectónica basándote en las notas. Redacta en tercera persona/voz pasiva (ej. "Se detectó que...", "Era necesario...")].

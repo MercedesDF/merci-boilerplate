@@ -169,7 +169,17 @@
 - [x] Pipeline WP → LinkedIn (Automatización Social): Conectar `merci-wp.py` con `merci-linkedin.py` para que al publicar o actualizar un post en WordPress se dispare automáticamente a LinkedIn.
 
 ### Fase 4: Observabilidad y SRE IA
-- [ ] Dashboard de Confianza: Implementar Grafana para visualizar cuántos cambios de IA han sido aprobados vs. rechazados.
-- [ ] Chaos Engineering con IA: Script que use la IA para simular fallos en el merci-boilerplate y verificar que el sistema de rollback funciona.
-- [ ] Hardening Automation: Agente que audite el cumplimiento de la docs/checklist-hardening.md de forma continua.
-- [ ] **Evaluación de Tienda WooCommerce (Deuda Fase 4.3):** Estudiar la viabilidad de activar WooCommerce más allá del modo catálogo actual. Evaluar: pasarela de pago compatible con la arquitectura (sin degradar Core Web Vitals), impacto en CSP (Content Security Policy), y si el volumen de productos justifica la complejidad operativa. Decisión de arquitectura previa obligatoria antes de cualquier implementación.
+- [X] Dashboard de Confianza: Implementar Grafana para visualizar cuántos cambios de IA han sido aprobados vs. rechazados.
+- [x] Chaos Engineering con IA: Script que use la IA para simular fallos en el merci-boilerplate y verificar que el sistema de rollback funciona.
+- [x] Hardening Automation: Agente que audite el cumplimiento de la docs/checklist-hardening.md de forma continua.
+- [x] **Evaluación de Tienda WooCommerce (Deuda Fase 4.3):** Se aprueba la viabilidad técnica asumiendo el reto arquitectónico. La implementación se traslada a la Épica 3.
+
+---
+
+## ÉPICA 3: E-COMMERCE EXTREMO (En preparación)
+
+### Fase 1: Pasarela de Pago y Rendimiento Híbrido
+- [ ] Configurar pasarela de pago (Stripe/PayPal) en el entorno aislado.
+- [ ] Implementar carga diferida (Lazy Load) o Web Workers (Partytown) para desencolar scripts de terceros del hilo principal.
+- [ ] Ajustar Content Security Policy (CSP) en Nginx para permitir iframes de pago sin degradar el escudo XSS.
+- [ ] Mantener 100/100 en Core Web Vitals (TBT 0ms) durante todo el proceso de *checkout*.

@@ -105,7 +105,7 @@ def process_note(note_path: Path):
     opcion = input("  👉 Elige una opción [1]: ").strip()
     
     tipo_doc = "cuadernillo"
-    prefijo = "cuadernillo-borrador"
+    prefijo = "cuadernillo"
     # QUÉ HACE: Centraliza la salida de todos los documentos en una única bandeja de entrada.
     # POR QUÉ: Separa los documentos recién creados por la IA de los borradores maduros listos para promoción.
     destino_dir = LAB_DIR / "incubacion"
@@ -115,11 +115,11 @@ def process_note(note_path: Path):
 
     if opcion == "2":
         tipo_doc = "compendio"
-        prefijo = "compendio-borrador"
+        prefijo = "compendio"
         instrucciones_extra = "ATENCIÓN: Estás redactando un COMPENDIO estratégico de alto nivel. Agrupa los conceptos con visión arquitectónica en lugar de centrarte en un solo bug."
         plantilla_path = REPO_ROOT / "docs" / "plantilla-proyecto.md"
     elif opcion == "3":
-        prefijo = "art-de-cote-borrador"
+        prefijo = "art-de-cote"
         instrucciones_extra = "ATENCIÓN: Estás redactando un ART DE COTÉ. Enfatiza el valor del código descartado o el experimento realizado para que quede como registro."
         plantilla_path = REPO_ROOT / "docs" / "plantilla-art-de-cote.md"
 
@@ -130,7 +130,7 @@ def process_note(note_path: Path):
     fecha_hoy = datetime.now().strftime("%Y-%m-%d")
     note_content = note_path.read_text(encoding="utf-8", errors="replace")
     bitacora_context = get_bitacora_context(note_content)
-    prompt = f"La fecha actual es {fecha_hoy}. {instrucciones_extra}\n\nREGLA DE IDIOMA INNEGOCIABLE: Todo el texto generado, incluyendo el mensaje para LinkedIn, DEBE estar redactado exclusivamente en Castellano (Español de España). Queda estrictamente prohibido el uso del inglés.\n\nREGLA DE ESTRUCTURACIÓN (Zero-Hallucination): Tu objetivo principal es DAR FORMATO a la 'NOTA CRUDA' encajándola en la plantilla solicitada. NO inventes código, NO inventes soluciones técnicas ni comandos que no estén explícitamente en la nota o en la bitácora. Limítate a estructurar la información en los '3 átomos' y crear el texto para LinkedIn.\n\n--- NOTA CRUDA (TEMA PRINCIPAL) ---\n{note_content}\n\n--- CONTEXTO DE LA BITÁCORA (MATERIAL DE APOYO SECUNDARIO) ---\n{bitacora_context}"
+    prompt = f"La fecha actual es {fecha_hoy}. {instrucciones_extra}\n\nREGLA DE IDIOMA INNEGOCIABLE: Todo el texto generado DEBE estar redactado exclusivamente en Castellano (Español de España). Queda estrictamente prohibido el uso del inglés.\n\nREGLA DE ESTRUCTURACIÓN (Zero-Hallucination): Tu objetivo principal es DAR FORMATO a la 'NOTA CRUDA' encajándola en la plantilla solicitada. NO inventes código, NO inventes soluciones técnicas ni comandos que no estén explícitamente en la nota o en la bitácora. Limítate a estructurar la información en los '3 átomos'.\n\n--- NOTA CRUDA (TEMA PRINCIPAL) ---\n{note_content}\n\n--- CONTEXTO DE LA BITÁCORA (MATERIAL DE APOYO SECUNDARIO) ---\n{bitacora_context}"
     
     # Inyectamos el tipo de documento dinámicamente en el molde mental (System Prompt)
     system_prompt = get_system_prompt().replace('tipo: "cuadernillo"', f'tipo: "{tipo_doc}"')

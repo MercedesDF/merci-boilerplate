@@ -10,6 +10,8 @@ import re
 import sys
 import shutil
 import unicodedata
+import html
+import json
 from pathlib import Path
 
 try:
@@ -88,6 +90,9 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
     alt_portada = meta.get("alt_portada", "")
     fase = meta.get("fase", "")
     
+    titulo_html = html.escape(titulo)
+    descripcion_html = html.escape(descripcion)
+
     # QUÉ HACE: Genera los nombres de salida basándose en el título del YAML, no en el archivo.
     # POR QUÉ: Desacopla el sistema de archivos del routing web (Auto-nombrado).
     out_filename = slugify(titulo) + ".html"
@@ -157,7 +162,7 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>{titulo}</title>
+    <title>{titulo_html}</title>
     <style>
         @page {{ size: A4; margin: 2.5cm; }}
         body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #334155; }}
@@ -174,7 +179,7 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
 </head>
 <body>
     <div class="portada">
-        <h1>{titulo}</h1>
+        <h1>{titulo_html}</h1>
         <p>{tipo.capitalize()} | Vol. {meta.get('volumen', 1)}</p>
         <p><strong>merci-boilerplate.es</strong> — {meta.get('fecha', '')}{fase_pdf_text}</p>
     </div>
@@ -206,8 +211,8 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{titulo} — merci-boilerplate.es</title>
-    <meta name="description" content="{descripcion}">
+    <title>{titulo_html} — merci-boilerplate.es</title>
+    <meta name="description" content="{descripcion_html}">
     <link rel="canonical" href="{canonical_url}">
     <link rel="stylesheet" href="/css/main.css?v={css_v}">
     <script src="/js/MerciController.js?v={js_c_v}" defer></script>
@@ -216,9 +221,9 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
     {{
       "@context": "https://schema.org",
       "@type": "Article",
-      "headline": "{titulo}",
-      "description": "{descripcion}",
-      "url": "{canonical_url}"
+      "headline": {json.dumps(titulo)},
+      "description": {json.dumps(descripcion)},
+      "url": {json.dumps(canonical_url)}
     }}
     </script>
 </head>
@@ -229,7 +234,7 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
         <article class="card {clase_css}">
             <a href="{base_url_path}" class="card__back-link">{back_text}</a>
             <header>
-                <h1 class="home-card__title--highlight">{titulo}</h1>
+                <h1 class="home-card__title--highlight">{titulo_html}</h1>
                 <a href="/descargas/{out_pdf_filename}" class="card__download" download>📄 Descargar Edición PDF</a>
             </header>
             <div class="card__content">
@@ -266,6 +271,8 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
 
 def generar_indice(publicaciones, out_path, title, meta_desc, hero_subtitle, canonical_url, header_html, footer_html, css_v: int, js_c_v: int, js_m_v: int):
     print(f"📖 Generando índice temático para {title}...")
+    title_html = html.escape(title)
+    meta_desc_html = html.escape(meta_desc)
     
     # Agrupar publicaciones por tema (Estanterías)
     estanterias = {}
@@ -344,8 +351,8 @@ def generar_indice(publicaciones, out_path, title, meta_desc, hero_subtitle, can
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{title} — merci-boilerplate.es</title>
-    <meta name="description" content="{meta_desc}">
+    <title>{title_html} — merci-boilerplate.es</title>
+    <meta name="description" content="{meta_desc_html}">
     <link rel="canonical" href="{canonical_url}">
     <link rel="stylesheet" href="/css/main.css?v={css_v}">
     <script src="/js/MerciController.js?v={js_c_v}" defer></script>
@@ -354,9 +361,9 @@ def generar_indice(publicaciones, out_path, title, meta_desc, hero_subtitle, can
     {{
       "@context": "https://schema.org",
       "@type": "CollectionPage",
-      "name": "{title} - merci-boilerplate.es",
-      "description": "{meta_desc}",
-      "url": "{canonical_url}"
+      "name": {json.dumps(title + " - merci-boilerplate.es")},
+      "description": {json.dumps(meta_desc)},
+      "url": {json.dumps(canonical_url)}
     }}
     </script>
 </head>
@@ -366,8 +373,8 @@ def generar_indice(publicaciones, out_path, title, meta_desc, hero_subtitle, can
     <main class="main" id="main">
         <!-- QUÉ HACE: Sección Hero unificada con el resto del ecosistema -->
         <section class="hero">
-            <h1 class="hero__title">{title}</h1>
-            <p class="hero__subtitle">{hero_subtitle}</p>
+            <h1 class="hero__title">{title_html}</h1>
+            <p class="hero__subtitle">{meta_desc_html}</p>
         </section>
         
         <!-- QUÉ HACE: Índice Curado (Table of Contents) autogenerado -->

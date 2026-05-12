@@ -9,13 +9,16 @@ weasyprint==68.1
 Pillow==12.2.0
 
 # Extracción de texto de PDFs de PageSpeed Insights (merci-extract-metrics.py)
-pypdf==5.4.0
+pypdf>=5.5.0
 
 # Librería de conversión Markdown a HTML (merci-publish.py, merci-wp.py)
-markdown==3.8
+markdown>=3.8.1
 
 # Orquestador unificado de IA (Ollama local / Gemini de contingencia)
-litellm==1.35.0
+litellm>=1.48.0
 
 # SDK nativo de Google (requerido por LiteLLM para usar Gemini)
 google-generativeai>=0.5.2
+
+# Exposición de métricas SRE para Grafana/Prometheus (merci-sre.py)
+prometheus-client>=0.20.0

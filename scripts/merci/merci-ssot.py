@@ -75,7 +75,7 @@ def main():
     bitacora_full = BITACORA_PATH.read_text(encoding="utf-8")
     
     # Extraer estrictamente las tareas pendientes del roadmap
-    pending_tasks = re.findall(r'- \[ \] (.*)', roadmap_content)
+    pending_tasks = re.findall(r'- \[\s*\] (.*)', roadmap_content)
     if not pending_tasks:
         print("  ℹ️ [Merci Info] No hay tareas pendientes en el Roadmap. Ya está 100% completado.")
         return
@@ -152,10 +152,9 @@ def main():
         cambios_aplicados = 0
         
         for tarea in tareas_completadas:
-            target = f"- [ ] {tarea}"
-            replacement = f"- [x] {tarea}"
-            if target in nuevo_roadmap:
-                nuevo_roadmap = nuevo_roadmap.replace(target, replacement)
+            pattern = re.compile(r'- \[\s*\] ' + re.escape(tarea))
+            if pattern.search(nuevo_roadmap):
+                nuevo_roadmap = pattern.sub(f"- [x] {tarea}", nuevo_roadmap)
                 cambios_aplicados += 1
                 
         if cambios_aplicados > 0:

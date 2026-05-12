@@ -77,25 +77,25 @@ class MerciController {
         if (path === '/' || path === '/index.html') {
             return [
                 '¡Hola! Soy tu asistente virtual de merci-boilerplate👋',
-                'merci-boilerplate es la base de este proyecto🚀',
-                'Todo operando a 100/100 en Web Vitals ⚡'
+                'merci-boilerplate es la base de este proyecto🚀 y tiene su propio repositorio en GitHub',
+                'Todo operando a 100/100 en Web Vitals, por ahora ⚡'
             ];
         } else if (path.includes('/biblioteca')) {
             return [
-                'Bienvenida a la Biblioteca 📚',
-                'Aquí guardamos el conocimiento inmutable.',
+                'Estás en la Biblioteca 📚',
+                'Aquí se guarda el conocimiento inmutable generado mientras se crea el proyecto merci-boilerplate.es',
                 'Recuerda que puedes descargar los artículos en PDF 📄'
             ];
         } else if (path.includes('/art-de-cote')) {
             return [
                 'Estás en Art de Coté 🎨',
                 'I+D, experimentos y hallazgos colaterales 🧪',
-                'Esta zona la sirve WordPress de forma aislada 🛡️'
+                'Esta zona se servía en WordPress pero ya no por facilitar el mantenimiento de la documentación'
             ];
         } else if (path.includes('/tienda')) {
             return [
                 '¡Bienvenid@ a la Tienda! 🛒',
-                'Merchandising y catálogo oficial.',
+                'La tienda no tienda de merchandising conmigo de como protagonista',
                 'Gestionado por WooCommerce bajo el capó 🛍️'
             ];
         } else if (path.includes('/blog')) {
@@ -106,8 +106,8 @@ class MerciController {
             ];
         } else if (path.includes('/contacto')) {
             return [
-                'Estás en la zona de contacto.',
-                '¿Quieres hablar con merci-boilerplate, el cerebro de la web? 📨',
+                'Comunícate con la creadora de forma fácil',
+                '¿Quieres hablar, compartir conocimientos, solicitar un servicio... habla con merci-boilerplate-merci-boilerplate, el cerebro de la web? 📨',
                 'No dejes de visitar la Biblioteca, la fuente de saber.😊'
             ];
         }

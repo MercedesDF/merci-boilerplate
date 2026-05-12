@@ -1,0 +1,11 @@
+global:
+  scrape_interval: 2s
+
+# QUÉ HACE: Configura Prometheus para que busque métricas de Python cada 5 segundos.
+# POR QUÉ: Establece el puente de comunicación. En breve, instrumentaremos merci-total.py para que exponga sus datos en 'host.docker.internal:8001'.
+
+scrape_configs:
+  - job_name: 'merci_orquestador'
+    static_configs:
+      # Modo host: Prometheus y Python comparten el mismo localhost
+      - targets: ['localhost:8001']

@@ -27,6 +27,7 @@ from __future__ import annotations
 import argparse
 import ast
 import json
+import os
 import re
 import subprocess
 import sys
@@ -427,6 +428,63 @@ def audit_inline_styles(state: AuditState, path: Path, text: str) -> None:
                 )
             )
 
+def audit_inline_scripts(state: AuditState, path: Path, text: str) -> None:
+    """
+    Detecta etiquetas <script> con contenido en línea, que son un riesgo de XSS
+    y violan la Política de Seguridad de Contenido (CSP).
+    """
+    if path.suffix.lower() not in {".html", ".htm", ".php"}:
+        return
+
+    # Busca todas las etiquetas <script> y extrae sus atributos y contenido
+    pattern = re.compile(r'<script([^>]*)>(.*?)</script>', re.IGNORECASE | re.DOTALL)
+    
+    for match in pattern.finditer(text):
+        attrs = match.group(1).lower()
+        if "application/ld+json" in attrs:
+            continue
+            
+        # Si tiene atributo 'src', es un script externo, no en línea
+        if "src=" in attrs:
+            continue
+            
+        script_content = match.group(2).strip()
+        if not script_content:
+            continue
+
+        line_number = text.count('\n', 0, match.start()) + 1
+        state.add(
+            Finding(
+                path, line_number, "error", "UI_INLINE_SCRIPT",
+                f"Script en línea detectado: <script>...{script_content[:30]}...</script>. Mover a archivo .js externo."
+            )
+        )
+
+def audit_external_assets(state: AuditState, path: Path, text: str) -> None:
+    """
+    Detecta cargas de recursos externos (CSS, JS) en HTML, violando la regla
+    de cero dependencias externas (Zero Bloat).
+    """
+    if path.suffix.lower() not in {".html", ".htm", ".php"}:
+        return
+
+    # Buscar scripts externos
+    script_pattern = re.compile(r'<script[^>]*\bsrc\s*=\s*["\'](https?://[^"\']+)["\']', re.IGNORECASE)
+    for match in script_pattern.finditer(text):
+        url = match.group(1)
+        if "merci-boilerplate.es" not in url and "localhost" not in url:
+            line_number = text.count('\n', 0, match.start()) + 1
+            state.add(Finding(path, line_number, "error", "UI_EXTERNAL_ASSET", f"Script externo detectado: {url[:30]}..."))
+            
+    # Buscar hojas de estilo externas
+    link_pattern = re.compile(r'<link[^>]*\bhref\s*=\s*["\'](https?://[^"\']+)["\'][^>]*>', re.IGNORECASE)
+    for match in link_pattern.finditer(text):
+        full_tag = match.group(0).lower()
+        url = match.group(1)
+        if "stylesheet" in full_tag and "merci-boilerplate.es" not in url and "localhost" not in url:
+            line_number = text.count('\n', 0, match.start()) + 1
+            state.add(Finding(path, line_number, "error", "UI_EXTERNAL_ASSET", f"CSS externo detectado: {url[:30]}..."))
+
 class SeoHTMLParser(HTMLParser):
     """
     Acumula datos mientras el analizador HTML de la librería estándar recorre el documento.
@@ -634,6 +692,8 @@ def run_on_files(paths: Iterable[Path], strict_json_ld: bool) -> AuditState:
         audit_md_acronyms(state, path, text)
         audit_php_smells(state, path, text)
         audit_inline_styles(state, path, text)
+        audit_inline_scripts(state, path, text)
+        audit_external_assets(state, path, text)
     return state
 
 
@@ -719,7 +779,7 @@ def print_report(state: AuditState) -> None:
         
         # --- INYECCIÓN DE IA (El Agente Auditor) ---
         # Solo solicitamos sugerencias para errores críticos para no saturar el pre-commit.
-        if item.level == "error" and litellm:
+        if item.level == "error" and litellm and not os.environ.get("MERCI_SKIP_AI"):
             print(f"  🤖 [Merci Brain] Analizando contexto de {item.code}...")
             suggestion = get_ai_suggestion(item)
             if suggestion:
