@@ -16,12 +16,11 @@ from pathlib import Path
 # Definición de rutas absolutas basadas en la ubicación del script
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
-# QUÉ HACE: Lista de bitácoras activas permitidas para gobernar los commits
-# POR QUÉ: Permite tener múltiples "libros" (Infraestructura, IA) sin romper la automatización.
-BITACORAS_ACTIVAS = [
-    REPO_ROOT / "laboratorio" / "bitacora-merci-boilerplate-orquestacion-ia.md",
-    REPO_ROOT / "laboratorio" / "bitacora-merci-boilerplate.md"
-]
+# QUÉ HACE: Autodescubre dinámicamente cualquier bitácora de épica.
+# POR QUÉ: Zero Maintenance. Permite crear nuevas épicas sin modificar el código en Python.
+def obtener_bitacoras_activas():
+    """Busca dinámicamente todas las bitácoras de épicas en el laboratorio."""
+    return list((REPO_ROOT / "laboratorio").glob("bitacora-merci-boilerplate-epic-*.md"))
 
 def check_repo_changes():
     """Verifica si hay algún cambio en el repositorio (staged, unstaged o untracked)."""
@@ -30,7 +29,7 @@ def check_repo_changes():
 
 def obtener_bitacora_activa():
     """Devuelve la bitácora que ha sido modificada físicamente más recientemente."""
-    activas = [b for b in BITACORAS_ACTIVAS if b.exists()]
+    activas = [b for b in obtener_bitacoras_activas() if b.exists()]
     if not activas:
         return None
     # Compara la fecha de modificación (st_mtime) y devuelve la más reciente
@@ -44,12 +43,15 @@ def check_bitacora_updated(bitacora_path):
     # `git diff --quiet` devuelve 0 si no hay cambios, 1 si los hay.
     # Usamos `HEAD` para comparar contra el último commit.
     try:
+        # Usamos 'git status --porcelain' que es más robusto para scripting.
+        # Devuelve una línea si el archivo está modificado, es nuevo, etc.
         result = subprocess.run(
-            ["git", "diff", "--quiet", "HEAD", "--", str(bitacora_path)],
+            ["git", "status", "--porcelain", "--", str(bitacora_path)],
             cwd=REPO_ROOT,
-            capture_output=True # Evitar que imprima errores si el archivo no existe aún
+            capture_output=True,
+            text=True
         )
-        return result.returncode != 0
+        return len(result.stdout.strip()) > 0
     except FileNotFoundError:
         # Git no está instalado, el script principal ya lo gestionará.
         return True

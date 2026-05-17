@@ -11,6 +11,7 @@ import json
 import re
 import urllib.request
 import urllib.parse
+import unicodedata
 import webbrowser
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
@@ -18,6 +19,13 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[2]
 ENV_PATH = REPO_ROOT / ".env"
 TOKEN_PATH = REPO_ROOT / ".linkedin_token.json" # Aquí guardaremos la llave
+
+def slugify(texto: str) -> str:
+    """Convierte un texto en una cadena segura para URLs (slug)."""
+    texto = str(texto)
+    texto = unicodedata.normalize('NFKD', texto).encode('ascii', 'ignore').decode('ascii')
+    texto = re.sub(r'[^\w\s-]', '', texto.lower())
+    return re.sub(r'[-\s]+', '-', texto).strip('-_')
 
 # =========================================================================
 # 1. EL MICRO-SERVIDOR LOCAL (El atrapa-códigos)
@@ -180,8 +188,8 @@ def publicar_texto_linkedin(access_token, author_urn, texto):
         print(f"❌ Error API LinkedIn: {e.read().decode('utf-8')}")
         return None
 
-def publicar_articulos_pendientes():
-    print("🚀 [Merci LinkedIn] Escaneando artículos subidos a la web...")
+def procesar_linkedin(modo_auto=False):
+    print(f"🚀 [Merci LinkedIn] {'Modo Automático (Cron)' if modo_auto else 'Modo Revisión Interactiva'}...")
     
     token_data = json.loads(TOKEN_PATH.read_text(encoding="utf-8"))
     access_token = token_data.get("access_token")
@@ -193,7 +201,8 @@ def publicar_articulos_pendientes():
     directorios = [REPO_ROOT / "blog", REPO_ROOT / "art-de-cote", REPO_ROOT / "biblioteca"]
     yaml_pattern = re.compile(r"^\s*---\r?\n(.*?)\r?\n---\r?\n", re.DOTALL)
     
-    publicados = 0
+    en_cola = []
+    aprobados = []
     for dir_path in directorios:
         if not dir_path.exists(): continue
         
@@ -210,32 +219,100 @@ def publicar_articulos_pendientes():
             # NUEVA LÓGICA: Leer el texto de LinkedIn desde un comentario HTML en el cuerpo del Markdown
             linkedin_text_match = re.search(r'<!--\s*linkedin:\s*(.*?)\s*-->', content, re.DOTALL | re.IGNORECASE)
             
-            # REGLA ESTRICTA: Solo publica si está publicado, tiene el bloque HTML y no se ha publicado en LinkedIn antes
-            if estado and estado.group(1) == "publicado" and linkedin_text_match and not linkedin_id:
-                texto_post = linkedin_text_match.group(1).strip()
-                print(f"\n  📝 Post pendiente detectado: {archivo.name}")
-                print(f"  💬 Previsualización: {texto_post[:70]}...")
+            estado_social = re.search(r'^estado_social:\s*["\']?([^"\'\n]+)["\']?', yaml_block, re.MULTILINE)
+            fecha = re.search(r'^fecha:\s*["\']?([^"\'\n]+)["\']?', yaml_block, re.MULTILINE)
+            
+            if estado and estado.group(1) == "publicado" and estado_social and linkedin_text_match and not linkedin_id:
+                val_estado_social = estado_social.group(1)
+                fecha_val = fecha.group(1) if fecha else "9999-99-99"
                 
-                # BARRERA DE SEGURIDAD: Preguntar antes de disparar a la red social
-                confirmacion = input("  👉 ¿Publicar esto en tu perfil de LinkedIn ahora? (s/N): ").strip().lower()
-                if confirmacion == 's':
-                    post_id = publicar_texto_linkedin(access_token, author_urn, texto_post)
-                    
-                    if post_id:
-                        # Inyectamos el sello de LinkedIn en el YAML para no duplicar jamás
-                        nuevo_yaml = yaml_block + f'\nlinkedin_id: "{post_id}"'
-                        nuevo_contenido = content.replace(yaml_block, nuevo_yaml)
-                        archivo.write_text(nuevo_contenido, encoding="utf-8")
-                        print(f"  ✅ ¡Éxito! Post sellado con ID de LinkedIn.")
-                        publicados += 1
+                texto_post_base = linkedin_text_match.group(1).strip()
+                
+                # INYECCIÓN DINÁMICA DE URL: Si no hay link, lo calculamos y añadimos
+                if "http" not in texto_post_base:
+                    tema_match = re.search(r'^tema:\s*["\']?([^"\'\n]+)["\']?', yaml_block, re.MULTILINE)
+                    tema_val = tema_match.group(1).lower() if tema_match else ""
+                    if "blog" in tema_val:
+                        enlace = f"https://merci-boilerplate.es/blog/{archivo.stem}/"
+                    else:
+                        titulo_match = re.search(r'^titulo:\s*["\']?([^"\'\n]+)["\']?', yaml_block, re.MULTILINE)
+                        titulo_val = titulo_match.group(1) if titulo_match else archivo.stem
+                        slug = slugify(titulo_val)
+                        base_path = "/art-de-cote/" if "art" in tema_val else "/biblioteca/"
+                        enlace = f"https://merci-boilerplate.es{base_path}{slug}.html"
+                    texto_post_final = f"{texto_post_base}\n\n🔗 Lee el artículo completo aquí:\n{enlace}"
                 else:
-                    print("  ⏭️ Publicación omitida por el usuario.")
+                    texto_post_final = texto_post_base
 
-    if publicados == 0:
-        print("  🤷‍♀️ Ningún artículo nuevo pendiente de publicar en LinkedIn.")
+                datos_post = {
+                    "archivo": archivo,
+                    "fecha": fecha_val,
+                    "texto_post": texto_post_final,
+                    "yaml_block": yaml_block,
+                    "content": content
+                }
+                
+                if val_estado_social == "en_cola":
+                    en_cola.append(datos_post)
+                elif val_estado_social == "aprobado":
+                    aprobados.append(datos_post)
+
+    if modo_auto:
+        if not aprobados:
+            print("  🤷‍♀️ Ningún post 'aprobado' en la cola para emitir hoy.")
+            return
+            
+        aprobados.sort(key=lambda x: x["fecha"])
+        post_objetivo = aprobados[0]
+        archivo = post_objetivo["archivo"]
+        texto_post = post_objetivo["texto_post"]
+        yaml_block = post_objetivo["yaml_block"]
+        content = post_objetivo["content"]
+
+        print(f"\n  📝 Emitiendo post más antiguo aprobado: {archivo.name} ({post_objetivo['fecha']})")
+        
+        post_id = publicar_texto_linkedin(access_token, author_urn, texto_post)
+        if post_id:
+            nuevo_yaml = re.sub(r'^estado_social:\s*["\']?aprobado["\']?', 'estado_social: "publicado_linkedin"', yaml_block, flags=re.MULTILINE)
+            nuevo_yaml += f'\nlinkedin_id: "{post_id}"'
+            nuevo_contenido = content.replace(yaml_block, nuevo_yaml)
+            archivo.write_text(nuevo_contenido, encoding="utf-8")
+            print(f"  ✅ ¡Éxito! Post publicado automáticamente.")
+    else:
+        print(f"\n  📊 Estado del Buffer: {len(en_cola)} pendientes de revisión | {len(aprobados)} listos para emisión automática.")
+        
+        if not en_cola:
+            print("  🤷‍♀️ No hay posts nuevos 'en_cola' para revisar.")
+            return
+            
+        en_cola.sort(key=lambda x: x["fecha"])
+        
+        aprobados_hoy = 0
+        for post in en_cola:
+            archivo = post["archivo"]
+            texto_post = post["texto_post"]
+            yaml_block = post["yaml_block"]
+            content = post["content"]
+            
+            print(f"\n  📝 Revisando: {archivo.name} ({post['fecha']})")
+            print(f"  💬 Previsualización:\n{texto_post}\n")
+            
+            confirmacion = input("  👉 ¿Aprobar este post y moverlo a la cola automática de emisión? (s/N): ").strip().lower()
+            if confirmacion == 's':
+                nuevo_yaml = re.sub(r'^estado_social:\s*["\']?en_cola["\']?', 'estado_social: "aprobado"', yaml_block, flags=re.MULTILINE)
+                nuevo_contenido = content.replace(yaml_block, nuevo_yaml)
+                archivo.write_text(nuevo_contenido, encoding="utf-8")
+                print(f"  ✅ Post movido a 'aprobado' (en tránsito).")
+                aprobados_hoy += 1
+            else:
+                print("  ⏭️ Omitido.")
+                
+        if aprobados_hoy > 0:
+            print(f"\n  🎉 Has aprobado {aprobados_hoy} post(s). Una tarea Cron los irá publicando poco a poco.")
 
 if __name__ == "__main__":
+    modo_auto = "--auto" in sys.argv or "--cron" in sys.argv
     if not TOKEN_PATH.exists():
         autenticar_linkedin()
     else:
-        publicar_articulos_pendientes()
+        procesar_linkedin(modo_auto)

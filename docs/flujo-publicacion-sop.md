@@ -11,12 +11,12 @@ Por diseño arquitectónico (Environment Segregation), el núcleo estático (Bib
 **Características:** Contenido fundacional, manuales, proyectos y arte colateral (experimentos). Genera HTML ultrarrápido y PDF descargable.
 
 ### Paso a Paso:
-1. **Incubación:** Crear o editar el documento Markdown (`.md`) dentro de la carpeta `laboratorio/` o sus subdirectorios de incubación. Usar `estado: "incubacion"` para documentos en desarrollo (fricción cero en terminal) y cambiar a `estado: "borrador"` cuando estén listos para ser procesados.
-2. **Curación (Promote):** Al estar listo para su publicación, ejecutar en la terminal:
+1. **Incubación (IA o Manual):** Volcar notas crudas en `laboratorio/notas_rapidas/` y ejecutar `merci librarian` para que la IA local estructure el documento. Todos los borradores nacen en la bandeja unificada `laboratorio/incubacion/` con `estado: "incubacion"`. Cambiar el YAML a `estado: "borrador"` cuando estén listos para ser promovidos.
+2. **Curación Dinámica (Promote):** Ejecutar en la terminal:
    ```bash
-   python3 scripts/merci/merci-promote.py
+   merci promote
    ```
-   *Nota:* El asistente interactivo validará el SEO/Accesibilidad, cambiará el estado a `"publicado"` y moverá físicamente el archivo a la carpeta de producción correspondiente (`biblioteca/` o `art-de-cote/`).
+   *Nota:* El asistente leerá el campo `tema` del YAML para enrutar mágicamente el archivo a `biblioteca/` o `art-de-cote/`. Al finalizar con éxito, **te preguntará si deseas invocar al Agente Blogger** para que genere automáticamente el post promocional y lo deje en la incubadora.
 3. **Compilación y QA:** Ejecutar el orquestador maestro para transformar el Markdown en HTML/PDF, actualizar el índice y pasar la auditoría estricta:
    ```bash
    merci total
@@ -30,14 +30,15 @@ Por diseño arquitectónico (Environment Segregation), el núcleo estático (Bib
 **Características:** Contenido dinámico, noticias, reflexiones o novedades rápidas.
 
 ### Paso a Paso:
-1. **Incubación:** Crear el documento Markdown dentro de la zona de pruebas destinada al entorno dinámico (ej. `laboratorio/blog/`). Usar `estado: "incubacion"` mientras se redacta.
-   *Garantizar que el YAML cambie a `estado: "publicado"` (o "borrador" según tu flujo) y tenga un `tema:` que coincida con una categoría existente en el entorno WordPress para promover.*
-2. **Curación (Promote):** Ejecutar `python3 scripts/merci/merci-promote.py` para curar el documento. El script detectará el destino y moverá físicamente el archivo a su carpeta definitiva en la raíz (`blog/`).
-3. **Sincronización Directa (Headless):** Ejecutar el publicador Headless para escanear y sincronizar automáticamente las carpetas dinámicas de la raíz:
+1. **Incubación:** Nace de la llamada automática de `merci promote` (Agent Chaining) o invocando manualmente a `merci-blogger.py`. El Blogger genera el post en `incubacion/` con `estado: "incubacion"`, `tema: "Blog"` y `estado_social: "en_cola"`. Una vez revisado, cambiar el estado a `"borrador"` y el estado social a `"aprobado"`.
+2. **Curación Minimalista (Promote):** Ejecutar `merci promote`. El orquestador detectará que el tema es "Blog", ocultará las preguntas estructurales burocráticas (Alt de portada, Fase) y lo moverá a la carpeta `blog/` en la raíz.
+3. **Sincronización Directa (Headless WP):** Ejecutar el publicador masivo para enviar los posts a WordPress:
    ```bash
-   python3 scripts/merci/merci-wp.py
+   merci wp
    ```
-4. **Actualización y Borradores:** El script **es 100% agnóstico al entorno**. Extrae el nombre del archivo (slug) y verifica su existencia en el servidor activo configurado en el archivo `.env`. Si no existe, lo crea; si ya existe, lo actualiza limpiamente sin inyectar códigos locales.
+   *(Nota: `merci total` lo hace automáticamente en el pipeline global).*
+4. **Despliegue a Producción (Contenido Dinámico):** Para enviar los posts a la web pública, edita tu archivo `.env`, comenta las credenciales de `localhost` y descomenta las de producción. Luego, ejecuta de nuevo `merci wp`. Una vez finalizado, recuerda volver a dejar el `.env` apuntando a `localhost`.
+5. **Distribución Asíncrona (Buffer Social):** Para liberar posts en LinkedIn de 1 en 1, ejecutar `merci linkedin`. El script actúa como Gatekeeper: selecciona el post más antiguo en cola, exige confirmación humana y sella el YAML a `"publicado_linkedin"`.
 
 ---
 

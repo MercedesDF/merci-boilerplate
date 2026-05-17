@@ -94,6 +94,7 @@ TEXT_SUFFIXES = frozenset(
         ".yaml",
         ".toml",
         ".py",
+        ".php",
         ".ini",
         ".env",
         ".sh",
@@ -422,7 +423,7 @@ def audit_inline_styles(state: AuditState, path: Path, text: str) -> None:
                 Finding(
                     path,
                     line_number,
-                    "warn",
+                        "error",
                     "UI_INLINE_STYLE",
                     f"Estilo en línea detectado (style='{style_content[:25]}...'). Extraer a componente SASS (BEM).",  # merci-audit:silence-style
                 )

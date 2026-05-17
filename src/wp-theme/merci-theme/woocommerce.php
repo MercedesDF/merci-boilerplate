@@ -16,7 +16,7 @@ $js_main_v = time();
     <script src="/js/main.js?v=<?php echo $js_main_v; ?>" defer></script>
     <?php wp_head(); ?>
 </head>
-<body <?php body_class('theme-body page'); ?>>
+<body id="page-tienda" <?php body_class('theme-body page'); ?>>
     <div id="top" tabindex="-1" style="position: absolute; top: 0; left: 0;"></div>
     <header class="header">
         <a href="/" class="header__brand">
@@ -53,7 +53,7 @@ $js_main_v = time();
 
     <footer class="footer" style="text-align: left; padding-bottom: 6rem;">
         <div class="footer__text">
-            <a href="#top" style="color: inherit; text-decoration: underline; font-weight: 600; display: inline-block; margin-bottom: 1rem;">↑ Volver arriba</a><br>
+            <a href="#top">↑ Volver arriba</a><br>
             &copy; 2026 <strong>merci-boilerplate</strong> — Base de código abierto bajo Licencia MIT.
         </div>
     </footer>

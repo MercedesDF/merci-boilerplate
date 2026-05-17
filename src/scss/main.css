@@ -1,0 +1,946 @@
+@charset "UTF-8";
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #ffffff;
+  color: #0f172a;
+  min-height: 100vh;
+  overflow-x: hidden;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+img,
+picture,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+  background-color: #ffffff;
+  color: #0f172a;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.2;
+  margin-bottom: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
+  color: inherit;
+}
+h1 a:hover, h2 a:hover, h3 a:hover, h4 a:hover, h5 a:hover, h6 a:hover {
+  color: #ea580c;
+}
+h1 a:visited, h2 a:visited, h3 a:visited, h4 a:visited, h5 a:visited, h6 a:visited {
+  /* QUÉ HACE: Asegura que los enlaces en cabeceras también respeten el estado de visitado. */
+  color: #7c2d12;
+}
+
+p {
+  margin-bottom: 1rem;
+}
+
+p a, li a {
+  color: #9a3412;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+a {
+  color: #ea580c;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+a:visited {
+  /* QUÉ HACE: Consume la variable global para teñir los enlaces ya leídos. */
+  /* POR QUÉ: Mantiene la centralización de los colores y mejora la UX al indicar el historial. */
+  color: #7c2d12;
+}
+a:hover, a:focus {
+  color: rgb(244.6975609756, 119.3512195122, 54.1024390244);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 1rem 2rem;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.header__brand {
+  display: flex;
+  align-items: center;
+}
+.header__logo {
+  display: block;
+  max-width: 150px;
+  height: auto;
+}
+.header__toggle {
+  display: block;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  z-index: 101;
+}
+@media (min-width: 768px) {
+  .header__toggle {
+    display: none;
+  }
+}
+.header__toggle-icon {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background-color: #0f172a;
+  position: relative;
+  transition: background-color 0.2s ease;
+}
+.header__toggle-icon::before, .header__toggle-icon::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: #0f172a;
+  left: 0;
+  transition: transform 0.2s ease, top 0.2s ease;
+}
+.header__toggle-icon::before {
+  top: -6px;
+}
+.header__toggle-icon::after {
+  top: 6px;
+}
+.header__toggle.is-active .header__toggle-icon {
+  background-color: transparent;
+}
+.header__toggle.is-active .header__toggle-icon::before {
+  top: 0;
+  transform: rotate(45deg);
+}
+.header__toggle.is-active .header__toggle-icon::after {
+  top: 0;
+  transform: rotate(-45deg);
+}
+.header__nav {
+  display: none;
+  flex-direction: column;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.98);
+  padding: 2rem;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.1);
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.05);
+}
+.header__nav.is-active {
+  display: flex;
+}
+@media (min-width: 768px) {
+  .header__nav {
+    display: flex;
+    flex-direction: row;
+    position: static;
+    width: auto;
+    background-color: transparent;
+    padding: 0;
+    border-bottom: none;
+    box-shadow: none;
+    gap: 1.5rem;
+  }
+}
+.header .nav__link {
+  color: #0f172a;
+  font-weight: 500;
+  transition: color 0.2s ease;
+  padding: 0.5rem 0;
+}
+@media (min-width: 768px) {
+  .header .nav__link {
+    padding: 0;
+  }
+}
+.header .nav__link:hover {
+  color: #ea580c;
+}
+
+/* Soporte de accesibilidad: Evitar borde de foco antiestético al recibir foco programático */
+[tabindex="-1"]:focus {
+  outline: none;
+}
+
+.footer {
+  text-align: left;
+  /* QUÉ HACE: Añade el mismo padding horizontal (32px / 2rem) que el header y el main. */
+  /* POR QUÉ: Mantiene la alineación vertical de los contenidos (Grid Alignment) en todo el layout. */
+  padding: 2rem 2rem 6rem;
+}
+.footer__links {
+  margin-bottom: 1.5rem;
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  font-weight: 500;
+}
+.footer__link {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.footer__link:visited {
+  color: #7c2d12;
+}
+.footer__text a {
+  color: inherit;
+  text-decoration: underline;
+  font-weight: 600;
+  display: inline-block;
+  margin-bottom: 1rem;
+}
+
+.hero {
+  padding: 6rem 2rem;
+  text-align: center;
+  background: linear-gradient(135deg, rgba(234, 88, 12, 0.1) 0%, rgba(255, 255, 255, 0) 100%);
+  /* QUÉ HACE: Unifica el tamaño base de todos los hero y centra el texto verticalmente. */
+  /* POR QUÉ: Permite consistencia visual entre páginas con textos de distinta longitud sin romper el responsive. */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 40vh; /* 40% del alto de la ventana del navegador */
+}
+.hero__title {
+  font-size: clamp(2rem, 5vw, 4rem);
+  margin-bottom: 1rem;
+  color: #0f172a;
+}
+.hero__subtitle {
+  font-size: 1.25rem;
+  color: rgb(50.7631578947, 77.8368421053, 142.1368421053);
+  max-width: 60ch;
+  margin: 0 auto 2rem;
+  opacity: 0.9;
+}
+.hero__statement {
+  font-size: 1.75rem;
+  font-weight: 400;
+  font-style: italic;
+  color: #0f172a;
+  margin-bottom: 1rem;
+  line-height: 1.3;
+}
+.hero--compact {
+  min-height: 20vh;
+  padding: 2rem 1rem;
+}
+.hero--compact .hero__title {
+  font-size: clamp(2rem, 4vw, 3rem);
+  margin-bottom: 0;
+}
+.hero--compact .hero__subtitle {
+  margin-bottom: 0;
+  margin-top: 0.5rem;
+  font-size: 1.15rem;
+}
+.hero {
+  /* ===================== */
+  /* ENGINEERING DASHBOARD */
+  /* ===================== */
+}
+.hero__dashboard {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+@media (min-width: 768px) {
+  .hero__dashboard {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+.hero__dashboard--standalone {
+  max-width: 1000px; /* Alineado a la nueva composición de Side-Headings */
+  margin: 5rem auto;
+}
+.hero__metric {
+  padding: 0.75rem;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  border-radius: 4px;
+  text-align: center;
+}
+.hero__metric-label {
+  display: block;
+  font-size: 1rem;
+  opacity: 0.6;
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.hero__metric-value {
+  display: block;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #ea580c;
+  line-height: 1.2;
+}
+.hero__dashboard-legend {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  margin: 0.75rem 0 0;
+  text-align: left;
+  max-width: 80ch;
+  line-height: 1.5;
+}
+.hero__highlights {
+  list-style: none;
+  padding: 0;
+  margin: 0 auto 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  max-width: 80ch;
+}
+.hero__highlights li {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  background: rgba(255, 255, 255, 0.5);
+}
+.hero__cta {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+.hero__cta a {
+  font-weight: 600;
+  color: #ea580c;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border: 1px solid #ea580c;
+  border-radius: 4px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.hero__cta a:hover {
+  background-color: #ea580c;
+  color: #ffffff;
+}
+
+.card {
+  position: relative;
+  background-color: transparent;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  border-radius: 8px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+.card:hover {
+  transform: translateY(-4px);
+  border-color: #ea580c;
+}
+.card:hover .card__title a {
+  color: #ea580c;
+}
+.card__back-link {
+  display: inline-block;
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+  font-weight: bold;
+  color: #64748b;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+.card__back-link:hover {
+  color: #ea580c;
+}
+.card__header {
+  display: flex;
+  flex-direction: column;
+}
+.card__download {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: rgba(234, 88, 12, 0.1);
+  color: #ea580c;
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.card__download:hover {
+  background-color: #ea580c;
+  color: #ffffff;
+}
+.card__download--highlight {
+  font-size: 2.5rem;
+  color: #ea580c;
+  margin-bottom: 0.5rem;
+  line-height: 1.2;
+}
+.card__title {
+  font-size: 1.5rem;
+  color: #0f172a;
+  margin-bottom: 0;
+}
+.card__title a {
+  text-decoration: none;
+  color: inherit;
+  transition: color 0.2s ease;
+  /* Patrón Stretched Link: Expande el área clicable a toda la tarjeta */
+}
+.card__title a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.card__meta {
+  font-size: 0.875rem;
+  color: #64748b;
+}
+.card--booklet {
+  border-top: 3px solid #ea580c;
+}
+.card--book {
+  border-top: 3px solid #10b981;
+}
+
+.card__content {
+  /* Espaciado para el texto generado desde Markdown */
+}
+.card__content h2 {
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  color: #ea580c; /* Un toque visual opcional para los capítulos */
+}
+.card__content h3 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+.card__content p, .card__content ul, .card__content ol, .card__content pre {
+  margin-bottom: 1.25rem;
+  line-height: 1.7;
+}
+.card__content li {
+  margin-bottom: 0.5rem;
+}
+.card__content {
+  /* Clases inyectadas por el orquestador para contenido multimedia */
+}
+.card__content .multimedia-video {
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  margin-bottom: 1.25rem;
+}
+.card__content .video-fallback {
+  display: none; /* Oculto en web, visible solo en los PDF generados por WeasyPrint */
+}
+
+.home-grid {
+  display: grid;
+  gap: 2rem;
+}
+@media (min-width: 768px) {
+  .home-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.home-card {
+  background-color: transparent;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  border-radius: 8px;
+  padding: 2rem;
+  transition: border-color 0.3s ease;
+}
+.home-card:hover {
+  border-color: #ea580c;
+}
+.home-card__title {
+  font-size: 1.5rem;
+  color: #0f172a;
+  margin-bottom: 0.75rem;
+}
+.home-card__title--highlight {
+  color: #ea580c;
+}
+
+/* Aseguramos que el layout de la sección se exporte al main.css */
+/**
+ * Componente: Section
+ * Propósito: Contenedor estructural universal para bloques de contenido.
+ * Aislar este layout permite su reutilización en vistas estáticas y dinámicas
+ * sin depender de los estilos específicos de una página (ej. _home.scss).
+ */
+.section {
+  padding: 4rem 2rem;
+}
+
+/* Integración visual de la tienda */
+/* Integración visual del Catálogo en Merci Boilerplate */
+.woocommerce {
+  /* Ocultamos la migas de pan y filtros redundantes para un look minimalista */
+}
+.woocommerce .woocommerce-breadcrumb,
+.woocommerce .woocommerce-result-count,
+.woocommerce .woocommerce-ordering {
+  display: none;
+}
+.woocommerce {
+  /* Convertimos su lista de productos en nuestra cuadrícula (Grid) */
+}
+.woocommerce .products {
+  display: grid;
+  gap: 2rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+@media (min-width: 768px) {
+  .woocommerce .products {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+}
+.woocommerce {
+  /* Convertimos cada producto en una de nuestras Tarjetas (Card) */
+}
+.woocommerce .product {
+  background-color: hsl(0, 0%, 98%);
+  border-radius: 8px;
+  padding: 2rem;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  text-align: center;
+}
+.woocommerce .product:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+  border-color: #ea580c;
+}
+.woocommerce .product img {
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+  width: 100%;
+  height: auto;
+}
+.woocommerce .product .woocommerce-loop-product__title {
+  font-size: 1.25rem;
+  color: #ea580c;
+  margin-bottom: 0.5rem;
+}
+.woocommerce .product .price {
+  display: block;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #0f172a;
+}
+.woocommerce .product {
+  /* QUÉ HACE: Estiliza el botón nativo de "Añadir al carrito" o "Leer más". */
+}
+.woocommerce .product .button {
+  display: inline-block;
+  background-color: #ea580c;
+  color: #ffffff;
+  padding: 0.6rem 1.2rem;
+  border-radius: 4px;
+  font-weight: 700;
+  margin-top: 1rem;
+  transition: background-color 0.2s ease;
+}
+.woocommerce .product .button:hover, .woocommerce .product .button:focus {
+  background-color: rgb(198.9, 74.8, 10.2);
+  color: #ffffff;
+}
+.woocommerce {
+  /* ========================================================
+     Vista de Ficha de Producto Individual (.single-product)
+     ======================================================== */
+  /* QUÉ HACE: Deshace el estilo de tarjeta y crea un layout de 2 columnas. */
+}
+.single-product .woocommerce div.product {
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+  text-align: left;
+  padding: 0;
+  display: grid;
+  gap: 3rem;
+}
+.single-product .woocommerce div.product:hover {
+  transform: none; /* Evitamos que flote al pasar el ratón */
+}
+@media (min-width: 768px) {
+  .single-product .woocommerce div.product {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+}
+.single-product .woocommerce .price {
+  font-size: 1.5rem;
+  color: #ea580c;
+  margin-bottom: 1.5rem;
+}
+.single-product .woocommerce {
+  /* QUÉ HACE: Obliga a las pestañas de descripción a caer a una nueva fila ocupando el 100%. */
+}
+.single-product .woocommerce .woocommerce-tabs {
+  grid-column: 1/-1;
+  margin-top: 3rem;
+}
+.single-product .woocommerce .woocommerce-tabs ul.tabs {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  gap: 2rem;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.1);
+  margin-bottom: 2rem;
+}
+.single-product .woocommerce .woocommerce-tabs ul.tabs li {
+  padding-bottom: 0.5rem;
+  font-weight: 700;
+  cursor: pointer;
+  color: #0f172a;
+}
+
+/**
+ * Componente: Merci UI
+ * @description Interfaz del asistente anclada flotante. Reemplaza el movimiento JS por CSS fijo.
+ */
+.merci-ui {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+.merci-ui__trigger {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  border-radius: 50%;
+}
+.merci-ui__trigger:hover, .merci-ui__trigger:focus {
+  transform: scale(1.1);
+  outline: 2px solid #ea580c;
+  outline-offset: 4px;
+}
+.merci-ui__avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: block;
+}
+.merci-ui__message-box {
+  background-color: rgb(252.4243902439, 221.087804878, 204.7756097561);
+  color: #0f172a;
+  padding: 0.5rem 1rem;
+  border-radius: 1rem 1rem 0 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  max-width: 200px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.merci-ui__message-box[aria-hidden=false] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.library-nav {
+  margin-bottom: 4rem;
+  background: #f8fafc;
+  padding: 2rem;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+.library-nav__title {
+  margin-top: 0;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  color: #334155;
+}
+.library-nav__list {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin: 0;
+}
+.library-nav__theme-title {
+  display: inline-block;
+  margin-bottom: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.9rem;
+  color: #9a3412; /* Naranja accesible WCAG */
+  border-bottom: 2px solid rgba(154, 52, 18, 0.3);
+  padding-bottom: 0.2rem;
+  text-decoration: none;
+}
+.library-nav__theme-title:visited {
+  color: #7c2d12;
+}
+.library-nav__article-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.library-nav__article-item {
+  padding-left: 1rem;
+  border-left: 2px solid #e2e8f0;
+  transition: border-color 0.2s ease;
+}
+.library-nav__article-item:hover {
+  border-color: #cbd5e1;
+}
+.library-nav__article-link {
+  font-size: 0.95rem;
+  color: #475569; /* Gris pizarra original */
+  text-decoration: none;
+  display: block;
+}
+.library-nav__article-link:visited {
+  color: #7c2d12;
+}
+.library-nav__article-link:hover {
+  color: #ea580c;
+}
+
+.library-section {
+  margin-bottom: 4rem;
+  scroll-margin-top: 100px;
+  padding: 0 2rem;
+}
+@media (min-width: 768px) {
+  .library-section {
+    padding: 0 2rem;
+  }
+}
+.library-section__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding-bottom: 0.5rem;
+}
+.library-section__title {
+  margin: 0;
+  border-bottom: none;
+  padding-bottom: 0 2rem;
+}
+.library-section__back-link {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #64748b;
+  text-decoration: underline;
+  white-space: nowrap;
+  margin-left: 1rem;
+}
+
+/* QUÉ HACE: Centraliza los estilos unificados de las secciones de la portada. */
+/* POR QUÉ: Separa las responsabilidades (Separation of Concerns) del componente hero, manteniendo un SASS modular y limpio. */
+.home-section {
+  padding: 2rem;
+}
+.home-section__title {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+/* COMPONENTE: Listado vertical de artículos del blog */
+.blog-feed {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+.blog-feed__article {
+  padding-bottom: 2.5rem;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.1);
+}
+.blog-feed__article:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+.blog-feed__header {
+  display: flex;
+  flex-direction: column;
+}
+.blog-feed__meta {
+  font-size: 0.875rem;
+  color: #64748b;
+}
+.blog-feed__title {
+  font-size: 1.8rem;
+  margin-top: 0.5rem;
+}
+.blog-feed__title a {
+  text-decoration: none;
+  color: inherit;
+  transition: color 0.2s ease;
+}
+.blog-feed__title a:hover {
+  color: #ea580c;
+}
+.blog-feed__excerpt {
+  margin-top: 1rem;
+  color: #334155;
+  line-height: 1.6;
+}
+
+/* COMPONENTE: Vista de lectura ergonómica y texto continuo (Prosa) */
+.prose {
+  max-width: 1000px; /* Ensanchado a 1000px para equilibrar el menú de navegación */
+  margin: 0 auto;
+  padding: 0 1.5rem; /* Seguridad en móviles */
+}
+.prose__back-link {
+  display: inline-block;
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+.prose__back-link:hover {
+  color: #ea580c;
+}
+.prose__header {
+  text-align: center; /* El título vuelve al centro con autoridad */
+  margin-bottom: 4rem;
+}
+.prose__title {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  color: #0f172a;
+  margin-bottom: 0.5rem;
+  line-height: 1.2;
+}
+.prose__content {
+  font-size: 1.15rem;
+  line-height: 1.8;
+  color: #334155;
+  /* EL PATRÓN "SIDE-HEADING" (Floats Asimétricos) */
+  /* Se reemplaza CSS Grid por Floats para evitar que H2 multilíneas rompan el flujo vertical de la columna derecha */
+}
+@media (min-width: 1024px) {
+  .prose__content {
+    display: block;
+    /* Margen izquierdo fijo para garantizar una alineación vertical estricta. */
+    /* Evita que elementos con fuentes más grandes (h3) desborden hacia la izquierda. */
+  }
+  .prose__content > * {
+    margin-left: calc(250px + 4rem);
+  }
+  .prose__content {
+    /* Los H2 se "flotan" en el espacio vacío de la izquierda */
+  }
+  .prose__content > h2 {
+    float: left;
+    clear: left;
+    width: 250px;
+    margin-left: 0;
+    text-align: left; /* Mirando hacia el texto */
+    margin-top: 4.5rem; /* Espaciado entre secciones */
+  }
+  .prose__content {
+    /* Sincronizamos el elemento a la derecha del H2 para que bajen juntos */
+  }
+  .prose__content > h2 + * {
+    margin-top: 4.5rem;
+  }
+  .prose__content {
+    /* El primer H2 y su acompañante no necesitan margen superior extra */
+  }
+  .prose__content > h2:first-child,
+  .prose__content > h2:first-child + * {
+    margin-top: 0;
+  }
+  .prose__content {
+    /* Limpieza de floats */
+  }
+  .prose__content::after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+}
+.prose__content > p, .prose__content > ul, .prose__content > ol, .prose__content > pre, .prose__content > h3 {
+  margin-bottom: 0.2rem;
+}
+.prose__content li {
+  margin-bottom: 0.5rem;
+}
+.prose__content img {
+  border-radius: 8px;
+  margin: 2rem 0;
+  max-width: 100%;
+  height: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+.prose__content h2 {
+  color: #0f172a;
+  font-size: 1.75rem;
+  line-height: 1.3;
+  margin-bottom: 1.5rem;
+}
+@media (max-width: 1023px) {
+  .prose__content h2 {
+    margin-top: 3.5rem;
+  }
+}
+.prose__content h3 {
+  color: #0f172a;
+  font-size: 1.35rem;
+}/*# sourceMappingURL=main.css.map */

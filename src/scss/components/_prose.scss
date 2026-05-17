@@ -1,0 +1,112 @@
+@use '../abstracts' as *;
+
+/* COMPONENTE: Vista de lectura ergonómica y texto continuo (Prosa) */
+.prose {
+  max-width: 1000px; /* Ensanchado a 1000px para equilibrar el menú de navegación */
+  margin: 0 auto;
+  padding: 0 1.5rem; /* Seguridad en móviles */
+
+  &__back-link {
+    display: inline-block;
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+    text-decoration: none;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: $color-primary;
+    }
+  }
+
+  &__header {
+    text-align: center; /* El título vuelve al centro con autoridad */
+    margin-bottom: 4rem;
+  }
+
+  &__title {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    color: $color-text-base;
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+  }
+  
+  &__content {
+    font-size: 1.25rem;
+    line-height: 1.8;
+    color: #334155;
+    
+    /* PATRÓN LANDING PAGE (Centrado y ancho completo) */
+    text-align: center;
+    
+    > p, > ul, > ol, > pre, > h3 { 
+      margin-bottom: 1.5rem; 
+    }
+
+    /* Mantiene las viñetas integradas en el centrado */
+    ul, ol {
+      list-style-position: inside;
+      list-style-type: none; /* Elimina los puntos por defecto */
+      padding-left: 0;
+    }
+
+    > pre {
+      text-align: left; /* Restaura la lectura normal para los bloques de código */
+    }
+
+    li { margin-bottom: 0.5rem; }
+    
+    img {
+      border-radius: 8px;
+      margin: 2rem auto;
+      max-width: 100%;
+      height: auto;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    h2 { 
+      color: $color-primary; 
+      font-size: 2rem; /* Subimos un poco el peso al estar centrado */
+      line-height: 1.3;
+      margin-bottom: 1.5rem;
+      margin-top: 4.5rem;
+    }
+
+    /* El primer H2 no requiere margen extra */
+    > h2:first-child {
+      margin-top: 0;
+    }
+
+    /* Separadores horizontales editoriales (Línea fina expandida) */
+    > h2 ~ h2 {
+      padding-top: 4.5rem;
+      border-top: 1px solid rgba($color-text-base, 0.1);
+    }
+
+    h3 { 
+      color: $color-text-base; 
+      font-size: 1.35rem; 
+      margin-top: 1.5rem; 
+      margin-bottom: 1.5rem;
+    }
+  }
+
+  /* Modificador para listas ordenadas con ordinales (1º, 2º...) mediante CSS Counters */
+  &__list--ordinal {
+    list-style-type: none;
+    counter-reset: prose-counter;
+    padding-left: 0;
+
+    li {
+      counter-increment: prose-counter;
+
+      &::before {
+        content: counter(prose-counter) "º ";
+        font-weight: bold;
+      }
+    }
+  }
+}

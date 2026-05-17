@@ -12,7 +12,7 @@ Este documento define las reglas de arquitectura e interacción de esta plantill
 - **Capa Dinámica:** WordPress aislado (`/blog`) sirviendo como CMS (Content Management System - Sistema de Gestión de Contenidos) headless bajo Nginx proxy inverso, sin invadir `/public`.
 
 ## 3. Reglas de Interacción y Código
-1. **Seguridad Shift-Left:** Todo el código debe pasar obligatoriamente por `python3 scripts/merci/merci-audit.py` antes del commit.
+1. **Seguridad Shift-Left:** Todo el código debe pasar obligatoriamente por `python3 scripts/merci/merci-audit.py` antes del commit. Cualquier cadena inyectada dinámicamente en el HTML debe ser sanitizada previamente (`html.escape`) para evitar ataques XSS y roturas de DOM.
 2. **Manejo de Errores:** Todo código debe incluir gestión de excepciones para evitar colapsos silentes.
 3. **Bitácora Obligatoria:** `merci-commit.py` bloqueará los empaquetados si no se ha documentado el cambio cronológicamente en la bitácora del laboratorio.
 4. **Copias de Seguridad (Disaster Recovery):** Utilizar `python3 scripts/merci/merci-backup.py` antes de cualquier operación destructiva o reescritura de historial.
@@ -42,6 +42,7 @@ El ecosistema cuenta con un flujo estático (SSG) y otro dinámico (Headless WP)
 - **Cero dependencias visuales:** Prohibido el uso de librerías de animación de terceros o frameworks reactivos (Vue/React/Tailwind) en el frontend.
 - **Accesibilidad Nativa:** Toda la UI (User Interface - Interfaz de Usuario) debe ser navegable mediante Tabulador y usar etiquetas semánticas (WAI-ARIA).
 - **Focus Management:** No se debe usar `tabindex="-1"` en el `body`.
+- **Enrutamiento Visual Zero-JS:** El resaltado de enlaces activos se maneja exclusivamente a través de CSS mediante el uso semántico del atributo `id` de la etiqueta `<body>`.
 
 ## 6. Protocolo Estricto de Cierre de Fase (Definition of Done)
 Antes de dar por concluida una funcionalidad mayor o transicionar a un nuevo hito, se recomienda ejecutar este checklist para asegurar la higiene del repositorio:

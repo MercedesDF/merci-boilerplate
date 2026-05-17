@@ -6,6 +6,9 @@ Herramienta interactiva de consola (CLI) para trasladar, curar y estandarizar bo
 """
 
 import re
+import unicodedata
+import sys
+import subprocess
 from datetime import datetime
 from pathlib import Path
 
@@ -17,6 +20,13 @@ DESTINOS_DIR = [
     REPO_ROOT / "blog",
     REPO_ROOT / "art-de-cote"
 ]
+
+def slugify(texto: str) -> str:
+    """Convierte un texto en una cadena segura para URLs (slug)."""
+    texto = str(texto)
+    texto = unicodedata.normalize('NFKD', texto).encode('ascii', 'ignore').decode('ascii')
+    texto = re.sub(r'[^\w\s-]', '', texto.lower())
+    return re.sub(r'[-\s]+', '-', texto).strip('-_')
 
 def main():
     print("🚀 [Merci Promote] Iniciando flujo de promoción de conocimiento...")
@@ -95,14 +105,45 @@ def main():
             # Limpiamos espacios y comillas residuales
             meta[key.strip()] = val.strip().strip('"\'')
 
+    # 4.5 Escudo de Referencias Cruzadas (Shift-Left DAST)
+    # QUÉ HACE: Bloquea la promoción si el post enlaza a un cuadernillo que aún no ha sido promovido.
+    enlaces_internos = re.findall(r'https://merci-boilerplate\.es/(biblioteca|art-de-cote)/([^/]+)\.html', md_body)
+    if enlaces_internos:
+        slugs_produccion = set()
+        for dest in [REPO_ROOT / "biblioteca", REPO_ROOT / "art-de-cote"]:
+            if dest.exists():
+                for f_md in dest.glob("*.md"):
+                    c_md = f_md.read_text(encoding="utf-8", errors="ignore")
+                    m_title = re.search(r"^titulo:\s*[\"']?([^\"'\n]+)[\"']?", c_md, re.MULTILINE)
+                    if m_title:
+                        slugs_produccion.add(slugify(m_title.group(1)))
+        
+        for estanteria, slug_buscado in enlaces_internos:
+            if slug_buscado not in slugs_produccion:
+                print(f"\n  🛑 [Escudo DevSecOps] ¡Promoción Bloqueada por Dependencia!")
+                print(f"  El documento enlaza a un artículo ({slug_buscado}.html) que AÚN NO EXISTE en producción.")
+                print("  👉 Solución: Promueve primero el documento técnico original (cuadernillo/compendio) y luego vuelve a intentar promover este artículo del blog.")
+                return
+
     print(f"\n⚙️ Curación de metadatos para: {meta.get('titulo', borrador_elegido.name)}")
     
     # 5. Auditoría interactiva y curación de datos (Shift-Left Quality)
-    # Mostramos el valor actual por defecto. Si el usuario pulsa Enter sin escribir, se conserva.
-    nuevo_tema = input(f"  🏷️  Tema/Estantería [{meta.get('tema', 'General')}]: ").strip() or meta.get('tema', 'General')
+    tema_actual = meta.get('tema', 'General')
+    es_blog = "blog" in tema_actual.lower()
+
+    if not es_blog:
+        nuevo_tema = input(f"  🏷️  Tema/Estantería [{tema_actual}]: ").strip() or tema_actual
+    else:
+        nuevo_tema = tema_actual
+
     nueva_desc = input(f"  📝 Descripción [{meta.get('descripcion', '')}]: ").strip() or meta.get('descripcion', '')
-    nuevo_alt = input(f"  👁️  Alt de la portada [{meta.get('alt_portada', '')}]: ").strip() or meta.get('alt_portada', '')
-    nueva_fase = input(f"  🏗️  Fase del Roadmap [{meta.get('fase', '')}]: ").strip() or meta.get('fase', '')
+
+    if not es_blog:
+        nuevo_alt = input(f"  👁️  Alt de la portada [{meta.get('alt_portada', '')}]: ").strip() or meta.get('alt_portada', '')
+        nueva_fase = input(f"  🏗️  Fase del Roadmap [{meta.get('fase', '')}]: ").strip() or meta.get('fase', '')
+    else:
+        nuevo_alt = meta.get('alt_portada', '')
+        nueva_fase = meta.get('fase', '')
     
     # Al republicar, permitimos conservar la fecha original o sobreescribirla con la actual
     fecha_defecto = meta.get('fecha', '').strip()
@@ -111,16 +152,18 @@ def main():
         
     nueva_fecha = input(f"  📅 Fecha de publicación [{fecha_defecto}]: ").strip() or fecha_defecto
 
-    # Bloqueo estricto si falta el atributo de accesibilidad
-    if not nuevo_alt:
+    # Bloqueo estricto si falta el atributo de accesibilidad (Solo para la Biblioteca/Proyectos)
+    if not es_blog and not nuevo_alt:
         print("  ❌ Error: El texto alternativo 'alt_portada' es obligatorio para mantener el 100/100 en WAI-ARIA.")
         return
 
     # 6. Máquina de Estados: Reconstrucción del YAML definitivo
     meta['tema'] = nuevo_tema
     meta['descripcion'] = nueva_desc
-    meta['alt_portada'] = nuevo_alt
-    meta['fase'] = nueva_fase
+    if not es_blog or nuevo_alt:
+        meta['alt_portada'] = nuevo_alt
+    if not es_blog or nueva_fase:
+        meta['fase'] = nueva_fase
     meta['estado'] = 'publicado'  # Cambio de estado automatizado
     meta['fecha'] = nueva_fecha
 
@@ -133,15 +176,15 @@ def main():
     # Ensamblamos el contenido final
     nuevo_contenido = f"{nuevo_yaml}\n{md_body}"
 
-    # 7. Enrutamiento Dinámico: Determinar el destino basado en el origen
-    # QUÉ HACE: Analiza la ruta relativa del archivo para saber a qué directorio pertenece.
-    # POR QUÉ: Permite usar un solo script de curación para la Biblioteca (SSG) y para WordPress.
-    rel_path = borrador_elegido.relative_to(REPO_ROOT)
-    
-    if "blog" in rel_path.parts[:-1]:
+    # 7. Enrutamiento Dinámico: Determinar el destino basado en el metadato 'tema'
+    # QUÉ HACE: Analiza el campo 'tema' del YAML en lugar de la carpeta física de origen.
+    # POR QUÉ: Permite que todos los borradores nazcan en la bandeja unificada (incubacion/) y se enruten mágicamente.
+    tema_normalizado = meta.get('tema', '').lower()
+
+    if "blog" in tema_normalizado:
         directorio_destino = REPO_ROOT / "blog"
         comando_sugerido = "merci wp"
-    elif "art-de-cote" in rel_path.parts[:-1]:
+    elif "art de" in tema_normalizado or "art-de-cote" in tema_normalizado:
         directorio_destino = REPO_ROOT / "art-de-cote"
         comando_sugerido = "merci total"
     else:
@@ -162,5 +205,20 @@ def main():
         
     print(f"  💡 Siguiente paso: Ejecuta '{comando_sugerido}' para aplicar los cambios.")
 
+    # 9. Agent Chaining: Invocar al Agente Blogger
+    if not es_blog:
+        respuesta = input("\n  🤖 ¿Deseas invocar al Agente Blogger para generar un post promocional? (s/N): ").strip().lower()
+        if respuesta == 's':
+            script_blogger = REPO_ROOT / "scripts" / "merci" / "merci-blogger.py"
+            if script_blogger.exists():
+                print(f"  🚀 Transfiriendo contexto al Agente Blogger...")
+                subprocess.run([sys.executable, str(script_blogger), str(destino)])
+            else:
+                print("  ❌ Error: No se encontró el script merci-blogger.py en la ruta esperada.")
+
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\n  🛑 Operación cancelada por la usuaria.")
+        sys.exit(130)

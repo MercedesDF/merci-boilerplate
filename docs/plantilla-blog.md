@@ -1,6 +1,9 @@
 ---
 titulo: "Título de la entrada del Blog"
+descripción: "Breve descripción de 1 o 2 líneas para el SEO (Search Engine Optimization - Optimización para Motores de Búsqueda) y el índice."
+tipo: "articulo"
 estado: "incubacion"
+estado_social: "en_cola"
 tema: "Blog"
 fase: ""
 ---

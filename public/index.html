@@ -4,20 +4,31 @@
     <meta charset="UTF-8">
     <!-- QUÉ HACE: Actualiza la meta descripción para alinearla con el perfil de Performance y Spec as Source. -->
     <!-- POR QUÉ: Refleja el valor real, demostrable y altamente demandado del ecosistema actual. -->
-    <meta name="description" content="Performance Engineer & Technical Writer. Especialista en metodología Spec as Source, DevSecOps y certificación 100/100 en Core Web Vitals.">
+    <meta name="description" content="Laboratorio DevSecOps y Performance Engineering. Ecosistema gobernado por 25+ agentes de IA, metodología Spec as Source y 100/100 Core Web Vitals.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- <meta name="googlebot" content="index, follow">
-    <meta name="google" content="notranslate">
-    <meta name="google" content="notranslate"> -->
+    
+    <!-- QUÉ HACE: Explicita las directrices de indexación para los motores de búsqueda -->
+    <!-- POR QUÉ: Limpia el bloque comentado obsoleto y asegura que el rastreador siga los enlaces del índice. -->
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="merci-boilerplateDF">
+
+    <!-- QUÉ HACE: Implementa el protocolo Open Graph para metadatos sociales (Social Cards) -->
+    <!-- POR QUÉ: Al automatizar LinkedIn con merci-linkedin.py, es vital controlar cómo se renderiza la URL matriz al ser compartida. -->
+    <meta property="og:title" content="merci-boilerplate — Spec as Source & Performance Engineering">
+    <meta property="og:description" content="Laboratorio DevSecOps gobernado por 25+ agentes IA y metodología Spec as Source.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://merci-boilerplate.es/">
+    <meta property="og:image" content="https://merci-boilerplate.es/assets/images/logo.webp">
+
     <title>merci-boilerplate — Spec as Source & Performance Engineering</title>
     
     <!-- Favicon y Mercí-->
     <link rel="icon" href="/favicon.ico?v=2" type="image/x-icon">
     <!-- QUÉ HACE: Cache Busting dinámico incrementado a v14 -->
     <!-- POR QUÉ: Obliga a Varnish y a navegadores móviles a purgar la caché y descargar la nueva rejilla de 5 columnas. -->
-    <link rel="stylesheet" href="/css/main.css?v=1778628027">
-    <script src="/js/MerciController.js?v=1778627978" defer></script>
-    <script src="/js/main.js?v=1778627926" defer></script>
+    <link rel="stylesheet" href="/css/main.css?v=1779021426">
+    <script src="/js/MerciController.js?v=1779021369" defer></script>
+    <script src="/js/main.js?v=1779021345" defer></script>
     <link rel="canonical" href="https://merci-boilerplate.es">
     
     <!-- JSON-LD Mínimo Fase 2 -->
@@ -30,7 +41,7 @@
     }
     </script>
 </head>
-<body class="page">
+<body class="page" id="page-home">
     <!-- Ancla invisible WAI-ARIA para Volver Arriba -->
     <div id="top" tabindex="-1" style="position: absolute; top: 0; left: 0;"></div>
     <header class="header">
@@ -57,153 +68,128 @@
     <main class="main" id="main">
 
         <!-- ===================== -->
-        <!-- HERO + ENGINEERING DASHBOARD -->
+        <!-- HERO SECTION          -->
         <!-- ===================== -->
-        <section class="hero" id="hero">
-
-            <h1 class="hero__title">
-                Desarrollo web orientado a rendimiento<br>y automatización
-            </h1>
-
+        <section class="hero">
+            <h1 class="hero__title">merce<span class="hero__highlight">dev</span>.es</h1>
+            <h2 class="hero__statement">proyecto vivo en producción</h2>
             <p class="hero__subtitle">
-                Soy merci-boilerplate, Ingeniera Técnica. Diseño sistemas web ligeros, mantenibles y auditables, con foco en rendimiento, automatización en Python y control técnico del ciclo de desarrollo.
+                <strong>Infraestructura operacional pura.</strong><br>
+                <br>
+                Un ecosistema gobernado por especificaciones formales, orquestación híbrida de IA y 25+ agentes autónomos en tiempo real.
             </p>
+            
+            <ul class="hero__highlights">
+                <li>100/100 Core Web Vitals</li>
+                <li>0 Dependencias Externas</li>
+                <li>IA Local (Zero Latency)</li>
+            </ul>
 
-            <p class="hero__subtitle">
-                Trabajo con un enfoque basado en especificaciones (spec-driven), donde la arquitectura se define desde el criterio técnico y no desde la complejidad de las herramientas.
-            </p>
+            <div class="hero__cta">
+                <a href="/sobre-mi/">¿quieres conocerme?</a>
+                <a href="https://github.com/merci-boilerplateDF/merci-boilerplate" target="_blank" rel="noopener noreferrer">Ver Código Fuente</a>
+            </div>
+        </section>
 
-            <p class="hero__subtitle">
-                Resultado: sistemas predecibles, reducción de errores operativos y rendimiento medible en entornos reales.
-            </p>
-
-            <!-- ===================== -->
-            <!-- ENGINEERING DASHBOARD -->
-            <!-- ===================== -->
-            <div class="hero__dashboard" role="group" aria-label="Métricas de rendimiento del sistema">
-
+        <!-- ===================== -->
+        <!-- ENGINEERING DASHBOARD -->
+        <!-- ===================== -->
+        <section class="section">
+            <h2 class="home-section__title">Auditoría de la web a 15 de mayo de 2026</h2>
+            <div class="hero__dashboard hero__dashboard--standalone" role="group" aria-label="Métricas de rendimiento del sistema">
                 <div class="hero__metric">
                     <span class="hero__metric-label">FCP</span>
                     <span class="hero__metric-value">0.8 s</span>
                 </div>
-
                 <div class="hero__metric">
                     <span class="hero__metric-label">LCP</span>
                     <span class="hero__metric-value">1.1 s</span>
                 </div>
-
                 <div class="hero__metric">
                     <span class="hero__metric-label">INP</span>
                     <span class="hero__metric-value">&lt;100ms</span>
                 </div>
-
                 <div class="hero__metric">
                     <span class="hero__metric-label">CLS</span>
                     <span class="hero__metric-value">0</span>
                 </div>
-
                 <div class="hero__metric">
                     <span class="hero__metric-label">TBT</span>
                     <span class="hero__metric-value">0 ms</span>
                 </div>
-
                 <div class="hero__metric">
                     <span class="hero__metric-label">SI</span>
                     <span class="hero__metric-value">0.8 s</span>
                 </div>
-
                 <div class="hero__metric">
                     <span class="hero__metric-label">Payload</span>
                     <span class="hero__metric-value">&lt;80KB</span>
                 </div>
-
                 <div class="hero__metric">
                     <span class="hero__metric-label">Deps</span>
                     <span class="hero__metric-value">0</span>
                 </div>
-
                 <div class="hero__metric">
                     <span class="hero__metric-label">Automation</span>
-                    <span class="hero__metric-value">8 CLI</span>
+                    <span class="hero__metric-value">25+ CLI</span>
                 </div>
-
                 <div class="hero__metric">
                     <span class="hero__metric-label">Arch</span>
                     <span class="hero__metric-value">3-layer</span>
                 </div>
-
+            </div>
+            <h2 class="home-section__title">Métricas del Repositorio</h2>
+            <div class="hero__dashboard hero__dashboard--standalone" role="group" aria-label="Métricas del Repositorio">
+                
+                <div class="hero__metric">
+                    <span class="hero__metric-label">Releases Boilerplate</span>
+                    <span class="hero__metric-value">v1.13.0</span>
+                </div>
+                <div class="hero__metric">
+                    <span class="hero__metric-label">Agentes Python</span>
+                    <span class="hero__metric-value">25+</span>
+                </div>
+                <div class="hero__metric">
+                    <span class="hero__metric-label">Docs (Líneas)</span>
+                    <span class="hero__metric-value">7,900+</span>
+                </div>
+                <div class="hero__metric">
+                    <span class="hero__metric-label">Fases Cerradas</span>
+                    <span class="hero__metric-value">15+</span>
+                </div>
+                <div class="hero__metric">
+                    <span class="hero__metric-label">Core Web Vitals</span>
+                    <span class="hero__metric-value">100/100</span>
+                </div>
             </div>
 
-            <p class="hero__dashboard-legend">
-                * Datos extraídos de auditorías empíricas en Google PageSpeed Insights (Simulación Móvil 4G). Todos los valores de rendimiento, carga e interactividad se asientan en el rango de excelencia (Verde), certificando una puntuación perfecta de 100/100.
-            </p>
-
-        </section>
-
-        <!-- ===================== -->
-        <!-- GOBERNANZA -->
-        <!-- ===================== -->
-        <section class="section home-section" id="metodo">
-
-            <h2 class="home-section__title">Gobernanza y decisiones técnicas</h2>
-
-            <div class="home-grid">
-
-                <article class="home-card">
-                    <h3 class="home-card__title">Registros de arquitectura (ADR)</h3>
-                    <p class="home-card__text">
-                        Cada decisión técnica relevante queda documentada y justificada. Esto permite mantener coherencia estructural y trazabilidad completa del sistema a lo largo del tiempo.
+            <!-- ===================== -->
+            <!-- PROSE (EDITORIAL)     -->
+            <!-- ===================== -->
+           <article class="prose">
+                <div class="prose__content">
+                    
+                    <h2>La Evolución</h2>
+                    <p>La web moderna colapsa bajo el peso de frameworks hipertrofiados. Inspirado en el minimalismo radical de <em><a href="https://motherfuckingwebsite.com/">Motherfucking Website</a></em>, este espacio es una tesis de ingeniería en vivo:<br>
+                        <h3><strong>Demuestra que es posible automatizar y publicar masivamente sin inyectar un solo byte de dependencia externa en el navegador.</strong></h3>
                     </p>
-                </article>
+                    
+                    <h2>Estado de la Infraestructura</h2>
+                    <p>La arquitectura del sitio se divide en tres capas aisladas mediante proxy inverso (Nginx) y automatizadas de forma nativa en Vanilla Python:</p>
 
-                <article class="home-card">
-                    <h3 class="home-card__title">Laboratorio de experimentación</h3>
-                    <p class="home-card__text">
-                        Entorno controlado donde valido enfoques técnicos antes de incorporarlos al sistema principal, reduciendo riesgos en producción y asegurando estabilidad arquitectónica.
-                    </p>
-                </article>
+                    <ul>
+                        <li><strong>Capa Estática:</strong> HTML5 semántico, SASS (BEM) y Vanilla JS. El estándar detrás del 100/100 Core Web Vitals.</li>
+                        <li><strong>Capa Dinámica:</strong> WordPress <em>Headless</em> acoplado por enlaces simbólicos y securizado con APIs restrictivas.</li>
+                        <li><strong>Capa IA (Hybrid Stack):</strong> Orquestación autónoma que combina la latencia cero de Ollama (Local) con la potencia cloud de Gemini. Blindada con resiliencia <em>Fail-Gracefully</em>.</li>
+                    </ul>
 
-                <article class="home-card">
-                    <h3 class="home-card__title">Automatización de procesos</h3>
-                    <p class="home-card__text">
-                        Desarrollo herramientas en Python para automatizar generación estática, despliegue, optimización de recursos y flujos repetitivos del sistema.
-                    </p>
-                </article>
+                    <h2>El Motor: Merci Boilerplate</h2>
+                    <p>Todo el núcleo arquitectónico que gobierna este sitio ha sido congelado, purgado de datos críticos y empaquetado como una plantilla de código abierto.</p>
+                    <p>Si quieres auditar las tripas del sistema, analizar los agentes Python y clonar la infraestructura, he documentado su desarrollo al detalle.</p>
+                    <p>👉 <a href="/art-de-cote/anatomia-de-merci-boilerplate-arquitectura-devsecops-de-zero-bloat.html"><strong>Explorar en Art de Coté: Anatomía de Merci Boilerplate</strong></a></p>
 
-            </div>
-        </section>
-
-        <!-- ===================== -->
-        <!-- ARQUITECTURA -->
-        <!-- ===================== -->
-        <section class="section home-section" id="ecosistema">
-
-            <h2 class="home-section__title">Arquitectura de referencia</h2>
-
-            <div class="home-grid">
-
-                <article class="home-card">
-                    <h3 class="home-card__title">Arquitectura estática optimizada</h3>
-                    <p class="home-card__text">
-                        HTML5 semántico, SASS estructurado y JavaScript modular. Sistema optimizado para rendimiento, control y mantenibilidad sin dependencias innecesarias.
-                    </p>
-                </article>
-
-                <article class="home-card">
-                    <h3 class="home-card__title">Integración headless</h3>
-                    <p class="home-card__text">
-                        CMS desacoplado mediante proxy inverso, permitiendo gestión dinámica sin impacto en el rendimiento del núcleo estático ni incremento de superficie de ataque.
-                    </p>
-                </article>
-
-                <article class="home-card">
-                    <h3 class="home-card__title">Perfil técnico estructurado</h3>
-                    <p class="home-card__text">
-                        Exposición del perfil mediante HTML semántico y JSON-LD, optimizado para interpretación por sistemas automatizados sin dependencia de formatos cerrados.
-                    </p>
-                </article>
-
-            </div>
+                </div>
+            </article>
         </section>
 
     </main>

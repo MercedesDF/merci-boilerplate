@@ -88,8 +88,10 @@ def main():
     for target_path in target_pages:
         # Obtenemos el nombre de la carpeta contenedora para el log, o el nombre del archivo si está en la raíz
         page_name = target_path.parent.name if target_path.parent.name != "public" else target_path.name
+        target_url = "/" if page_name == target_path.name else f"/{page_name}/"
         
         target_html = target_path.read_text(encoding="utf-8")
+
         nuevo_html = replace_block(target_html, header_pattern, header_content, "Header")
         nuevo_html = replace_block(nuevo_html, footer_pattern, footer_content, "Footer")
         nuevo_html = replace_block(nuevo_html, aside_pattern, aside_content, "Aside (Merci)")

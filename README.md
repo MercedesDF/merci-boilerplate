@@ -1,10 +1,19 @@
-# Merci Boilerplate v1.12.0
+# Merci Boilerplate v1.13.0
 
 Un ecosistema DevSecOps autónomo impulsado por Inteligencia Artificial Local (Shift-Left AI) y Desarrollo Guiado por Especificaciones (Spec-Driven Development). 
 
 Combina un orquestador local en Python puro (Sistema Merci) que automatiza la calidad del código, un núcleo estático ultrarrápido (HTML5, SASS, Vanilla JS, BEM) y un motor dinámico aislado opcional (WordPress Headless). Diseñado para alcanzar un rendimiento perfecto (Core Web Vitals 100/100) con 0 dependencias externas bloqueantes en el pipeline.
 
 > 🤖 **Inteligencia y Gobernanza:** El boilerplate incluye agentes de IA locales que auto-reparan código, auto-documentan el Roadmap y generan bases de conocimiento estáticas con coste cero y privacidad total. La justificación de las decisiones DevSecOps reside en la carpeta `/docs`.
+
+## 🚀 Novedades en la v1.13.0 (Content Ops & Agent Chaining)
+
+- **Agent Chaining (Cadenas de Trabajo IA):** Introducción de `merci-blogger.py`. Los agentes ahora se pasan el testigo; el Bibliotecario redacta el manual y llama automáticamente al Blogger para que genere los *teasers* sociales, inyectando URLs canónicas resolutivas dinámicamente.
+- **Buffer Social y Máquina de Estados:** `merci-linkedin.py` opera ahora como un gestor de colas asíncrono. Permite revisión humana interactiva para pasar posts a estado `aprobado` y cuenta con un modo desatendido (`--auto`) preparadísimo para ejecutarse vía Cronjob en el SO.
+- **Rutas Relativas Agnósticas:** Todos los enlaces inter-documentales generados por la IA utilizan rutas relativas a la raíz (ej. `/biblioteca/...`), garantizando la paridad Dev/Prod y eliminando errores 404 en el entorno de desarrollo local.
+- **Rediseño UI/UX del Blog:** Refactorización de `index.php` para el Child Theme de WordPress. Se purga la vista de estanterías en favor de un diseño vertical, cronológico y minimalista adaptado a la lectura de marketing y DevRel.
+- **Enrutamiento Zero-JS:** El resaltado visual del menú de navegación se delega al 100% a la hoja de estilos SASS mediante identificadores de contexto (`body id`), erradicando clases legacy y dependencias de scripts.
+- **Blindaje Anti-XSS (Shift-Left Security):** Los metadatos extraídos del YAML Frontmatter son sanitizados nativamente (`html.escape`) antes de inyectarse en la generación SSG o PDF, previniendo roturas del DOM e inyecciones de código.
 
 ## 🚀 Novedades en la v1.12.0 (SRE, Hardening & Chaos Engineering)
 

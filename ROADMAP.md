@@ -150,7 +150,7 @@
 
 ---
 
-## ÉPICA 2: ORQUESTACIÓN IA & SELF-HEALING (En curso)
+## ÉPICA 2: ORQUESTACIÓN IA & SELF-HEALING (Concluida)
 
 ### Fase 1: Cimientos y Conectividad 
 - [x] Setup de Modelos (Hybrid Stack): Configurar Ollama para ejecución local y LiteLLM para fallback con Gemini Flash API.
@@ -172,14 +172,46 @@
 - [X] Dashboard de Confianza: Implementar Grafana para visualizar cuántos cambios de IA han sido aprobados vs. rechazados.
 - [x] Chaos Engineering con IA: Script que use la IA para simular fallos en el merci-boilerplate y verificar que el sistema de rollback funciona.
 - [x] Hardening Automation: Agente que audite el cumplimiento de la docs/checklist-hardening.md de forma continua.
-- [x] **Evaluación de Tienda WooCommerce (Deuda Fase 4.3):** Se aprueba la viabilidad técnica asumiendo el reto arquitectónico. La implementación se traslada a la Épica 3.
+- [x] **Evaluación de Tienda WooCommerce (Deuda Fase 4.3):** Se aprueba la viabilidad técnica asumiendo el reto arquitectónico. La implementación se traslada a la Épica 4.
 
 ---
 
-## ÉPICA 3: E-COMMERCE EXTREMO (En preparación)
+## ÉPICA 3: DEVREL & OBSERVABILIDAD AVANZADA (En curso)
+
+### Fase 1: Motor de Difusión y Buffer Social
+- [x] Crear la taxonomía/estantería 'SOS Terminal' dentro de Art de Coté.
+- [x] Definir el Frontmatter base para aislar estos snippets rápidos de los cuadernillos pesados.
+- [x] Añadir el campo `estado_social: "en_cola"` al YAML Frontmatter.
+- [x] Refactorizar `merci-linkedin.py` para procesar únicamente 1 publicación en cola por ejecución.
+- [x] Refinar UI/UX del Blog: Diferenciar visualmente las entradas de los cuadernillos técnicos (lectura ligera).
+- [x] Crear visor de terminal (`merci-queue.py`) para monitorizar el estado del buffer social y desacoplar la nomenclatura de UX.
+
+### Fase 2: Observabilidad y Alertas SRE
+- [x] Instrumentar `merci-sre.py` para medir y exponer a Prometheus la métrica `merci_linkedin_queue_total`.
+- [x] Configurar alertas nativas en Grafana (Alerting) para enviar un aviso por email si la cola baja de 5 posts.
+- [ ] Integrar métricas de Inteligencia Artificial (fallbacks a la nube, errores del auditor) en Grafana.
+- [ ] Implementar un registro privado persistente (`.privado/chaos-audit.log`) para las mutaciones del Agente Chaos.
+- [ ] Instrumentar `merci-sre.py` para exponer el historial de resiliencia de Chaos Engineering hacia Grafana.
+- [ ] Instrumentar la inyección dinámica de telemetría (commits, líneas de doc, versiones) en la página estática "Sobre Mí".
+
+### Fase 3: Identidad Criptográfica y Privacidad
+- [x] Implementar y estandarizar flujo de Comunicaciones Cifradas (PGP) en el ecosistema.
+
+---
+
+## ÉPICA 4: E-COMMERCE EXTREMO (En preparación)
 
 ### Fase 1: Pasarela de Pago y Rendimiento Híbrido
 - [ ] Configurar pasarela de pago (Stripe/PayPal) en el entorno aislado.
 - [ ] Implementar carga diferida (Lazy Load) o Web Workers (Partytown) para desencolar scripts de terceros del hilo principal.
 - [ ] Ajustar Content Security Policy (CSP) en Nginx para permitir iframes de pago sin degradar el escudo XSS.
 - [ ] Mantener 100/100 en Core Web Vitals (TBT 0ms) durante todo el proceso de *checkout*.
+
+---
+
+## ÉPICA 5: SHOWCASE Y DISTRIBUCIÓN DEL BOILERPLATE (En cola)
+
+### Fase 1: Demostración Interactiva (Live Demo)
+- [ ] Desplegar una instancia pública del Boilerplate vacío para visualización de usuarios.
+- [ ] Evaluar plataformas de despliegue estático de fricción cero (ej. GitHub Pages, subdominio dedicado).
+- [ ] Diseñar flujo de actualización automática del Showcase al lanzar nuevas Releases (v1.x.x).

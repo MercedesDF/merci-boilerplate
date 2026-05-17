@@ -29,3 +29,6 @@ public/blog
 !.privado/.gitkeep
 docs/matriz/
 !docs/matriz/.gitkeep
+
+# Manuales locales en PDF (Protege los PDFs legítimos generados por el SSG en otras carpetas)
+docs/*.pdf

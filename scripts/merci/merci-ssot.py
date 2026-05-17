@@ -28,31 +28,16 @@ except ImportError:
     sys.exit(0)
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-ENV_PATH = REPO_ROOT / ".env"
 ROADMAP_PATH = REPO_ROOT / "ROADMAP.md"
-BITACORA_PATH = REPO_ROOT / "laboratorio" / "bitacora-merci-boilerplate-orquestacion-ia.md"
 PROMPT_PATH = REPO_ROOT / "laboratorio" / "prompts" / "prompt-ssot.md"
 
-def cargar_api_key():
-    if not ENV_PATH.exists():
+def obtener_bitacora_activa():
+    """Busca dinámicamente la bitácora más reciente en el laboratorio."""
+    bitacoras = list((REPO_ROOT / "laboratorio").glob("bitacora-merci-boilerplate-epic-*.md"))
+    if not bitacoras:
         return None
-    for linea in ENV_PATH.read_text(encoding="utf-8").splitlines():
-        if linea.startswith("GEMINI_API_KEY="):
-            return linea.split("=", 1)[1].strip().strip('"\'')
-    return None
+    return max(bitacoras, key=lambda p: p.stat().st_mtime)
 
-def auto_descubrir_modelo(api_key):
-    url = f"https://generativelanguage.googleapis.com/v1beta/models?key={api_key}"
-    try:
-        with urllib.request.urlopen(url) as response:
-            data = json.loads(response.read().decode("utf-8"))
-            validos = [m["name"].split("/")[-1] for m in data.get("models", []) if "generateContent" in m.get("supportedGenerationMethods", []) and "gemini" in m.get("name", "").lower()]
-            for familia in ["1.5-flash", "1.5-pro"]:
-                for v in validos:
-                    if familia in v: return v
-            return "gemini-1.5-flash"
-    except Exception:
-        return "gemini-1.5-flash"
 
 def extract_json_array(text: str) -> list:
     """Extrae un array JSON de la respuesta de la IA, ignorando texto basura."""
@@ -67,9 +52,10 @@ def extract_json_array(text: str) -> list:
 def main():
     print("\n🤖 [Merci SSOT] Analizando deriva documental entre Bitácora y Roadmap...")
     
-    if not ROADMAP_PATH.exists() or not BITACORA_PATH.exists():
+    BITACORA_PATH = obtener_bitacora_activa()
+    if not ROADMAP_PATH.exists() or not BITACORA_PATH:
         print("  ❌ [Merci Error] No se encuentra el Roadmap o la Bitácora de IA.")
-        return
+        sys.exit(1)
 
     roadmap_content = ROADMAP_PATH.read_text(encoding="utf-8")
     bitacora_full = BITACORA_PATH.read_text(encoding="utf-8")
@@ -92,54 +78,28 @@ def main():
 
     if not PROMPT_PATH.exists():
         print("  ❌ [Merci Error] Falta el archivo rector: prompt-ssot.md")
-        return
+        sys.exit(1)
     system_prompt = PROMPT_PATH.read_text(encoding="utf-8")
 
     prompt = f"--- ÚLTIMOS HECHOS EXTRAÍDOS ---\n{bitacora_filtrada}\n\n--- TAREAS PENDIENTES ---\n{pending_list_str}"
 
-    api_key = cargar_api_key()
-    raw_response = None
-
-    if api_key:
-        modelo_activo = auto_descubrir_modelo(api_key)
-        print(f"  🧠 Consultando a {modelo_activo} en la nube...")
-        try:
-            respuesta = completion(
-                model=f"gemini/{modelo_activo}",
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": prompt}
-                ],
-                api_key=api_key,
-                temperature=0.0,
-                max_tokens=4000,
-                timeout=600
-            )
-            raw_response = respuesta.choices[0].message.content
-        except Exception as e_cloud:
-            print(f"  ⚠️ [Merci Warn] Falló Gemini ({e_cloud}). Intentando Fallback local con Ollama (qwen2.5-coder)...")
-    else:
-        print("  ⚠️ [Merci Warn] Falta GEMINI_API_KEY. Delegando directamente a IA Local (qwen2.5-coder)...")
-
-    if not raw_response:
-        # QUÉ HACE: Delega la tarea a Ollama localmente si no hay API Key o si la nube falla.
-        # POR QUÉ: Garantiza la Degradación Elegante (Graceful Degradation) para que el agente siga operativo offline.
-        try:
-            respuesta = completion(
-                model="ollama/qwen2.5-coder",
-                api_base="http://localhost:11434",
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": prompt}
-                ],
-                temperature=0.0,
-                max_tokens=4000,
-                timeout=600
-            )
-            raw_response = respuesta.choices[0].message.content
-        except Exception as e_local:
-            print(f"  ❌ [Merci Error] Falló el motor local de Ollama. Detalle: {e_local}")
-            return
+    print("  🏠 Consultando a motor local (Ollama - qwen2.5-coder)...")
+    try:
+        respuesta = completion(
+            model="ollama/qwen2.5-coder",
+            api_base="http://localhost:11434",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.0,
+            max_tokens=4000,
+            timeout=600
+        )
+        raw_response = respuesta.choices[0].message.content
+    except Exception as e_local:
+        print(f"  ❌ [Merci Error] Falló el motor local de Ollama. Detalle: {e_local}")
+        sys.exit(1)
 
     try:
         tareas_completadas = extract_json_array(raw_response)
@@ -165,6 +125,7 @@ def main():
             
     except Exception as e:
         print(f"  ❌ [Merci Error] Fallo procesando la respuesta de la IA: {e}")
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()

@@ -41,6 +41,6 @@ alt_portada: "[Genera una descripción visual técnica detallada para una supues
 ```
 
 **Reglas Editoriales (Innegociables):**
-1. Redacta de forma impersonal (evita "yo", "nosotros", "hice"). Usa "Se implementó", "Se diagnosticó".
+1. Tono 100% impersonal (voz pasiva e infinitivos). Evita a toda costa la primera y segunda persona ("yo", "nosotros", "hice", "hicimos"). Usa siempre "Se implementó", "Se diagnosticó", "Es necesario configurar".
 2. Muestra autoridad técnica. No uses lenguaje de marketing vacío.
 3. Si el usuario te pasa acrónimos (ej. SSG, SEO, WP), asegúrate de expandirlos en su primera aparición en el texto: "SSG (Static Site Generation - Generación de Sitios Estáticos)".

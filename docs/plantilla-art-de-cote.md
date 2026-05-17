@@ -1,6 +1,8 @@
 ---
 titulo: "Título de la exploración o cuadernillo"
+tipo: "cuadernillo"
 estado: "incubacion"
+estado_social: "en_cola"
 tema: "Art de Coté"
 fase: ""
 ---
@@ -8,11 +10,11 @@ fase: ""
 <!-- linkedin:
 Escribe aquí tu anuncio para LinkedIn.
 Acepta saltos de línea sin problemas.
-https://merci-boilerplate.es/blog/tu-url
+https://merci-boilerplate.es/art-de-cote/tu-url
 -->
 
 Escribe aquí el contenido de tu exploración colateral.
 
-*Nota: Al ejecutar `merci wp`, este documento se publicará en WordPress aislado en su propia categoría, sin aparecer en el feed cronológico del Blog principal.*
+*Nota: Al ejecutar `merci publish`, este documento se compilará estáticamente en la ruta `/art-de-cote/` sin depender de WordPress.*
 
 <!-- TODO: Borra estas notas antes de publicar. -->

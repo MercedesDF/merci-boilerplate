@@ -16,6 +16,7 @@ import urllib.request
 from pathlib import Path
 import warnings
 import re
+import subprocess
 
 # Silenciamos advertencias de deprecación de librerías de terceros (ej. google.generativeai) para mantener la consola limpia
 warnings.filterwarnings("ignore", category=FutureWarning)
@@ -102,8 +103,14 @@ def process_note(note_path: Path):
     print("  [1] Cuadernillo (Táctico - Biblioteca) [Defecto]")
     print("  [2] Compendio (Estratégico - Biblioteca)")
     print("  [3] Art de Coté (Experimento / Descartado - SSG Estático)")
+    print("  [4] Solo Post Marketing (Blog/LinkedIn - Sin documento técnico)")
     opcion = input("  👉 Elige una opción [1]: ").strip()
     
+    if opcion == "4":
+        print("\n  🚀 Transfiriendo la nota cruda directamente al Agente Blogger...")
+        subprocess.run([sys.executable, str(REPO_ROOT / "scripts" / "merci" / "merci-blogger.py"), str(note_path)])
+        return
+
     tipo_doc = "cuadernillo"
     prefijo = "cuadernillo"
     # QUÉ HACE: Centraliza la salida de todos los documentos en una única bandeja de entrada.
@@ -153,6 +160,12 @@ def process_note(note_path: Path):
         # POR QUÉ: Seguridad DLP. Nunca destruimos la información base por si la IA alucina.
         note_path.rename(PROCESADAS_DIR / note_path.name)
         
+        # BARRERA DE ENCADENAMIENTO (Agent Chaining)
+        crear_blog = input(f"\n  👉 ¿Quieres que el Blogger redacte un post promocionando este {tipo_doc}? (s/N): ").strip().lower() == 's'
+        if crear_blog:
+            print("\n  🚀 Pasando el testigo al Agente Blogger...")
+            subprocess.run([sys.executable, str(REPO_ROOT / "scripts" / "merci" / "merci-blogger.py"), str(output_path)])
+
     except Exception as e:
         print(f"  ❌ [Merci Error] Fallo procesando la respuesta de la IA: {e}")
 

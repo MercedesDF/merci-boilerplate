@@ -4,6 +4,7 @@ Documento central para el registro de decisiones arquitectónicas, resolución d
 
 ## Registro cronológico
 
+
 ### AAAA-MM-DD — Instanciación del repositorio base
 
 **Contexto:** Arranque de un nuevo proyecto utilizando la infraestructura fundacional de Merci Boilerplate. Se requiere limpiar las referencias del proyecto matriz y establecer el estado en blanco.

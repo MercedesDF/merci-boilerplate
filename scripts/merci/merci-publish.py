@@ -90,6 +90,8 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
     alt_portada = meta.get("alt_portada", "")
     fase = meta.get("fase", "")
     
+    # QUÉ HACE: Sanitiza las cadenas de texto extraídas del YAML Frontmatter.
+    # POR QUÉ: Previene ataques XSS y la rotura del DOM si los metadatos contienen comillas o etiquetas HTML literales.
     titulo_html = html.escape(titulo)
     descripcion_html = html.escape(descripcion)
 
@@ -115,10 +117,9 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
             
         # QUÉ HACE: Expulsa físicamente el archivo origen hacia el entorno de incubación.
         # POR QUÉ: Principio de segregación de entornos. La biblioteca no admite borradores.
-        rel_path = filepath.relative_to(REPO_ROOT)
-        destino_laboratorio = REPO_ROOT / "laboratorio" / rel_path
+        destino_laboratorio = REPO_ROOT / "laboratorio" / "incubacion" / filepath.name
         destino_laboratorio.parent.mkdir(parents=True, exist_ok=True)
-        print(f"  🔙 Expulsando (Estado: {estado}): Moviendo '{filepath.name}' de vuelta al laboratorio.")
+        print(f"  🔙 Expulsando (Estado: {estado}): Moviendo '{filepath.name}' de vuelta a laboratorio/incubacion/")
         try:
             shutil.move(str(filepath), str(destino_laboratorio))
         except Exception as e:
@@ -156,7 +157,13 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
     out_pdf_path = PUBLIC_DESCARGAS / out_pdf_filename
     PUBLIC_DESCARGAS.mkdir(parents=True, exist_ok=True)
     
-    fase_pdf_text = f" | Fase {fase}" if fase else ""
+    # QUÉ HACE: Sanitiza los campos menores del Frontmatter antes de inyectarlos al generador de PDF.
+    # POR QUÉ: Evita inyecciones XSS y errores de compilación en WeasyPrint por caracteres malformados.
+    fase_html = html.escape(str(fase))
+    fase_pdf_text = f" | Fase {fase_html}" if fase else ""
+    tipo_html = html.escape(str(tipo)).capitalize()
+    volumen_html = html.escape(str(meta.get('volumen', 1)))
+    fecha_html = html.escape(str(meta.get('fecha', '')))
     
     pdf_html_content = f"""<!DOCTYPE html>
 <html lang="es">
@@ -180,8 +187,8 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
 <body>
     <div class="portada">
         <h1>{titulo_html}</h1>
-        <p>{tipo.capitalize()} | Vol. {meta.get('volumen', 1)}</p>
-        <p><strong>merci-boilerplate.es</strong> — {meta.get('fecha', '')}{fase_pdf_text}</p>
+        <p>{tipo_html} | Vol. {volumen_html}</p>
+        <p><strong>merci-boilerplate.es</strong> — {fecha_html}{fase_pdf_text}</p>
     </div>
     <div class="contenido">
         {html_content}
@@ -189,6 +196,7 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
 </body>
 </html>"""
 
+    pdf_download_link = ""
     # QUÉ HACE: Renderiza el PDF inyectando el base_url hacia la carpeta public/.
     # POR QUÉ: Sin el base_url, WeasyPrint no puede resolver rutas absolutas como /assets/images/... 
     # y las imágenes del Markdown aparecerían rotas o invisibles en el PDF descargable.
@@ -196,6 +204,8 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
     if HTML:
         try:
             HTML(string=pdf_html_content, base_url=str(REPO_ROOT / "public")).write_pdf(out_pdf_path)
+            if out_pdf_path.exists():
+                pdf_download_link = f'\n                <a href="/descargas/{out_pdf_filename}" class="card__download" download>📄 Descargar Edición PDF</a>'
         except Exception as e:
             print(f"  ❌ Error crítico al generar PDF para {filepath.name}. Comprueba las imágenes: {e}")
             # Continuamos con el proceso aunque falle el PDF para no dejar a la web sin HTML
@@ -205,6 +215,7 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
     # QUÉ HACE: Asigna la clase CSS BEM dinámicamente basándose en el atributo 'tipo'.
     # POR QUÉ: Respeta la decisión del autor en el YAML Frontmatter, aplicando degradación elegante.
     clase_css = "card--booklet" if tipo.lower() == "cuadernillo" else "card--book"
+    page_id = "page-art-de-cote" if is_art else "page-biblioteca"
     
     html_final = f"""<!DOCTYPE html>
 <html lang="es">
@@ -227,15 +238,14 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
     }}
     </script>
 </head>
-<body class="page">
+<body class="page" id="{page_id}">
     <div id="top" tabindex="-1" style="position: absolute; top: 0; left: 0;"></div>
     {header_html}
     <main class="main--padded section" id="main">
         <article class="card {clase_css}">
             <a href="{base_url_path}" class="card__back-link">{back_text}</a>
             <header>
-                <h1 class="home-card__title--highlight">{titulo_html}</h1>
-                <a href="/descargas/{out_pdf_filename}" class="card__download" download>📄 Descargar Edición PDF</a>
+                    <h1 class="home-card__title--highlight">{titulo_html}</h1>{pdf_download_link}
             </header>
             <div class="card__content">
                 {html_content}
@@ -253,7 +263,6 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
     # CONTROL DE ERRORES: Escritura final en disco (riesgo de permisos I/O)
     try:
         out_path.write_text(html_final, encoding="utf-8")
-        print(f"  ✅ Publicado con éxito: public{base_url_path}{out_filename}")
     except IOError as e:
         print(f"  ❌ Error de permisos al guardar el HTML {out_filename}: {e}")
         return False
@@ -291,6 +300,9 @@ def generar_indice(publicaciones, out_path, title, meta_desc, hero_subtitle, can
     for tema in sorted(estanterias.keys()):
         # QUÉ HACE: Genera un ID válido para el ancla (ej. 'devsecops-y-gobernanza')
         tema_slug = slugify(tema)
+        # QUÉ HACE: Sanitiza el nombre de la estantería (tema) antes de inyectarlo en el HTML.
+        # POR QUÉ: Protege el DOM del índice contra caracteres conflictivos.
+        tema_html = html.escape(tema)
         
         # QUÉ HACE: Ordena los artículos: Primero los "Compendios" (True), luego por fecha del más nuevo al más antiguo.
         # POR QUÉ: Otorga un trato preferente (arriba de la lista) a los documentos de alto nivel 
@@ -300,33 +312,41 @@ def generar_indice(publicaciones, out_path, title, meta_desc, hero_subtitle, can
         # Construimos el contenedor principal de la estantería (con diseño de columnas responsivo)
         enlaces_indice_html += f'                <li class="library-nav__item">\n'
         # QUÉ HACE: Delega el color a la clase SASS .indice__tema para permitir pseudo-clases interactivas (:visited).
-        enlaces_indice_html += f'                    <a href="#{tema_slug}" class="library-nav__theme-title" aria-label="Explorar estantería: {tema}">{tema}</a>\n'
+        enlaces_indice_html += f'                    <a href="#{tema_slug}" class="library-nav__theme-title" aria-label="Explorar estantería: {tema_html}">{tema_html}</a>\n'
         enlaces_indice_html += f'                    <ul class="library-nav__article-list">\n'
         
         cards_html = ""
         for pub in pubs_tema:
             # QUÉ HACE: Genera un ID válido para la tarjeta del artículo.
             pub_slug = slugify(pub["titulo"])
+            # QUÉ HACE: Escapa los títulos y descripciones antes de inyectarlos en las tarjetas.
+            # POR QUÉ: Impide que etiquetas literales en las descripciones rompan la interfaz visual.
+            pub_titulo_html = html.escape(pub["titulo"])
+            pub_desc_html = html.escape(pub["descripcion"])
             
             # QUÉ HACE: Inyecta cada artículo como un ancla interna apuntando a su tarjeta resumen.
             # POR QUÉ: Retiene al usuario en la página índice para que pueda leer la descripción antes de entrar.
             enlaces_indice_html += f'                        <li class="library-nav__article-item">\n'
             # QUÉ HACE: Diferencia el texto accesible (aria-label) para evitar penalización por enlaces con mismo texto y distinto destino.
-            enlaces_indice_html += f'                            <a href="#{pub_slug}" class="library-nav__article-link" aria-label="Ir al resumen de: {pub["titulo"]}">{pub["titulo"]}</a>\n'
+            enlaces_indice_html += f'                            <a href="#{pub_slug}" class="library-nav__article-link" aria-label="Ir al resumen de: {pub_titulo_html}">{pub_titulo_html}</a>\n'
             enlaces_indice_html += f'                        </li>\n'
             
             clase_css = "card--booklet" if pub["tipo"].lower() == "cuadernillo" else "card--book"
-            badge = pub["tipo"].capitalize()
-            fase_badge = f" &middot; Fase {pub['fase']}" if pub.get("fase") else ""
+            
+            # QUÉ HACE: Escapa campos secundarios del Frontmatter para la etiqueta meta de la tarjeta.
+            # POR QUÉ: Cierra cualquier vía de inyección secundaria hacia el bloque estático.
+            pub_fecha_html = html.escape(str(pub["fecha"]))
+            badge_html = html.escape(str(pub["tipo"])).capitalize()
+            fase_badge_html = f" &middot; Fase {html.escape(str(pub['fase']))}" if pub.get("fase") else ""
             
             cards_html += f"""
                 <article class="card {clase_css}" id="{pub_slug}">
                     <header>
-                        <span class="card__meta">{pub["fecha"]} — {badge}{fase_badge}</span>
-                        <h2 class="card__title"><a href="{pub["url"]}" aria-label="Leer artículo completo: {pub["titulo"]}">{pub["titulo"]}</a></h2>
+                        <span class="card__meta">{pub_fecha_html} — {badge_html}{fase_badge_html}</span>
+                        <h2 class="card__title"><a href="{pub["url"]}" aria-label="Leer artículo completo: {pub_titulo_html}">{pub_titulo_html}</a></h2>
                     </header>
                     <div class="card__content">
-                        <p>{pub["descripcion"]}</p>
+                        <p>{pub_desc_html}</p>
                     </div>
                 </article>"""
                 
@@ -338,7 +358,7 @@ def generar_indice(publicaciones, out_path, title, meta_desc, hero_subtitle, can
         secciones_html += f"""
         <section class="library-section" id="{tema_slug}">
             <div class="library-section__header">
-                <h2 class="library-section__title home-card__title--highlight"><a href="#{tema_slug}" aria-label="Ver sección: {tema}">{tema}</a></h2>
+                <h2 class="library-section__title home-card__title--highlight"><a href="#{tema_slug}" aria-label="Ver sección: {tema_html}">{tema_html}</a></h2>
                 <a href="#top" class="library-section__back-link">↑ Volver arriba</a>
             </div>
             <div class="home-grid">
@@ -346,6 +366,16 @@ def generar_indice(publicaciones, out_path, title, meta_desc, hero_subtitle, can
             </div>
         </section>"""
                 
+    # QUÉ HACE: Inyecta el "Announcement Badge" dinámicamente solo en la portada de Art de Coté
+    badge_html = ""
+    page_id = "page-biblioteca"
+    if title == "Art de Coté":
+        page_id = "page-art-de-cote"
+        badge_html = """<a href="/art-de-cote/anatomia-de-merci-boilerplate-arquitectura-devsecops-de-zero-bloat.html" class="hero__badge">
+            <span class="hero__badge-tag">Primer Art de Coté</span>
+            Anatomía de Merci Boilerplate →
+        </a>"""
+
     html_final = f"""<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -367,7 +397,7 @@ def generar_indice(publicaciones, out_path, title, meta_desc, hero_subtitle, can
     }}
     </script>
 </head>
-<body class="page">
+<body class="page" id="{page_id}">
     <div id="top" tabindex="-1" style="position: absolute; top: 0; left: 0;"></div>
     {header_html}
     <main class="main" id="main">
@@ -375,6 +405,7 @@ def generar_indice(publicaciones, out_path, title, meta_desc, hero_subtitle, can
         <section class="hero">
             <h1 class="hero__title">{title_html}</h1>
             <p class="hero__subtitle">{meta_desc_html}</p>
+            {badge_html}
         </section>
         
         <!-- QUÉ HACE: Índice Curado (Table of Contents) autogenerado -->
@@ -458,6 +489,8 @@ def main(): # type: ignore
         PUBLIC_ART_DE_COTE.mkdir(parents=True, exist_ok=True)
         generar_indice(publicaciones_art, PUBLIC_ART_DE_COTE / "index.html", "Art de Coté", "Índice de scripts experimentales, andamiajes y código colateral.", "Scripts, flujos de automatización y código experimental preservado bajo la filosofía Zero Waste (Cero Desperdicio).", "https://merci-boilerplate.es/art-de-cote/", header_html, footer_html, css_version, js_controller_version, js_main_version)
             
+    total_pubs = len(publicaciones_bib) + len(publicaciones_art)
+    print(f"  ✅ {total_pubs} documentos estáticos compilados y publicados exitosamente.")
     print("🚀 [Merci Publish] Pipeline de conversión finalizado.")
 
 if __name__ == "__main__":

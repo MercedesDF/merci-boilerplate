@@ -16,6 +16,7 @@ import shutil
 import urllib.request
 import urllib.parse
 import unicodedata
+import html
 from urllib.error import URLError, HTTPError
 from pathlib import Path
 
@@ -230,11 +231,12 @@ def publicar_en_wordpress(filepath: str, creds: dict, verbose: bool = False):
                 out_pdf_path = REPO_ROOT / "public" / "descargas" / out_pdf_filename
                 out_pdf_path.parent.mkdir(parents=True, exist_ok=True)
                 
+                titulo_html = html.escape(titulo)
                 pdf_html_content = f"""<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>{titulo}</title>
+    <title>{titulo_html}</title>
     <style>
         @page {{ size: A4; margin: 2.5cm; }}
         body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #334155; }}
@@ -249,7 +251,7 @@ def publicar_en_wordpress(filepath: str, creds: dict, verbose: bool = False):
 </head>
 <body>
     <div class="portada">
-        <h1>{titulo}</h1>
+        <h1>{titulo_html}</h1>
         <p>Art de Coté | Cuadernillo</p>
     </div>
     <div class="contenido">
@@ -271,11 +273,10 @@ def publicar_en_wordpress(filepath: str, creds: dict, verbose: bool = False):
             # QUÉ HACE: Expulsa físicamente el archivo origen hacia el entorno de incubación si es borrador.
             # POR QUÉ: Paridad de flujos. Mantiene las carpetas dinámicas raíz exclusivas para contenido en producción.
             if estado != "publicado" and not target_path.is_relative_to(REPO_ROOT / "laboratorio"):
-                rel_path = target_path.relative_to(REPO_ROOT)
-                destino_lab = REPO_ROOT / "laboratorio" / rel_path
+                destino_lab = REPO_ROOT / "laboratorio" / "incubacion" / target_path.name
                 destino_lab.parent.mkdir(parents=True, exist_ok=True)
                 shutil.move(str(target_path), str(destino_lab))
-                print(f"  🔙 Expulsando (Estado: {estado}): Moviendo '{target_path.name}' de vuelta a laboratorio/{rel_path.parent.name}/")
+                print(f"  🔙 Expulsando (Estado: {estado}): Moviendo '{target_path.name}' de vuelta a laboratorio/incubacion/")
             
     except HTTPError as e:
         error_info = e.read().decode("utf-8")

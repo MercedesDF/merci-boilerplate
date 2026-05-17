@@ -9,7 +9,7 @@ class MerciController {
         this.container = document.getElementById(containerId);
 
         if (!this.container) {
-            console.warn(`[Merci] Contenedor #${containerId} no encontrado. El asistente permanecerá en reposo.`);
+            console.debug(`[Merci] Contenedor #${containerId} no encontrado. El asistente permanecerá en reposo.`);
             return;
         }
 

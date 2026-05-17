@@ -14,7 +14,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
-TARGET_EXTENSIONS = {'.html', '.php', '.md', '.py', '.js', '.scss', '.yaml', '.yml'}
+TARGET_EXTENSIONS = {'.html', '.php', '.md', '.py', '.js', '.scss', '.yaml', '.yml', '.json'}
 
 def replace_in_files(old_str: str, new_str: str):
     """
@@ -249,6 +249,7 @@ def main():
     # Borramos la identidad documental del autor original
     (REPO_ROOT / "README.md").unlink(missing_ok=True)
     (REPO_ROOT / "instrucciones.md").unlink(missing_ok=True)
+    (REPO_ROOT / "SECURITY.md").unlink(missing_ok=True)
     
     # Ascendemos los archivos gemelos a oficiales
     readme_merci = REPO_ROOT / "README-merci.md"

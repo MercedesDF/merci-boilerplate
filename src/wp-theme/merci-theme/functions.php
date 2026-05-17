@@ -108,7 +108,7 @@ function merci_purgar_inyecciones_inline() {
     // Eliminar script inline de detección de JS de WooCommerce (Generador de violación CSP - Prioridad 0)
     remove_action('wp_head', 'wc_javascript_is_active', 0);
     
-    // Eliminar las Speculation Rules de WP (inyectan bloques <script> bloqueados por la CSP)
+    // Eliminar las Speculation Rules de WP (inyectan etiquetas script bloqueadas por la CSP)
     remove_action('wp_head', 'wp_print_speculation_rules');
     remove_action('wp_footer', 'wp_print_speculation_rules');
     

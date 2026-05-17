@@ -17,6 +17,7 @@ ROADMAP_TASKS = Gauge('merci_roadmap_tareas_total', 'Tareas del Roadmap', ['esta
 DOCS_INCUBACION = Gauge('merci_documentos_incubacion_total', 'Borradores en incubación')
 DOCS_PROMOCION = Gauge('merci_documentos_promocion_total', 'Documentos listos para promover (borrador)')
 DOCS_BIBLIOTECA = Gauge('merci_documentos_biblioteca_total', 'Documentos publicados en biblioteca')
+LINKEDIN_QUEUE = Gauge('merci_linkedin_queue_total', 'Publicaciones en cola para LinkedIn')
 
 def actualizar_metricas():
     # 1. Analizar tareas del Roadmap
@@ -54,6 +55,25 @@ def actualizar_metricas():
     biblioteca_dir = REPO_ROOT / "biblioteca"
     if biblioteca_dir.exists():
         DOCS_BIBLIOTECA.set(len(list(biblioteca_dir.glob("*.md"))))
+
+    # 4. Contar publicaciones en cola para LinkedIn
+    directorios_sociales = [REPO_ROOT / "blog", REPO_ROOT / "art-de-cote", REPO_ROOT / "biblioteca"]
+    en_cola_social = 0
+    for dir_path in directorios_sociales:
+        if dir_path.exists():
+            for md_file in dir_path.rglob("*.md"):
+                try:
+                    content = md_file.read_text(encoding="utf-8", errors="ignore")
+                    match = re.match(r"^\s*---\r?\n(.*?)\n---", content, re.DOTALL)
+                    if match:
+                        yaml_block = match.group(1)
+                        # Solo contamos si está publicado y en cola
+                        if re.search(r'^estado:\s*["\']publicado["\']', yaml_block, re.MULTILINE | re.IGNORECASE) and \
+                           re.search(r'^estado_social:\s*["\'](en_cola|aprobado)["\']', yaml_block, re.MULTILINE | re.IGNORECASE):
+                            en_cola_social += 1
+                except Exception:
+                    pass
+    LINKEDIN_QUEUE.set(en_cola_social)
 
 def main():
     puerto = 8001

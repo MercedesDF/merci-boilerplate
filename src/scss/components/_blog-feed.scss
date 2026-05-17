@@ -1,0 +1,51 @@
+@use '../abstracts' as *;
+
+/* COMPONENTE: Listado vertical de artículos del blog */
+.blog-feed {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+
+  &__article {
+    padding-bottom: 2.5rem;
+    border-bottom: 1px solid rgba($color-text-base, 0.1);
+
+    &:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+  }
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__meta {
+    font-size: 0.875rem;
+    color: #64748b;
+  }
+
+  &__title {
+    font-size: 1.8rem;
+    margin-top: 0.5rem;
+
+    a {
+      text-decoration: none;
+      color: inherit;
+      transition: color 0.2s ease;
+
+      &:hover {
+        color: $color-primary;
+      }
+    }
+  }
+
+  &__excerpt {
+    margin-top: 1rem;
+    color: #334155;
+    line-height: 1.6;
+  }
+}

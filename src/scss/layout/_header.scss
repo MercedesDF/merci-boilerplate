@@ -119,3 +119,15 @@
 [tabindex="-1"]:focus {
     outline: none;
 }
+
+/* ESTADO ACTIVO (Navegación Zero-JS) */
+#page-home .nav__link[href="/"],
+#page-biblioteca .nav__link[href="/biblioteca/"],
+#page-sobre-mi .nav__link[href="/sobre-mi/"],
+#page-blog .nav__link[href="/blog/"],
+#page-art-de-cote .nav__link[href="/art-de-cote/"],
+#page-tienda .nav__link[href="/blog/tienda/"],
+#page-contacto .nav__link[href="/contacto/"] {
+    color: $color-primary;
+    font-weight: 600; /* Le da un pelín más de presencia al enlace activo */
+}
