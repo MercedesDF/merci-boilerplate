@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """
 merci-blogger.py — Agente Redactor DevRel (Fase 1: Motor de Difusión).
 Transforma notas crudas en artículos atractivos para el blog y
@@ -10,8 +11,12 @@ import sys
 import re
 from datetime import datetime
 from pathlib import Path
+import os
+import logging
 
 try:
+    os.environ["LITELLM_LOCAL_MODEL_COST_MAP"] = "True"
+    logging.getLogger('LiteLLM').setLevel(logging.ERROR)
     from litellm import completion
     import litellm
     litellm.telemetry = False
@@ -28,6 +33,7 @@ INCUBACION_DIR = REPO_ROOT / "laboratorio" / "incubacion"
 def slugify(texto: str) -> str:
     import unicodedata
     texto = str(texto)
+    texto = re.sub(r'[—–]', '-', texto)
     texto = unicodedata.normalize('NFKD', texto).encode('ascii', 'ignore').decode('ascii')
     texto = re.sub(r'[^\w\s-]', '', texto.lower())
     return re.sub(r'[-\s]+', '-', texto).strip('-_')
@@ -108,7 +114,7 @@ def main():
                 base_path = "/biblioteca/"
                 
             url_promocion = f"{base_path}{slugify(titulo_doc)}.html"
-            nota_contenido += f"\n\n--- INSTRUCCIÓN EXTRA INNEGOCIABLE ---\nEl documento original ya está publicado o en proceso. DEBES incluir este enlace exacto al final de tu artículo invitando al lector a leerlo completo: {url_promocion}"
+            nota_contenido += f"\n\n--- INSTRUCCIÓN EXTRA INNEGOCIABLE ---\nEl documento original ya está publicado o en proceso. DEBES incluir este enlace exacto al final de tu artículo usando sintaxis Markdown (ej. [leer cuadernillo]({url_promocion})) invitando al lector a leerlo completo."
     elif es_nota_rapida:
         nota_contenido += "\n\n--- INSTRUCCIÓN EXTRA INNEGOCIABLE ---\nEste es un artículo INDEPENDIENTE y directo. Termina el post con una conclusión fuerte o una pregunta a la comunidad. NO invites a leer más información en la biblioteca porque no existe."
 
@@ -144,9 +150,19 @@ def main():
         respuesta_texto = respuesta_texto[inicio_yaml:]
     
     # Autonombrado (Slugify)
-    titulo_match = re.search(r'^titulo:\s*["\']?([^"\'\n]+)["\']?', respuesta_texto, re.MULTILINE)
-    titulo = titulo_match.group(1) if titulo_match else "articulo-generado"
-    filename = "blog-" + slugify(titulo) + ".md"
+    # QUÉ HACE: Hereda el nombre de archivo del documento técnico original en lugar de inventar uno nuevo.
+    # POR QUÉ: Mantiene la paridad visual en el explorador de archivos. Un 'cuadernillo-glosario.md' 
+    # generará un 'blog-glosario.md', permitiendo a la autora relacionarlos instantáneamente.
+    if nota_elegida.name.startswith("cuadernillo-"):
+        filename = nota_elegida.name.replace("cuadernillo-", "blog-", 1)
+    elif nota_elegida.name.startswith("compendio-"):
+        filename = nota_elegida.name.replace("compendio-", "blog-", 1)
+    elif nota_elegida.name.startswith("art-de-cote-"):
+        filename = nota_elegida.name.replace("art-de-cote-", "blog-", 1)
+    else:
+        titulo_match = re.search(r'^titulo:\s*["\']?([^"\'\n]+)["\']?', respuesta_texto, re.MULTILINE)
+        titulo = titulo_match.group(1) if titulo_match else "articulo-generado"
+        filename = "blog-" + slugify(titulo) + ".md"
     
     # ESCUDO ANTI-DUPLICIDAD: Evitar generar marketing redundante
     post_en_produccion = REPO_ROOT / "blog" / filename

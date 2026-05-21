@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """
 merci-promote.py — Flujo de Promoción Laboratorio -> Biblioteca (Fase 7.3).
 Herramienta interactiva de consola (CLI) para trasladar, curar y estandarizar borradores.
@@ -24,6 +25,7 @@ DESTINOS_DIR = [
 def slugify(texto: str) -> str:
     """Convierte un texto en una cadena segura para URLs (slug)."""
     texto = str(texto)
+    texto = re.sub(r'[—–]', '-', texto)
     texto = unicodedata.normalize('NFKD', texto).encode('ascii', 'ignore').decode('ascii')
     texto = re.sub(r'[^\w\s-]', '', texto.lower())
     return re.sub(r'[-\s]+', '-', texto).strip('-_')
@@ -207,14 +209,38 @@ def main():
 
     # 9. Agent Chaining: Invocar al Agente Blogger
     if not es_blog:
-        respuesta = input("\n  🤖 ¿Deseas invocar al Agente Blogger para generar un post promocional? (s/N): ").strip().lower()
-        if respuesta == 's':
-            script_blogger = REPO_ROOT / "scripts" / "merci" / "merci-blogger.py"
-            if script_blogger.exists():
-                print(f"  🚀 Transfiriendo contexto al Agente Blogger...")
-                subprocess.run([sys.executable, str(script_blogger), str(destino)])
-            else:
-                print("  ❌ Error: No se encontró el script merci-blogger.py en la ruta esperada.")
+        slug_destino = slugify(meta.get('titulo', borrador_elegido.name))
+        base_path = "/art-de-cote/" if ("art de" in tema_normalizado or "art-de-cote" in tema_normalizado) else "/biblioteca/"
+        url_promocion = f"{base_path}{slug_destino}.html"
+        
+        ya_promocionado = False
+        # Escaneamos si el post promocional ya reside en la incubadora o en producción
+        for dir_path in [REPO_ROOT / "laboratorio" / "incubacion", REPO_ROOT / "blog"]:
+            if dir_path.exists():
+                for file_path in dir_path.rglob("*.md"):
+                    if file_path == destino:
+                        continue
+                    try:
+                        contenido = file_path.read_text(encoding="utf-8", errors="ignore")
+                        if url_promocion in contenido and re.search(r'^tema:\s*["\']?Blog["\']?', contenido, re.MULTILINE | re.IGNORECASE):
+                            ya_promocionado = True
+                            break
+                    except Exception:
+                        pass
+            if ya_promocionado:
+                break
+
+        if ya_promocionado:
+            print(f"\n  ✨ El Agente Blogger ya redactó un post promocional para este documento. Omitiendo encadenamiento.")
+        else:
+            respuesta = input("\n  🤖 ¿Deseas invocar al Agente Blogger para generar un post promocional? (s/N): ").strip().lower()
+            if respuesta == 's':
+                script_blogger = REPO_ROOT / "scripts" / "merci" / "merci-blogger.py"
+                if script_blogger.exists():
+                    print(f"  🚀 Transfiriendo contexto al Agente Blogger...")
+                    subprocess.run([sys.executable, str(script_blogger), str(destino)])
+                else:
+                    print("  ❌ Error: No se encontró el script merci-blogger.py en la ruta esperada.")
 
 if __name__ == "__main__":
     try:

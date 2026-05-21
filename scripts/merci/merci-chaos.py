@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """
 merci-chaos.py — Agente de Chaos Engineering (Epic 2 Fase 4).
 Objetivo: Simular una mutación o sabotaje en el código fuente utilizando IA,
@@ -11,10 +12,14 @@ import os
 import sys
 import subprocess
 import random
+from datetime import datetime
 import re
 import json
 from pathlib import Path
+import logging
 try:
+    os.environ["LITELLM_LOCAL_MODEL_COST_MAP"] = "True"
+    logging.getLogger('LiteLLM').setLevel(logging.ERROR)
     from litellm import completion
     import litellm
     litellm.telemetry = False
@@ -25,6 +30,8 @@ except ImportError:
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 PROMPT_PATH = REPO_ROOT / "laboratorio" / "prompts" / "prompt-chaos.md"
+PRIVADO_DIR = REPO_ROOT / ".privado"
+CHAOS_LOG_PATH = PRIVADO_DIR / "chaos-audit.json"
 
 def extract_json_array(text: str) -> list:
     match = re.search(r'\[.*?\]', text, re.DOTALL)
@@ -81,9 +88,32 @@ def main():
         resultado = subprocess.run([sys.executable, str(REPO_ROOT / "scripts" / "merci" / "merci-audit.py")], cwd=REPO_ROOT, capture_output=True, text=True, env=env_aislado)
         
         salida = resultado.stdout.strip()
+        fue_detectado = False
+        
         # Un WARN también es una detección exitosa del linter, aunque no rompa la compilación
-        if resultado.returncode != 0 or "WARN" in salida or "ERROR" in salida: print(f"\n  ✅ [ÉXITO DEL CAOS] El sistema detectó la anomalía.\n\n{salida}")
-        else: print(f"\n  ❌ [VULNERABILIDAD] El escudo falló. El código malicioso pasó indetectado.\n\n{salida}")
+        if resultado.returncode != 0 or "WARN" in salida or "ERROR" in salida: 
+            print(f"\n  ✅ [ÉXITO DEL CAOS] El sistema detectó la anomalía.\n\n{salida}")
+            fue_detectado = True
+        else: 
+            print(f"\n  ❌ [VULNERABILIDAD] El escudo falló. El código malicioso pasó indetectado.\n\n{salida}")
+            
+        # --- REGISTRO DE AUDITORÍA PRIVADA ---
+        PRIVADO_DIR.mkdir(exist_ok=True)
+        logs_chaos = []
+        if CHAOS_LOG_PATH.exists():
+            try:
+                logs_chaos = json.loads(CHAOS_LOG_PATH.read_text(encoding="utf-8"))
+            except json.JSONDecodeError:
+                pass
+                
+        logs_chaos.append({
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "objetivo": target_file.name,
+            "inyeccion": sabotajes[0]["reemplazar"],
+            "defensa_exitosa": fue_detectado
+        })
+        CHAOS_LOG_PATH.write_text(json.dumps(logs_chaos, indent=2), encoding="utf-8")
+        
     finally:
         print("\n  ⏪ Ejecutando Auto-Healing (Rollback)...")
         subprocess.run(["git", "restore", str(target_file)], cwd=REPO_ROOT)

@@ -53,6 +53,12 @@ Este documento consolida las medidas de seguridad aplicadas en la arquitectura h
   - Detección de "JS Smells" (Uso de `eval` o `new Function`).
 - [x] **Auditoría Estandarizada Pre-Merge:**
   - Obligatoriedad de ejecutar `python3 scripts/merci/merci-audit.py --strict-json-ld` para garantizar la presencia de datos estructurados antes de pasar a producción.
+- [x] **Blindaje Supply Chain (Cadena de Suministro) — `audit_python_imports`:**
+  - La regla de auditoría usa AST (Abstract Syntax Tree - Árbol de Sintaxis Abstracta) para validar que todas las importaciones Python pertenezcan a la `stdlib` o a la lista blanca estricta de `requirements.txt`.
+  - *Motivo:* Un ecosistema puede estar blindado contra XSS o inyección SQL, pero si el código importa una librería maliciosa no registrada, el servidor queda comprometido (RCE - Remote Code Execution - Ejecución Remota de Código). Vulnerabilidad descubierta y parcheada mediante Chaos Engineering.
+- [x] **Caché Multi-Entorno en Publicador Headless (`merci-wp.py`):**
+  - El archivo `observabilidad/.wp_sync.json` almacena la clave centinela `_entorno` (valor del `WP_URL` activo). Al cambiar de entorno (local ↔ producción), la caché se invalida automáticamente sin intervención manual.
+  - *Motivo:* Un Cache Hit válido para `localhost` es un Cache Hit falso para producción. Sin esta guardia, el publicador omite silenciosamente todos los artículos al cambiar el `WP_URL` del `.env`.
 
 ---
-*Última revisión: Épica 2 Completada (2026-05-10). Orquestación IA, Auto-Healing y DLP Avanzado.*
+*Última revisión: Épica 3 — Fase 2 Completada (2026-05-21). Blindaje Supply Chain y Caché Multi-Entorno incorporados.*

@@ -1,3 +1,6 @@
+# Historial de modificaciones:
+# - Última modificación el 2026-05-18 (Fase 2 - Épica 3)
+
 # Dependencias de compilación y automatización (Build-time / Pipeline local).
 # Instalar dentro del entorno virtual: source .venv/bin/activate && pip install -r requirements.txt
 # Política: 0 dependencias en Runtime (navegador). Estas librerías solo operan en el pipeline local.

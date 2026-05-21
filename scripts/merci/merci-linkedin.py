@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """
 merci-linkedin.py — Motor de automatización social (Fase 8.3).
 Arquitectura OIDC (Three-legged OAuth) con 0 dependencias externas.
@@ -23,6 +24,7 @@ TOKEN_PATH = REPO_ROOT / ".linkedin_token.json" # Aquí guardaremos la llave
 def slugify(texto: str) -> str:
     """Convierte un texto en una cadena segura para URLs (slug)."""
     texto = str(texto)
+    texto = re.sub(r'[—–]', '-', texto)
     texto = unicodedata.normalize('NFKD', texto).encode('ascii', 'ignore').decode('ascii')
     texto = re.sub(r'[^\w\s-]', '', texto.lower())
     return re.sub(r'[-\s]+', '-', texto).strip('-_')

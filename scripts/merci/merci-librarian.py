@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """
 merci-librarian.py — Agente Bibliotecario (Fase 3).
 
@@ -61,7 +62,7 @@ def get_bitacora_context(nota_cruda: str) -> str:
     for bitacora in bitacoras:
         if bitacora.exists():
             texto = bitacora.read_text(encoding="utf-8", errors="replace")
-            entradas = re.split(r'(?=### \d{4}-\d{2}-\d{2})', texto)
+            entradas = re.split(r'(?=### \d{4}-\d{2}-\d{2}(?:\s\d{2}:\d{2})?)', texto)
             relevantes = []
             for entrada in entradas:
                 if not entrada.strip(): continue

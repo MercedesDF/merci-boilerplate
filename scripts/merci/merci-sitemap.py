@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """
 merci-sitemap.py — Automatización del mantenimiento del sitemap.xml.
 

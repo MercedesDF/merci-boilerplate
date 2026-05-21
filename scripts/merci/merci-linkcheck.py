@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """
 merci-linkcheck.py — Rastreador dinámico de enlaces rotos.
 

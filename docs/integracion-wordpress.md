@@ -1,3 +1,4 @@
+
 # Integración y Aislamiento Dinámico (WordPress)
 
 Este documento define la arquitectura técnica y operativa para la **Fase 4.1**. El objetivo es implementar espacios dinámicos administrables (`/blog`, `/tienda`) sin que el componente dinámico (WordPress) vulnere ni contamine la arquitectura estricta del núcleo servido desde `public/`.

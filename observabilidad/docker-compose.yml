@@ -17,6 +17,8 @@ services:
     image: grafana/grafana:latest
     container_name: merci-grafana
     network_mode: "host"
+    env_file:
+      - ../.env
     volumes:
       - grafana_data:/var/lib/grafana
       - ./provisioning:/etc/grafana/provisioning

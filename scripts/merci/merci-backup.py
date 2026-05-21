@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """
 merci-backup.py — Herramienta de copias de seguridad locales.
 Empaqueta el proyecto en un archivo ZIP excluyendo carpetas pesadas o de entorno.

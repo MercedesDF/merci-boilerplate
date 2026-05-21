@@ -10,7 +10,7 @@
     <!-- QUÉ HACE: Explicita las directrices de indexación para los motores de búsqueda -->
     <!-- POR QUÉ: Limpia el bloque comentado obsoleto y asegura que el rastreador siga los enlaces del índice. -->
     <meta name="robots" content="index, follow">
-    <meta name="author" content="merci-boilerplateDF">
+    <meta name="author" content="merci-boilerplate">
 
     <!-- QUÉ HACE: Implementa el protocolo Open Graph para metadatos sociales (Social Cards) -->
     <!-- POR QUÉ: Al automatizar LinkedIn con merci-linkedin.py, es vital controlar cómo se renderiza la URL matriz al ser compartida. -->
@@ -26,9 +26,9 @@
     <link rel="icon" href="/favicon.ico?v=2" type="image/x-icon">
     <!-- QUÉ HACE: Cache Busting dinámico incrementado a v14 -->
     <!-- POR QUÉ: Obliga a Varnish y a navegadores móviles a purgar la caché y descargar la nueva rejilla de 5 columnas. -->
-    <link rel="stylesheet" href="/css/main.css?v=1779021426">
-    <script src="/js/MerciController.js?v=1779021369" defer></script>
-    <script src="/js/main.js?v=1779021345" defer></script>
+    <link rel="stylesheet" href="/css/main.css?v=1779354148">
+    <script src="/js/MerciController.js?v=1778974789" defer></script>
+    <script src="/js/main.js?v=1777153888" defer></script>
     <link rel="canonical" href="https://merci-boilerplate.es">
     
     <!-- JSON-LD Mínimo Fase 2 -->
@@ -54,8 +54,8 @@
         <nav class="header__nav nav" id="main-nav" aria-label="Navegación principal">
             <a href="/" class="nav__link">Home</a>
             <a href="/biblioteca/" class="nav__link">Biblioteca</a>
-            <!-- QUÉ HACE: Inyecta la futura ruta de tu Perfil Semántico (Anti-ATS) -->
-            <!-- POR QUÉ: Integra tu autoridad profesional directamente en el flujo de navegación de infraestructura. -->
+            <!-- QUÉ HACE: Inyecta la ruta del Perfil Semántico (Anti-ATS). -->
+            <!-- POR QUÉ: Integra la autoridad profesional directamente en el flujo de navegación de infraestructura. -->
             <a href="/sobre-mi/" class="nav__link">Sobre Mí</a>
             <!-- QUÉ HACE: Diferencia este enlace del autogenerado por WordPress en las tarjetas. -->
             <!-- POR QUÉ: Evita el error WAI-ARIA de "Enlaces idénticos con distinto destino". -->
@@ -71,8 +71,8 @@
         <!-- HERO SECTION          -->
         <!-- ===================== -->
         <section class="hero">
-            <h1 class="hero__title">merce<span class="hero__highlight">dev</span>.es</h1>
-            <h2 class="hero__statement">proyecto vivo en producción</h2>
+            <h1 class="hero__title">mercedev.es</h1>
+            <h2 class="hero__statement">proyecto vivo<br>en producción desde abril 2026.</h2>
             <p class="hero__subtitle">
                 <strong>Infraestructura operacional pura.</strong><br>
                 <br>
@@ -87,7 +87,7 @@
 
             <div class="hero__cta">
                 <a href="/sobre-mi/">¿quieres conocerme?</a>
-                <a href="https://github.com/merci-boilerplateDF/merci-boilerplate" target="_blank" rel="noopener noreferrer">Ver Código Fuente</a>
+                <a href="https://github.com/MercedesDF/merci-boilerplate" target="_blank" rel="noopener noreferrer">Ver Código Fuente</a>
             </div>
         </section>
 
@@ -95,8 +95,8 @@
         <!-- ENGINEERING DASHBOARD -->
         <!-- ===================== -->
         <section class="section">
-            <h2 class="home-section__title">Auditoría de la web a 15 de mayo de 2026</h2>
-            <div class="hero__dashboard hero__dashboard--standalone" role="group" aria-label="Métricas de rendimiento del sistema">
+            <h2 class="home-section__title">Auditoría de la web actual (mobile-first)</h2>
+            <div class="hero__dashboard hero__dashboard--standalone" role="group" aria-label="Métricas de rendimiento — Auditoría Mobile (PageSpeed Insights)">
                 <div class="hero__metric">
                     <span class="hero__metric-label">FCP</span>
                     <span class="hero__metric-value">0.8 s</span>
@@ -138,20 +138,20 @@
                     <span class="hero__metric-value">3-layer</span>
                 </div>
             </div>
-            <h2 class="home-section__title">Métricas del Repositorio</h2>
+            <h2 class="home-section__title">Métricas del Repositorio en GitHub</h2>
             <div class="hero__dashboard hero__dashboard--standalone" role="group" aria-label="Métricas del Repositorio">
                 
                 <div class="hero__metric">
                     <span class="hero__metric-label">Releases Boilerplate</span>
-                    <span class="hero__metric-value">v1.13.0</span>
+                    <span class="hero__metric-value">N/D</span>
                 </div>
                 <div class="hero__metric">
                     <span class="hero__metric-label">Agentes Python</span>
-                    <span class="hero__metric-value">25+</span>
+                    <span class="hero__metric-value">N/D</span>
                 </div>
                 <div class="hero__metric">
                     <span class="hero__metric-label">Docs (Líneas)</span>
-                    <span class="hero__metric-value">7,900+</span>
+                    <span class="hero__metric-value">N/D</span>
                 </div>
                 <div class="hero__metric">
                     <span class="hero__metric-label">Fases Cerradas</span>
@@ -167,37 +167,21 @@
             <!-- PROSE (EDITORIAL)     -->
             <!-- ===================== -->
            <article class="prose">
-                <div class="prose__content">
-                    
-                    <h2>La Evolución</h2>
-                    <p>La web moderna colapsa bajo el peso de frameworks hipertrofiados. Inspirado en el minimalismo radical de <em><a href="https://motherfuckingwebsite.com/">Motherfucking Website</a></em>, este espacio es una tesis de ingeniería en vivo:<br>
-                        <h3><strong>Demuestra que es posible automatizar y publicar masivamente sin inyectar un solo byte de dependencia externa en el navegador.</strong></h3>
-                    </p>
-                    
-                    <h2>Estado de la Infraestructura</h2>
-                    <p>La arquitectura del sitio se divide en tres capas aisladas mediante proxy inverso (Nginx) y automatizadas de forma nativa en Vanilla Python:</p>
-
-                    <ul>
-                        <li><strong>Capa Estática:</strong> HTML5 semántico, SASS (BEM) y Vanilla JS. El estándar detrás del 100/100 Core Web Vitals.</li>
-                        <li><strong>Capa Dinámica:</strong> WordPress <em>Headless</em> acoplado por enlaces simbólicos y securizado con APIs restrictivas.</li>
-                        <li><strong>Capa IA (Hybrid Stack):</strong> Orquestación autónoma que combina la latencia cero de Ollama (Local) con la potencia cloud de Gemini. Blindada con resiliencia <em>Fail-Gracefully</em>.</li>
-                    </ul>
-
-                    <h2>El Motor: Merci Boilerplate</h2>
-                    <p>Todo el núcleo arquitectónico que gobierna este sitio ha sido congelado, purgado de datos críticos y empaquetado como una plantilla de código abierto.</p>
-                    <p>Si quieres auditar las tripas del sistema, analizar los agentes Python y clonar la infraestructura, he documentado su desarrollo al detalle.</p>
-                    <p>👉 <a href="/art-de-cote/anatomia-de-merci-boilerplate-arquitectura-devsecops-de-zero-bloat.html"><strong>Explorar en Art de Coté: Anatomía de Merci Boilerplate</strong></a></p>
-
-                </div>
-            </article>
+            <div class="prose__content">
+                <h2>¡Bienvenido a tu Boilerplate DevSecOps!</h2>
+                <p>Esta plataforma ha sido instanciada con éxito y el código base está listo para ti.</p>
+                <p>Arriba puedes ver los Dashboards de rendimiento en tiempo real calculados por el agente <code>merci-telemetry.py</code>. Este espacio es tuyo para presentar tu proyecto o tesis de ingeniería.</p>
+                <p>👉 Edita el bloque <code>&lt;article class="prose"&gt;</code> en <code>public/index.html</code> para comenzar a construir tu identidad.</p>
+            </div>
+        </article>
         </section>
 
     </main>
     <footer class="footer">
         <div class="footer__links">
             <a href="https://www.linkedin.com/in/mercedesdf-ingenieria/" target="_blank" rel="noopener noreferrer" class="footer__link">LinkedIn</a>
-            <a href="https://github.com/merci-boilerplateDF" target="_blank" rel="noopener noreferrer" class="footer__link">GitHub</a>
-            <a href="https://github.com/merci-boilerplateDF/merci-boilerplate" target="_blank" rel="noopener noreferrer" class="footer__link">Merci Boilerplate</a>
+            <a href="https://github.com/MercedesDF" target="_blank" rel="noopener noreferrer" class="footer__link">GitHub</a>
+            <a href="https://github.com/MercedesDF/merci-boilerplate" target="_blank" rel="noopener noreferrer" class="footer__link">Merci Boilerplate</a>
         </div>
         <div class="footer__text">
             <a href="#top">↑ Volver arriba</a><br>

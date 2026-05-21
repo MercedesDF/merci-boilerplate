@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """
 merci-assets-watcher.py — Agente local de WebP Automation (Fase 2).
 

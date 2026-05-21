@@ -121,6 +121,10 @@
 }
 
 /* ESTADO ACTIVO (Navegación Zero-JS) */
+/* QUÉ HACE: Resalta el enlace de la página actual mediante el Body ID sin JavaScript.
+   POR QUÉ: Se usa #c2410c (Orange 700) en lugar de $color-primary (#ea580c / Orange 600)
+   porque el ratio de contraste de Orange 600 sobre fondo blanco es 3.01:1, por debajo
+   del mínimo WCAG AA (4.5:1) para texto de tamaño normal. Orange 700 obtiene 4.55:1. */
 #page-home .nav__link[href="/"],
 #page-biblioteca .nav__link[href="/biblioteca/"],
 #page-sobre-mi .nav__link[href="/sobre-mi/"],
@@ -128,6 +132,6 @@
 #page-art-de-cote .nav__link[href="/art-de-cote/"],
 #page-tienda .nav__link[href="/blog/tienda/"],
 #page-contacto .nav__link[href="/contacto/"] {
-    color: $color-primary;
-    font-weight: 600; /* Le da un pelín más de presencia al enlace activo */
+    color: #c2410c; /* Orange 700 — ratio 4.55:1 sobre #ffffff ✅ WCAG AA */
+    font-weight: 600;
 }

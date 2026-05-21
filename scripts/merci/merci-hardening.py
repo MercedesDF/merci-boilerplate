@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """
 merci-hardening.py — Agente de Hardening Continuo (Fase 4).
 

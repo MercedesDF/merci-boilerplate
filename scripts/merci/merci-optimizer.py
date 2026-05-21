@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """
 merci-optimizer.py — Automatización de optimización de imágenes (Fase 3.4).
 
@@ -44,6 +45,13 @@ def optimize_images(verbose=False):
         return
 
     for image_path in image_files:
+        # Caché Incremental: Evita reprocesar si la imagen WebP base ya existe y es más reciente
+        base_output = DEST_DIR / f"{image_path.stem}.webp"
+        if base_output.exists() and int(base_output.stat().st_mtime) >= int(image_path.stat().st_mtime):
+            if verbose:
+                print(f"   ⏭️ Saltando (Caché): {image_path.name}")
+            continue
+
         try:
             with Image.open(image_path) as img:
                 if verbose:
@@ -56,7 +64,6 @@ def optimize_images(verbose=False):
                     img = img.convert('RGB')
 
                 # Siempre generar una versión base optimizada al tamaño original
-                base_output = DEST_DIR / f"{image_path.stem}.webp"
                 img.save(base_output, "WEBP", quality=WEBP_QUALITY)
                 if verbose:
                     print(f"   ✨ Generado base: {base_output.name}")

@@ -1,3 +1,6 @@
+# Historial de modificaciones:
+# - Última modificación el 2026-05-18 (Fase 2 - Épica 3)
+
 #!/usr/bin/env sh
 # Instalar (desde la raíz del repo):
 #   chmod +x scripts/merci/pre-commit

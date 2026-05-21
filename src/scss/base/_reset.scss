@@ -29,3 +29,9 @@ video {
     display: block;
     max-width: 100%;
 }
+
+/* QUÉ HACE: Compensa el header fijo en todos los saltos de enlaces ancla. */
+/* POR QUÉ: Evita que el contenido destino quede oculto bajo la navegación superior. */
+[id] {
+    scroll-margin-top: 120px;
+}

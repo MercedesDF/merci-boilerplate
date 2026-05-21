@@ -1,3 +1,4 @@
+
 # SOP: Flujo de Publicación Dual (SSG y Headless WP)
 
 Este documento define el Procedimiento Operativo Estándar (SOP) para la publicación de contenidos en el ecosistema híbrido **Merci Boilerplate**.
@@ -37,14 +38,19 @@ Por diseño arquitectónico (Environment Segregation), el núcleo estático (Bib
    merci wp
    ```
    *(Nota: `merci total` lo hace automáticamente en el pipeline global).*
-4. **Despliegue a Producción (Contenido Dinámico):** Para enviar los posts a la web pública, edita tu archivo `.env`, comenta las credenciales de `localhost` y descomenta las de producción. Luego, ejecuta de nuevo `merci wp`. Una vez finalizado, recuerda volver a dejar el `.env` apuntando a `localhost`.
-5. **Distribución Asíncrona (Buffer Social):** Para liberar posts en LinkedIn de 1 en 1, ejecutar `merci linkedin`. El script actúa como Gatekeeper: selecciona el post más antiguo en cola, exige confirmación humana y sella el YAML a `"publicado_linkedin"`.
+4. **Despliegue a Producción (Contenido Dinámico):** Para enviar los posts a la web pública, edita tu archivo `.env` y cambia el `WP_URL` a las credenciales de producción. Luego ejecuta de nuevo `merci wp`. La caché multi-entorno detectará automáticamente el cambio de destino e invalidará el registro, forzando la sincronización completa hacia producción sin necesidad de purgar nada manualmente.
+5. **Gobernanza del Buffer Social (LinkedIn):** La gestión de la cola de redes es puramente declarativa a través de los archivos Markdown:
+   *   **Monitorizar cola:** Ejecutar `merci queue` para visualizar qué artículos están aprobados o pendientes en el buffer.
+   *   **Editar publicación:** Modificar libremente el texto dentro del bloque `<!-- linkedin: ... -->` en el archivo `.md`.
+   *   **Cancelar publicación:** Borrar el valor del metadato dejándolo como `estado_social: ""` para que el orquestador lo ignore por completo.
+   *   **Publicar:** Ejecutar `merci linkedin`. El script actúa como Gatekeeper: extrae el post más antiguo, exige confirmación interactiva (`s/N`) y sella el YAML a `"publicado_linkedin"`.
 
 ---
 
 ## ⚠️ Reglas de Oro (Hardening Operativo)
 
 - **Prevención de Posts Fantasma (Data Drift):** Nunca borrar un archivo `.md` dinámico del disco si ya ha sido sincronizado con WordPress. En caso de eliminación física, el script Headless lo ignorará y la base de datos jamás recibirá la orden de ocultarlo. Para despublicar, cambiar su YAML a `estado: "borrador"` y ejecutar `merci wp` (El script lo ocultará del CMS y lo expulsará físicamente al laboratorio). Solo entonces se debe eliminar del entorno local.
+- **Actualización de Contenidos y Fechas (El control del tiempo):** Para editar un documento ya publicado, modifica el `.md` en su carpeta de producción y ejecuta su orquestador (`merci wp` o `merci total`). El sistema lo actualizará sin duplicarlo. **Sobre la fecha:** Si mantienes el campo `fecha` original intacto, harás una *"actualización silenciosa"* (ideal para corregir erratas sin alterar el orden cronológico). Si deseas indicar que el contenido ha sido profundamente revisado o quieres que vuelva a subir al principio del blog, cambia manualmente el campo `fecha: "YYYY-MM-DD"` en el YAML Frontmatter a la fecha de hoy antes de sincronizar.
 - **Prohibición de cruce:** Nunca ejecutar `merci-promote.py` sobre un archivo que ya reside en las carpetas de producción de la raíz. En caso afirmativo, el script lo enviará a la `biblioteca/` estática provocando una colisión de arquitecturas.
 - **Despublicación SSG (Kill-Switch):** En caso de requerir la retirada de un artículo de la Biblioteca o Art de Coté, editar el archivo `.md` en su carpeta de producción, cambiar el YAML a `estado: "borrador"` y ejecutar `merci total`. El orquestador destruirá el HTML/PDF público y enviará el archivo de vuelta al `laboratorio/`.
 - **Entorno encendido:** El *Flujo 2* requiere obligatoriamente que el servidor Nginx/MariaDB local esté encendido para poder comunicarse con la API REST de WordPress.

@@ -1,3 +1,8 @@
+<!--
+Historial de modificaciones de la plantilla:
+- Última modificación el 2026-05-18 (Fase 2 - Épica 3)
+-->
+
 ---
 titulo: "Título de la entrada del Blog"
 descripción: "Breve descripción de 1 o 2 líneas para el SEO (Search Engine Optimization - Optimización para Motores de Búsqueda) y el índice."

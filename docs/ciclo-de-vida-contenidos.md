@@ -5,7 +5,7 @@ Este documento explica cómo el *YAML Frontmatter* actúa como el "volante" del 
 ## 1. Anatomía del YAML (El DNI del Documento)
 
 *   `titulo`: El nombre humano. *El motor SSG lo convierte automáticamente en URL (ej. `mi-titulo.html`).*
-*   `descripcion`: Se inyecta en la etiqueta `<meta name="description">` y en el JSON-LD para el SEO, y sirve de resumen en las tarjetas.
+*   `descripcion`: Se inyecta en la etiqueta `<meta name="description">` y en el JSON-LD (JavaScript Object Notation for Linked Data - Notación de Objetos JavaScript para Datos Enlazados) para el SEO, y sirve de resumen en las tarjetas.
 *   `tipo`: Define el diseño CSS (Metodología BEM). 
     *   `"cuadernillo"`: Se le aplica la clase `.card--booklet` (diseño fluido azul). 
     *   `"proyecto"` o `"compendio"`: Se aplica `.card--book` (diseño sólido verde). 
@@ -38,7 +38,7 @@ Este documento explica cómo el *YAML Frontmatter* actúa como el "volante" del 
 ### B. El Flujo Dinámico (Blog en WordPress)
 1. **Marketing:** La IA (`merci blogger`) crea el artículo de marketing en `incubacion/` con tema "Blog" a partir de otro post técnico. Lo pasas a `borrador`.
 2. **Curación Ligera:** Ejecutas `merci promote`. El script lo mueve a la carpeta `/blog/` en la raíz local.
-3. **Sincronización API:** Ejecutas `merci wp` (o `merci total`). Python dialoga con WordPress, sube el artículo y **escribe el `wp_id`** dentro del YAML de tu archivo para mantenerlos gemelos para siempre.
+3. **Sincronización API:** Ejecutas `merci wp` (o `merci total`). Python dialoga con WordPress vía API REST, resuelve dinámicamente si el post ya existe (por slug) y lo crea o actualiza sin duplicarlo. La caché incremental (`observabilidad/.wp_sync.json`) evita llamadas de red sobre artículos no modificados.
 
 ### C. El Flujo Social (LinkedIn)
 1. **Aprobación (Humano):** Ejecutas `merci linkedin`. El script te muestra los posts `en_cola` y te pregunta si están bien. Si dices que sí, los cambia a `aprobado`.

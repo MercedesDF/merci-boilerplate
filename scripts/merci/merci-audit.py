@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """
 merci-audit.py — Auditoría local del proyecto merci-boilerplate.es (Fase 1).
 
@@ -283,6 +284,37 @@ def audit_python_syntax(state: AuditState, path: Path, text: str) -> None:
                 f"Sintaxis Python inválida: {exc.msg}",
             )
         )
+
+def audit_python_imports(state: AuditState, path: Path, text: str) -> None:
+    """
+    Escudo contra ataques a la Cadena de Suministro (Supply Chain).
+    Detecta importaciones de librerías de terceros maliciosas o no registradas.
+    """
+    if path.suffix.lower() != ".py":
+        return
+        
+    try:
+        tree = ast.parse(text, filename=str(path))
+    except SyntaxError:
+        return
+        
+    # Lista blanca estricta (Zero Trust) de dependencias aprobadas en requirements.txt
+    ALLOWED_EXTERNAL = {"weasyprint", "PIL", "pypdf", "markdown", "litellm", "google", "prometheus_client"}
+    
+    def _verify(lineno: int, module_name: str):
+        base_mod = module_name.split('.')[0]
+        if base_mod in sys.stdlib_module_names or base_mod in sys.builtin_module_names or base_mod in ALLOWED_EXTERNAL:
+            return
+        if base_mod.startswith("merci_"):  # Permite imports locales en testings
+            return
+        state.add(Finding(path, lineno, "error", "PY_UNAUTHORIZED_IMPORT", f"Módulo no autorizado: '{base_mod}'. Posible ataque de Supply Chain."))
+
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                _verify(node.lineno, alias.name)
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            _verify(node.lineno, node.module)
 
 GLOBAL_ACRONYM_COUNTS: dict[str, int] = {}
 
@@ -687,6 +719,7 @@ def run_on_files(paths: Iterable[Path], strict_json_ld: bool) -> AuditState:
             continue
         scan_secrets(state, path, text)
         audit_python_syntax(state, path, text)
+        audit_python_imports(state, path, text)
         audit_js_smells(state, path, text)
         audit_json(state, path, text)
         audit_html_seo(state, path, text, strict_json_ld)
@@ -845,6 +878,15 @@ def main(argv: Optional[list[str]] = None) -> int:
         return 2
 
     print_report(state)
+
+    # Exportar métricas para Grafana (Agente SRE)
+    try:
+        obs_dir = REPO_ROOT / "observabilidad"
+        obs_dir.mkdir(exist_ok=True)
+        report_data = {"errors": len(state.errors), "warnings": len(state.warns)}
+        (obs_dir / ".audit_report.json").write_text(json.dumps(report_data), encoding="utf-8")
+    except Exception:
+        pass
 
     if state.warns:
         print(

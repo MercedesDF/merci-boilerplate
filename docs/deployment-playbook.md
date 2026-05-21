@@ -1,3 +1,4 @@
+
 # Deployment Playbook (Manual de Despliegue)
 
 Este documento define el proceso estandarizado para desplegar la arquitectura híbrida **Merci Boilerplate** en un entorno de producción Ubuntu limpio. Inicia desde la adquisición del dominio hasta la verificación final.
@@ -25,6 +26,10 @@ Este documento define el proceso estandarizado para desplegar la arquitectura h�
 1. Generar clave SSH para el usuario del sitio en CloudPanel.
 2. Vincular la clave en GitHub (Deploy Key) para permitir acceso de lectura.
 3. Clonar el repositorio en el Document Root asignado (ej. `/home/tu_usuario/htdocs/tu_dominio.com`).
+4. Aprovisionar el entorno Python del ecosistema:
+   `cd /home/tu_usuario/htdocs/tu_dominio.com`
+   `python3 -m venv .venv && source .venv/bin/activate`
+   `pip install -r requirements.txt`
 
 ## PASO 3: Aislamiento del CMS (WordPress)
 1. Crear base de datos y usuario asociado desde la interfaz de CloudPanel.
@@ -42,8 +47,13 @@ Este documento define el proceso estandarizado para desplegar la arquitectura h�
 4. Inyectar el bloque de cabeceras HTTP de seguridad (CSP, HSTS, COOP, etc.) en el mismo bloque `server` del puerto 8080 para blindar el frontend contra ataques XSS y *Clickjacking*.
 5. Acceder a la ruta `/blog` en el navegador, completar la instalación de WordPress, guardar los **Enlaces Permanentes** ("Nombre de la entrada") y activar el Child Theme.
 
-## PASO 5: Verificación
-1. Ejecutar `merci-linkcheck.py` contra el dominio público para auditar la ausencia de enlaces rotos (404).
+## PASO 5: Observabilidad y Tareas Programadas (Opcional)
+1. **Grafana/Prometheus:** Para habilitar la telemetría SRE (Site Reliability Engineering), asegurar que Docker esté instalado en el VPS, acceder a `observabilidad/` y levantar el clúster con `docker compose up -d`.
+2. **Buffer Social (LinkedIn):** Para automatizar la publicación asíncrona de contenidos aprobados, añadir la tarea al demonio cron del usuario (`crontab -e`):
+   `0 10 */3 * * cd /home/tu_usuario/htdocs/tu_dominio.com && .venv/bin/python scripts/merci/merci-linkedin.py --auto >> /tmp/merci_linkedin.log 2>&1`
+
+## PASO 6: Verificación
+1. Activar el entorno virtual (`source .venv/bin/activate`) y ejecutar `python3 scripts/merci/merci-linkcheck.py` contra el dominio público para auditar la ausencia de enlaces rotos HTTP.
 2. Realizar auditoría de Core Web Vitals (Google PageSpeed Insights) para certificar el rendimiento.
 3. Comprobar accesos y bloqueos de seguridad en el panel de administración del CMS (Content Management System - Sistema de Gestión de Contenidos).
 

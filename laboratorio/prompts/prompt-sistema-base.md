@@ -1,7 +1,7 @@
+
 # Prompt Base del Sistema Merci (Orquestación IA)
 
 Este documento debe ser inyectado como `role: "system"` en todas las peticiones a la API local (vía LiteLLM) para establecer las reglas arquitectónicas inquebrantables de cualquier agente de IA que interactúe con el código fuente.
-Debe cumplir con lo escrito en instrucciones.md
 
 ---
 

@@ -1,5 +1,5 @@
-# robots.txt para mercedev.es
+# robots.txt para merci-boilerplate.es
 User-agent: *
 Allow: /
 
-Sitemap: https://mercedev.es/sitemap.xml
+Sitemap: https://merci-boilerplate.es/sitemap.xml

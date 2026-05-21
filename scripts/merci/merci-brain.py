@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """
 merci-brain.py — Lóbulo frontal de Inteligencia Artificial (Shift-Left AI).
 
@@ -29,6 +30,7 @@ PROMPT_PATH = REPO_ROOT / "laboratorio" / "prompts" / "prompt-brain.md"
 def slugify(texto: str) -> str:
     """Convierte un texto en una cadena segura para URLs (slug)."""
     texto = str(texto)
+    texto = re.sub(r'[—–]', '-', texto)
     texto = unicodedata.normalize('NFKD', texto).encode('ascii', 'ignore').decode('ascii')
     texto = re.sub(r'[^\w\s-]', '', texto.lower())
     return re.sub(r'[-\s]+', '-', texto).strip('-_')

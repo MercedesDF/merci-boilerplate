@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """
 merci-sync-pages.py — Sincronizador de estructuras comunes estáticas.
 

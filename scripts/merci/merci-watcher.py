@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """
 merci-watcher.py — Vigilante de archivos SASS para compilación automática.
 

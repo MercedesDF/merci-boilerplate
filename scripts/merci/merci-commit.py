@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """
 merci-commit.py — Automatización de commits impulsados por la bitácora.
 
@@ -71,7 +72,8 @@ def parse_latest_entry(content: str):
 
     # RegEx (Regular Expressions - Expresiones Regulares) para capturar el primer bloque:
     # Busca "### YYYY-MM-DD — Título" y captura todo hasta el siguiente "###" o el final.
-    pattern = r"###\s+(\d{4}-\d{2}-\d{2})\s+—\s+([^\n]+)\n(.*?)(?=###\s+\d{4}-\d{2}-\d{2}|$)"
+    # Se hace tolerante a guion corto (-), medio (–) y largo (—) para robustez.
+    pattern = r"###\s+(\d{4}-\d{2}-\d{2}(?:\s\d{2}:\d{2})?)\s+[-—–]\s+([^\n]+)\n(.*?)(?=###\s+\d{4}-\d{2}-\d{2}(?:\s\d{2}:\d{2})?|$)"
     match = re.search(pattern, registro, re.DOTALL)
 
     if not match:

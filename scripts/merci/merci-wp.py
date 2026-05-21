@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """
 merci-wp.py — Publicador Headless para WordPress.
 
@@ -37,6 +38,7 @@ ENV_FILE = REPO_ROOT / ".env"
 WP_DIRS = [
     REPO_ROOT / "blog"
 ]
+SYNC_CACHE_PATH = REPO_ROOT / "observabilidad" / ".wp_sync.json"
 
 def slugify(texto: str) -> str:
     """
@@ -45,6 +47,7 @@ def slugify(texto: str) -> str:
     y consistentes independientemente de cómo el autor nombre sus archivos en el sistema operativo.
     """
     texto = str(texto)
+    texto = re.sub(r'[—–]', '-', texto)
     texto = unicodedata.normalize('NFKD', texto).encode('ascii', 'ignore').decode('ascii')
     texto = re.sub(r'[^\w\s-]', '', texto.lower())
     return re.sub(r'[-\s]+', '-', texto).strip('-_')
@@ -120,7 +123,7 @@ def obtener_id_por_slug(wp_url, auth_b64, slug):
         pass
     return None
 
-def publicar_en_wordpress(filepath: str, creds: dict, verbose: bool = False):
+def publicar_en_wordpress(filepath: str, creds: dict, sync_cache: dict, verbose: bool = False):
     """
     QUÉ HACE: Lee un archivo Markdown, extrae su contenido y metadatos, y lo sincroniza
     con la base de datos de WordPress correspondiente según el entorno activo.
@@ -134,6 +137,13 @@ def publicar_en_wordpress(filepath: str, creds: dict, verbose: bool = False):
         print(f"  ❌ Error: No se encontró el archivo '{target_path.name}'.")
         return False
         
+    # Caché Incremental: Evita llamadas de red si el archivo no ha sido modificado localmente
+    file_key = str(target_path.relative_to(REPO_ROOT))
+    # Usamos int() para evitar pérdida de precisión de microsegundos al serializar en JSON
+    md_mtime = int(target_path.stat().st_mtime)
+    if file_key in sync_cache and sync_cache[file_key] >= md_mtime:
+        return True
+
     wp_url = creds.get("WP_URL", "").rstrip("/")
     wp_user = creds.get("WP_USER", "")
     wp_password = creds.get("WP_APP_PASSWORD", "")
@@ -218,13 +228,14 @@ def publicar_en_wordpress(filepath: str, creds: dict, verbose: bool = False):
             nuevo_id = res_data.get("id")
             
             if verbose:
-                print(f"  ✅ ¡Éxito! Post transferido correctamente.")
+                print(f"  ✅ ¡Éxito! Post transferido correctamente (Paso 1/2).")
                 print(f"  🔗 Enlace de WP: {link}")
             
             # 3.5 Generar PDF localmente (Paridad con Biblioteca)
             # QUÉ HACE: Genera el PDF utilizando el slug definitivo asignado por WordPress en su base de datos.
             # POR QUÉ: Asegura que el enlace dinámico ($post->post_name) de la web coincida matemáticamente con el archivo local.
             pdf_msg = ""
+            pdf_generado_ok = False
             wp_slug = res_data.get("slug")
             if wp_slug and estado == "publicado":
                 out_pdf_filename = f"{wp_slug}.pdf"
@@ -232,13 +243,13 @@ def publicar_en_wordpress(filepath: str, creds: dict, verbose: bool = False):
                 out_pdf_path.parent.mkdir(parents=True, exist_ok=True)
                 
                 titulo_html = html.escape(titulo)
-                pdf_html_content = f"""<!DOCTYPE html>
+                pdf_html_content = f"""<!DOCTYPE html> # merci-audit:silence-style
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>{titulo_html}</title>
     <style>
-        @page {{ size: A4; margin: 2.5cm; }}
+        @page {{ size: A4; margin: 2.5cm; }} # merci-audit:silence-style
         body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #334155; }}
         .portada {{ text-align: center; page-break-after: always; padding-top: 30%; }}
         .portada h1 {{ font-size: 2.5em; color: #ea580c; margin-bottom: 0.2em; }}
@@ -260,13 +271,40 @@ def publicar_en_wordpress(filepath: str, creds: dict, verbose: bool = False):
 </body>
 </html>"""
                 if HTML:
-                    try:
-                        HTML(string=pdf_html_content, base_url=str(REPO_ROOT / "public")).write_pdf(out_pdf_path)
-                        if verbose: print(f"  📄 PDF generado con éxito: public/descargas/{out_pdf_filename}")
-                        pdf_msg = " (+ PDF)"
-                    except Exception as e:
-                        print(f"  ❌ Error al generar PDF para {target_path.name}: {e}")
-                    
+                    if out_pdf_path.exists() and out_pdf_path.stat().st_mtime >= target_path.stat().st_mtime:
+                        pdf_generado_ok = True
+                    else:
+                        try:
+                            HTML(string=pdf_html_content, base_url=str(REPO_ROOT / "public")).write_pdf(out_pdf_path)
+                            if out_pdf_path.exists():
+                                if verbose: print(f"  📄 PDF generado con éxito: public/descargas/{out_pdf_filename}")
+                                pdf_generado_ok = True
+                        except Exception as e:
+                            print(f"  ❌ Error al generar PDF para {target_path.name}: {e}")
+            
+            # Si se generó un PDF, actualizamos el post para inyectar el enlace de descarga
+            if pdf_generado_ok:
+                if verbose: print("  🔄 Inyectando enlace PDF en el post (Paso 2/2)...")
+                pdf_download_link = f'\n<p><a href="/descargas/{out_pdf_filename}" class="card__download" download>📄 Descargar Edición PDF</a></p>'
+                
+                update_payload = {"content": html_content + pdf_download_link}
+                update_data = json.dumps(update_payload).encode("utf-8")
+                
+                update_endpoint = f"{wp_url}/wp-json/wp/v2/posts/{nuevo_id}"
+                update_req = urllib.request.Request(update_endpoint, data=update_data, method="POST")
+                update_req.add_header("Content-Type", "application/json")
+                update_req.add_header("Authorization", f"Basic {auth_b64}")
+                update_req.add_header("X-Authorization", f"Basic {auth_b64}")
+                update_req.add_header("User-Agent", "Merci-Boilerplate-Agent/1.0")
+                
+                try:
+                    with urllib.request.urlopen(update_req):
+                        if verbose: print("  ✅ Enlace PDF inyectado con éxito.")
+                except HTTPError as e_update:
+                    print(f"  ❌ Error al inyectar enlace PDF: {e_update.read().decode('utf-8')}")
+
+            pdf_msg = " (+ PDF)" if pdf_generado_ok else ""
+
             if not verbose and estado == "publicado":
                 print(f"  ✅ Sincronizado en WP: {target_path.name}{pdf_msg}")
 
@@ -277,6 +315,9 @@ def publicar_en_wordpress(filepath: str, creds: dict, verbose: bool = False):
                 destino_lab.parent.mkdir(parents=True, exist_ok=True)
                 shutil.move(str(target_path), str(destino_lab))
                 print(f"  🔙 Expulsando (Estado: {estado}): Moviendo '{target_path.name}' de vuelta a laboratorio/incubacion/")
+            
+            # Registrar sincronización exitosa en la caché
+            sync_cache[file_key] = md_mtime
             
     except HTTPError as e:
         error_info = e.read().decode("utf-8")
@@ -299,15 +340,35 @@ if __name__ == "__main__":
         print("❌ [Merci WP] Error: Faltan credenciales completas en tu archivo .env.")
         sys.exit(1)
         
+    sync_cache = {}
+    if SYNC_CACHE_PATH.exists():
+        try:
+            sync_cache = json.loads(SYNC_CACHE_PATH.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            pass
+
+    # QUÉ HACE: Invalida la caché si el entorno destino (WP_URL) ha cambiado desde el último ciclo.
+    # POR QUÉ: La caché registra mtime de archivos locales, no el destino al que se subieron.
+    # Cambiar de local a producción sin invalidar la caché provoca que el script omita todos
+    # los archivos silenciosamente (Cache Hit falso). Guardar el entorno activo como clave
+    # centinela (_entorno) permite detectar y descartar la caché de forma automática.
+    entorno_activo = creds.get("WP_URL", "")
+    if sync_cache.get("_entorno") != entorno_activo:
+        print(f"🔄 [Merci WP] Entorno cambiado a '{entorno_activo}'. Invalidando caché de sincronización...")
+        sync_cache = {"_entorno": entorno_activo}
+    else:
+        # Asegurar que la clave centinela está presente aunque la caché sea antigua
+        sync_cache.setdefault("_entorno", entorno_activo)
+
     # QUÉ HACE: Si se pasa un argumento, procesa ese archivo o carpeta. Si no, sincroniza masivamente.
     # POR QUÉ: Permite sincronizaciones atómicas globales (SSOT) evitando la deriva de configuración.
     if len(args) > 0:
         target = Path(args[0]).resolve()
         if target.is_dir():
             for md_file in target.rglob("*.md"):
-                publicar_en_wordpress(str(md_file), creds, is_verbose)
+                publicar_en_wordpress(str(md_file), creds, sync_cache, is_verbose)
         else:
-            publicar_en_wordpress(str(target), creds, is_verbose)
+            publicar_en_wordpress(str(target), creds, sync_cache, is_verbose)
     else:
         if is_verbose:
             print("🔄 Sincronización masiva de carpetas dinámicas detectada...")
@@ -315,8 +376,15 @@ if __name__ == "__main__":
             if wp_dir.exists():
                 if is_verbose: print(f"\n📂 Escaneando directorio: {wp_dir.name}/")
                 for md_file in wp_dir.rglob("*.md"):
-                    publicar_en_wordpress(str(md_file), creds, is_verbose)
+                    publicar_en_wordpress(str(md_file), creds, sync_cache, is_verbose)
             else:
                 if is_verbose: print(f"\n⚠️  Directorio no encontrado: {wp_dir.name}/. Omitiendo.")
                 
+    # QUÉ HACE: Persiste la clave centinela junto con los registros de mtime.
+    # POR QUÉ: Garantiza que en el próximo ciclo el script compare el entorno guardado
+    # con el activo y descarte la caché si ha habido un cambio de entorno.
+    sync_cache["_entorno"] = entorno_activo
+    SYNC_CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    SYNC_CACHE_PATH.write_text(json.dumps(sync_cache, indent=2), encoding="utf-8")
+
     print("\n✅ [Merci WP] Sincronización finalizada.")

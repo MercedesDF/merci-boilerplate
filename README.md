@@ -1,10 +1,23 @@
-# Merci Boilerplate v1.13.0
+# Merci Boilerplate v1.14.0
 
 Un ecosistema DevSecOps autónomo impulsado por Inteligencia Artificial Local (Shift-Left AI) y Desarrollo Guiado por Especificaciones (Spec-Driven Development). 
 
 Combina un orquestador local en Python puro (Sistema Merci) que automatiza la calidad del código, un núcleo estático ultrarrápido (HTML5, SASS, Vanilla JS, BEM) y un motor dinámico aislado opcional (WordPress Headless). Diseñado para alcanzar un rendimiento perfecto (Core Web Vitals 100/100) con 0 dependencias externas bloqueantes en el pipeline.
 
 > 🤖 **Inteligencia y Gobernanza:** El boilerplate incluye agentes de IA locales que auto-reparan código, auto-documentan el Roadmap y generan bases de conocimiento estáticas con coste cero y privacidad total. La justificación de las decisiones DevSecOps reside en la carpeta `/docs`.
+
+## 🚀 Novedades en la v1.14.0 (Observabilidad Avanzada & DevRel Autónomo)
+
+- **Pipeline Sub-10s (Compilación Incremental):** El orquestador maestro `merci-total.py` ha pasado de ~20s a 9.39s gracias a la adopción del paradigma *Mark & Sweep* en `merci-publish.py` (SSG), `merci-wp.py` (WordPress) y `merci-optimizer.py` (WebP). La comparación `st_mtime` evita regenerar artefactos inmutables en cada ciclo.
+- **Ecosistema SRE Completo con Grafana IaC:** El agente `merci-sre.py` expone ahora 14 métricas hacia Prometheus y Grafana, cubriendo DevRel (cola social, incubación, biblioteca), gobernanza (deriva documental, tareas del Roadmap), rendimiento del pipeline y resiliencia (Chaos Engineering, fallbacks IA). El dashboard persiste en `observabilidad/dashboards/merci-dashboard.json` como Infraestructura como Código (IaC).
+- **Agente Redactor DevRel (`merci-blogger.py`):** Motor de escritura con perfil de Storytelling Técnico y Agent Chaining. Recibe un cuadernillo de la Biblioteca como entrada y genera un post de blog orientado a DevRel y un gancho social para LinkedIn, pasando el testigo automáticamente desde `merci-librarian.py`.
+- **Visor de Buffer Social (`merci-queue.py`):** Terminal interactivo para monitorizar el estado de la cola de publicaciones en LinkedIn por estado YAML, desacoplando el diagnóstico del orquestador maestro.
+- **Telemetría Automática del Proyecto (`merci-telemetry.py`):** Agente de build-time que calcula commits, agentes operativos, líneas de documentación y días de trabajo efectivo vía `git log`, inyectándolos en los `<span>` de los HTMLs estáticos sin intervención humana.
+- **Glosario Data-Driven (`merci-glosario.py`):** Compilador autónomo que persiste definiciones técnicas en `glosario-tecnico.json` (SSOT) y genera `glosario-tecnico.md` con ordenación alfabética estricta en build-time. Elimina el parseo frágil de Markdown.
+- **Blindaje Supply Chain (`merci-audit.py`):** Nueva regla `audit_python_imports` que valida con AST (Abstract Syntax Tree - Árbol de Sintaxis Abstracta) que todas las importaciones pertenezcan a la stdlib o a la lista blanca de `requirements.txt`. Detectado y parcheado mediante Chaos Engineering.
+- **Caché Multi-Entorno en WordPress:** `merci-wp.py` invalida automáticamente la caché de sincronización al cambiar el `WP_URL` del `.env` (local ↔ producción), sin necesidad de purga manual.
+- **Detector de Deriva Documental (`merci-drift.py`):** Agente centinela que cruza los scripts del ecosistema con el contenido de los manuales maestros, reportando en `observabilidad/.drift_report.json` los agentes no documentados.
+- **Erradicación de la Regla 17:** Las cabeceras de historial manual en scripts han sido eliminadas. La detección de deriva se delega al sistema operativo (`st_mtime`) y a la auditoría semántica.
 
 ## 🚀 Novedades en la v1.13.0 (Content Ops & Agent Chaining)
 
@@ -13,7 +26,7 @@ Combina un orquestador local en Python puro (Sistema Merci) que automatiza la ca
 - **Rutas Relativas Agnósticas:** Todos los enlaces inter-documentales generados por la IA utilizan rutas relativas a la raíz (ej. `/biblioteca/...`), garantizando la paridad Dev/Prod y eliminando errores 404 en el entorno de desarrollo local.
 - **Rediseño UI/UX del Blog:** Refactorización de `index.php` para el Child Theme de WordPress. Se purga la vista de estanterías en favor de un diseño vertical, cronológico y minimalista adaptado a la lectura de marketing y DevRel.
 - **Enrutamiento Zero-JS:** El resaltado visual del menú de navegación se delega al 100% a la hoja de estilos SASS mediante identificadores de contexto (`body id`), erradicando clases legacy y dependencias de scripts.
-- **Blindaje Anti-XSS (Shift-Left Security):** Los metadatos extraídos del YAML Frontmatter son sanitizados nativamente (`html.escape`) antes de inyectarse en la generación SSG o PDF, previniendo roturas del DOM e inyecciones de código.
+- **Blindaje Anti-XSS (Shift-Left Security):** Los metadatos extraídos del YAML Frontmatter son sanitizados nativamente (`html.escape`) antes de inyectarse en la generación SSG o PDF, previniendo roturas del DOM (Document Object Model - Modelo de Objetos del Documento) e inyecciones de código.
 
 ## 🚀 Novedades en la v1.12.0 (SRE, Hardening & Chaos Engineering)
 
@@ -162,6 +175,7 @@ Este boilerplate incluye su propia cadena de suministro CI/CD (Continuous Integr
 - `merci-brain.py`: Generador de base de conocimientos estática (Shift-Left AI).
 - `merci-ssot.py`: Agente Sync SSOT (Self-Healing Docs) para la curación autónoma de la deriva documental.
 - `merci-librarian.py`: Agente Bibliotecario (Zero-Hallucination) para el formateo estricto de cuadernillos.
+- `merci-glosario.py`: Compilador de Glosario Autónomo (Data-Driven).
 - `merci-publish.py` y `merci-promote.py`: Motor SSG (Static Site Generation - Generación de Sitios Estáticos) y curación de contenidos.
 - `merci-backup.py`: Creación instantánea de copias de seguridad locales en formato ZIP.
 - `merci-optimizer.py` y `merci-assets-watcher.py`: Optimizador WebP y agente vigilante de activos multimedia en segundo plano.
@@ -172,6 +186,10 @@ Este boilerplate incluye su propia cadena de suministro CI/CD (Continuous Integr
 - `merci-styles.py` y `merci-watcher.py`: Compilador y vigilante de SASS local.
 - `merci-linkedin.py`: Motor de autenticación OIDC (OpenID Connect) y publicación automatizada en LinkedIn.
 - `merci-init.py`: Inicializador destructivo para nuevos proyectos.
+- `merci-drift.py`: Detector de Deriva Documental temporal y semántica.
+- `merci-blogger.py`: Agente Redactor DevRel (Storytelling Técnico y Agent Chaining con el Bibliotecario).
+- `merci-queue.py`: Visor de terminal interactivo para monitorizar el estado del buffer social.
+- `merci-telemetry.py`: Inyector dinámico de telemetría del proyecto (Commits, Agentes, Docs, Días Activos).
 
 ---
 *Desarrollado bajo licencia MIT.*

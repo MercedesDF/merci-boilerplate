@@ -33,6 +33,6 @@ jobs:
       - name: Commit y Push del Parche Autónomo
         run: |
           git config --global user.name "Merci Auto-Fix [Bot]"
-          git config --global user.email "bot@mercedev.es"
+          git config --global user.email "bot@merci-boilerplate.es"
           git add .
           git diff --quiet && git diff --staged --quiet || (git commit -m "fix: auto-reparación aplicada por Merci Brain 🤖" && git push)
