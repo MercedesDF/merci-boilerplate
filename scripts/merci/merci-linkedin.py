@@ -281,16 +281,35 @@ def procesar_linkedin(modo_auto=False):
             archivo.write_text(nuevo_contenido, encoding="utf-8")
             print(f"  ✅ ¡Éxito! Post publicado automáticamente.")
     else:
-        print(f"\n  📊 Estado del Buffer: {len(en_cola)} pendientes de revisión | {len(aprobados)} listos para emisión automática.")
-        
-        if not en_cola:
-            print("  🤷‍♀️ No hay posts nuevos 'en_cola' para revisar.")
-            return
-            
-        en_cola.sort(key=lambda x: x["fecha"])
         
         aprobados_hoy = 0
-        for post in en_cola:
+        en_cola.sort(key=lambda x: x["fecha"])
+        
+        while True:
+            if not en_cola:
+                print("\n  🎉 Ya no hay más posts pendientes de revisión en la cola.")
+                break
+                
+            print(f"\n  📊 Estado del Buffer: {len(en_cola)} pendientes de revisión | {len(aprobados)} listos para emisión automática.")
+            print("\n  📄 Posts pendientes de revisión:")
+            for i, post in enumerate(en_cola, 1):
+                print(f"    [{i}] {post['fecha']} — {post['archivo'].name}")
+                
+            opcion = input("\n  👉 Elige el número del post a revisar (0 para salir): ").strip()
+            
+            if opcion == '0' or not opcion:
+                break
+                
+            try:
+                idx = int(opcion) - 1
+                if idx < 0 or idx >= len(en_cola):
+                    print("  ❌ Selección inválida.")
+                    continue
+                post = en_cola[idx]
+            except ValueError:
+                print("  ❌ Entrada inválida. Introduce un número.")
+                continue
+
             archivo = post["archivo"]
             texto_post = post["texto_post"]
             yaml_block = post["yaml_block"]
@@ -306,8 +325,10 @@ def procesar_linkedin(modo_auto=False):
                 archivo.write_text(nuevo_contenido, encoding="utf-8")
                 print(f"  ✅ Post movido a 'aprobado' (en tránsito).")
                 aprobados_hoy += 1
+                en_cola.pop(idx)
+                aprobados.append(post)
             else:
-                print("  ⏭️ Omitido.")
+                print("  ⏭️ Omitido. Dejado en la cola.")
                 
         if aprobados_hoy > 0:
             print(f"\n  🎉 Has aprobado {aprobados_hoy} post(s). Una tarea Cron los irá publicando poco a poco.")

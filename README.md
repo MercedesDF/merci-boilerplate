@@ -1,10 +1,14 @@
-# Merci Boilerplate v1.14.0
+# Merci Boilerplate v1.14.1
 
 Un ecosistema DevSecOps autónomo impulsado por Inteligencia Artificial Local (Shift-Left AI) y Desarrollo Guiado por Especificaciones (Spec-Driven Development). 
 
 Combina un orquestador local en Python puro (Sistema Merci) que automatiza la calidad del código, un núcleo estático ultrarrápido (HTML5, SASS, Vanilla JS, BEM) y un motor dinámico aislado opcional (WordPress Headless). Diseñado para alcanzar un rendimiento perfecto (Core Web Vitals 100/100) con 0 dependencias externas bloqueantes en el pipeline.
 
 > 🤖 **Inteligencia y Gobernanza:** El boilerplate incluye agentes de IA locales que auto-reparan código, auto-documentan el Roadmap y generan bases de conocimiento estáticas con coste cero y privacidad total. La justificación de las decisiones DevSecOps reside en la carpeta `/docs`.
+
+## 🚀 Novedades en la v1.14.1 (Hotfix DX - DevRel)
+
+- **Selector interactivo en Buffer Social:** El orquestador `merci-linkedin.py` incorpora un menú de selección indexado que permite aprobar u omitir posts encolados a voluntad, mejorando radicalmente la Experiencia de Desarrollador (DX) frente al antiguo bucle secuencial ciego.
 
 ## 🚀 Novedades en la v1.14.0 (Observabilidad Avanzada & DevRel Autónomo)
 

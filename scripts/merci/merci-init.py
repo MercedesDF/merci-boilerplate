@@ -193,7 +193,7 @@ def resetear_telemetria_html():
     POR QUÉ: Previene la fuga de datos (DLP) de las métricas de la autora hacia el nuevo proyecto.
     """
     print("  📊 Reseteando métricas de telemetría en dashboards (DLP)...")
-    targets = [REPO_ROOT / "public" / "index.html", REPO_ROOT / "public" / "sobre-mi" / "index.html"]
+    targets = [REPO_ROOT / "public" / "sobre-mi" / "index.html"]
     keys = ["Commit", "Agente", "Línea", "Release", "Versión", "Día"]
     
     for path in targets:

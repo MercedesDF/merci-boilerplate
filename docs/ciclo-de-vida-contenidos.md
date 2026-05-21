@@ -41,7 +41,7 @@ Este documento explica cómo el *YAML Frontmatter* actúa como el "volante" del 
 3. **Sincronización API:** Ejecutas `merci wp` (o `merci total`). Python dialoga con WordPress vía API REST, resuelve dinámicamente si el post ya existe (por slug) y lo crea o actualiza sin duplicarlo. La caché incremental (`observabilidad/.wp_sync.json`) evita llamadas de red sobre artículos no modificados.
 
 ### C. El Flujo Social (LinkedIn)
-1. **Aprobación (Humano):** Ejecutas `merci linkedin`. El script te muestra los posts `en_cola` y te pregunta si están bien. Si dices que sí, los cambia a `aprobado`.
+1. **Aprobación (Humano):** Ejecutas `merci linkedin`. El script te muestra una lista interactiva numerada con los posts `en_cola`. Eliges cuál revisar y, si lo confirmas, cambia a `aprobado`.
 2. **Disparo (Robot):** Una tarea automática de Ubuntu (`cron`) ejecuta `merci linkedin --auto` cada varios días. Coge un post `aprobado`, lo publica en LinkedIn, y lo sella como `publicado_linkedin`.
 
 ---

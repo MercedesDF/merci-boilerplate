@@ -43,7 +43,8 @@ Por diseño arquitectónico (Environment Segregation), el núcleo estático (Bib
    *   **Monitorizar cola:** Ejecutar `merci queue` para visualizar qué artículos están aprobados o pendientes en el buffer.
    *   **Editar publicación:** Modificar libremente el texto dentro del bloque `<!-- linkedin: ... -->` en el archivo `.md`.
    *   **Cancelar publicación:** Borrar el valor del metadato dejándolo como `estado_social: ""` para que el orquestador lo ignore por completo.
-   *   **Publicar:** Ejecutar `merci linkedin`. El script actúa como Gatekeeper: extrae el post más antiguo, exige confirmación interactiva (`s/N`) y sella el YAML a `"publicado_linkedin"`.
+   *   **Aprobar (Interactivo):** Ejecutar `merci linkedin`. El script muestra un menú numerado ordenado por fecha con los posts pendientes, te permite elegir cuál revisar, y tras tu confirmación (`s/N`) lo pasa a estado `"aprobado"`.
+   *   **Publicar (Automático):** Una tarea programada (`merci linkedin --auto`) extraerá periódicamente el post aprobado más antiguo, lo emitirá y sellará el YAML a `"publicado_linkedin"`.
 
 ---
 
