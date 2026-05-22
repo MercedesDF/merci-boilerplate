@@ -11,9 +11,6 @@ weasyprint==68.1
 # Optimización de imágenes a WebP responsivo (merci-optimizer.py)
 Pillow==12.2.0
 
-# Extracción de texto de PDFs de PageSpeed Insights (merci-extract-metrics.py)
-pypdf>=5.5.0
-
 # Librería de conversión Markdown a HTML (merci-publish.py, merci-wp.py)
 markdown>=3.8.1
 

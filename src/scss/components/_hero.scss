@@ -109,7 +109,7 @@
 
         &--standalone {
             max-width: 1000px; /* Alineado a la nueva composición de Side-Headings */
-            margin: 1.5rem auto 4rem; /* Top: 1.5rem, Sides: auto, Bottom: 4rem */
+            margin: 1.5rem auto 1.5rem; /* Margen inferior reducido para acercar el resumen de puntuaciones */
         }
     }
 
@@ -144,6 +144,21 @@
         text-align: left;
         max-width: 80ch;
         line-height: 1.5;
+    }
+    
+    &__scores-summary {
+        text-align: center;
+        font-size: 1rem; /* Mismo tamaño que los párrafos normales */
+        color: color.scale($color-text-base, $lightness: 40%); /* Gris elegante */
+        margin: 0 auto 4rem; /* Bottom de 4rem para empujar la prosa (H3) hacia abajo */
+        line-height: 1.6;
+        
+        small {
+            font-size: 0.85em; /* Ligeramente más pequeño para el asterisco de SRE */
+            opacity: 0.8;
+            display: inline-block;
+            margin-top: 0.25rem;
+        }
     }
 
     &__highlights {

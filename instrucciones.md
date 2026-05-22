@@ -25,7 +25,7 @@ Este documento define las reglas de arquitectura e interacción de esta plantill
   - `merci-init.py`: Inicializador destructivo.
   - `merci-linkedin.py`: Publicación en LinkedIn.
   - `merci-wp.py`: Sincronizador Headless para WordPress.
-  - `merci-extract-metrics.py`: Extractor automatizado de métricas.
+  - `merci-extract-metrics.py`: Extractor Data-Driven automatizado de métricas JSON.
   - `merci-telemetry.py`: Inyector dinámico de telemetría.
   - `merci-styles.py` y `merci-watcher.py`: Compilador SASS local.
   - `merci-optimizer.py` y `merci-assets-watcher.py`: Procesamiento WebP.

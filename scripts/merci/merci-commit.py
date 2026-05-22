@@ -111,8 +111,11 @@ def main():
         print("Se han detectado archivos modificados, pero falta la justificación técnica.")
         respuesta = input("¿Deseas registrar esto como un parche menor/manual sin bitácora? (s/N): ")
         if respuesta.lower().strip() != 's':
-            print("\n[Merci Info] Operación cancelada. Por favor, actualiza la bitácora antes de continuar.")
-            sys.exit(0)
+            # QUÉ HACE: Emite un código de salida 1 en lugar de 0 al cancelar.
+            # POR QUÉ: Activa el patrón Fail-Fast del orquestador supremo (merci-completo), 
+            # bloqueando el despliegue a producción de código no comiteado.
+            print("\n[Merci Error] Operación cancelada por el usuario. El pipeline se detendrá aquí.")
+            sys.exit(1)
             
         custom_subject = input("\nIntroduce el título corto del commit (ej. chore: limpieza de archivos): ").strip()
         if not custom_subject:

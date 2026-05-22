@@ -38,7 +38,7 @@ Por diseño arquitectónico (Environment Segregation), el núcleo estático (Bib
    merci wp
    ```
    *(Nota: `merci total` lo hace automáticamente en el pipeline global).*
-4. **Despliegue a Producción (Contenido Dinámico):** Para enviar los posts a la web pública, edita tu archivo `.env` y cambia el `WP_URL` a las credenciales de producción. Luego ejecuta de nuevo `merci wp`. La caché multi-entorno detectará automáticamente el cambio de destino e invalidará el registro, forzando la sincronización completa hacia producción sin necesidad de purgar nada manualmente.
+4. **Despliegue a Producción (Contenido Dinámico):** Añade las variables `WP_PROD_URL`, `WP_PROD_USER` y `WP_PROD_APP_PASSWORD` a tu archivo `.env`. Al ejecutar `merci deploy` (o `merci completo`), el orquestador leerá estas variables temporalmente en memoria y enviará los artículos a producción sin que tengas que modificar tu archivo `.env` a mano, validando la caché multi-entorno automáticamente.
 5. **Gobernanza del Buffer Social (LinkedIn):** La gestión de la cola de redes es puramente declarativa a través de los archivos Markdown:
    *   **Monitorizar cola:** Ejecutar `merci queue` para visualizar qué artículos están aprobados o pendientes en el buffer.
    *   **Editar publicación:** Modificar libremente el texto dentro del bloque `<!-- linkedin: ... -->` en el archivo `.md`.

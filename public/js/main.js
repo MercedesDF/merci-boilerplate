@@ -43,6 +43,15 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // 2. Inicializamos a Merci solo si su script se ha cargado correctamente
     if (typeof MerciController !== 'undefined') {
-        new MerciController('merci-ui');
+        // QUÉ HACE: Aplica el patrón Yielding (Ceder el paso) mediante requestIdleCallback.
+        // POR QUÉ: El asistente es una mejora progresiva. Retrasar su inicialización
+        // hasta que la CPU esté ociosa erradica las Long Tasks y protege el TBT.
+        const initMerci = () => new MerciController('merci-ui');
+        
+        if ('requestIdleCallback' in window) {
+            requestIdleCallback(initMerci);
+        } else {
+            setTimeout(initMerci, 1); // Fallback para Safari
+        }
     }
 });

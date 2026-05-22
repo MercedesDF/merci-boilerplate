@@ -46,7 +46,10 @@ def main():
     print("\n🐒 [Merci Chaos] Iniciando experimento de Chaos Engineering...")
     
     status = subprocess.run(["git", "status", "--porcelain"], cwd=REPO_ROOT, capture_output=True, text=True)
-    if status.stdout.strip():
+    
+    # Filtramos la telemetría SRE y logs privados para no bloquear bucles de testing
+    cambios_reales = [line for line in status.stdout.splitlines() if "observabilidad/" not in line and ".privado/" not in line]
+    if cambios_reales:
         print("  🛑 [Seguridad] Tienes cambios sin guardar en Git. Ejecuta 'merci total' primero.")
         print("     El Chaos Monkey necesita un entorno inmaculado para hacer el Rollback seguro.")
         sys.exit(1)

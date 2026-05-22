@@ -23,7 +23,7 @@ SOURCE_DIR = REPO_ROOT / ".assets-raw"
 DEST_DIR = REPO_ROOT / "assets/images"
 
 # Tamaños objetivo en píxeles de ancho. El alto se calculará manteniendo la proporción.
-TARGET_WIDTHS = [1920, 1280, 800, 400]
+TARGET_WIDTHS = [1920, 1280, 800, 400, 160, 80]
 WEBP_QUALITY = 80  # Calidad del 0 al 100. 80 es un buen equilibrio.
 
 def optimize_images(verbose=False):
@@ -62,6 +62,20 @@ def optimize_images(verbose=False):
                     img = img.convert('RGBA')
                 elif img.mode != 'RGB':
                     img = img.convert('RGB')
+
+                # QUÉ HACE: Escudo protector de rendimiento para avatares de la UI.
+                # POR QUÉ: Evita que el HTML cargue una imagen base de 1024px (54KB) "Above the Fold",
+                # lo cual destruye el LCP en redes 4G. 160px garantiza calidad Retina con un peso mínimo (~4KB).
+                if "Merci-en-la-nube" in image_path.name and img.width > 160:
+                    aspect_ratio = img.height / img.width
+                    img = img.resize((160, int(160 * aspect_ratio)), Image.Resampling.LANCZOS)
+
+                # QUÉ HACE: Escudo protector de rendimiento para el logotipo principal (LCP).
+                # POR QUÉ: El logotipo se muestra en el DOM a 263x65. Cargar el original (731px)
+                # desperdicia ancho de banda en 4G. 526px garantiza Retina 2x con el mínimo peso.
+                if "logo" in image_path.name.lower() and img.width > 526:
+                    aspect_ratio = img.height / img.width
+                    img = img.resize((526, int(526 * aspect_ratio)), Image.Resampling.LANCZOS)
 
                 # Siempre generar una versión base optimizada al tamaño original
                 img.save(base_output, "WEBP", quality=WEBP_QUALITY)

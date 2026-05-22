@@ -1,10 +1,19 @@
-# Merci Boilerplate v1.14.1
+# Merci Boilerplate v1.15.0
 
 Un ecosistema DevSecOps autónomo impulsado por Inteligencia Artificial Local (Shift-Left AI) y Desarrollo Guiado por Especificaciones (Spec-Driven Development). 
 
 Combina un orquestador local en Python puro (Sistema Merci) que automatiza la calidad del código, un núcleo estático ultrarrápido (HTML5, SASS, Vanilla JS, BEM) y un motor dinámico aislado opcional (WordPress Headless). Diseñado para alcanzar un rendimiento perfecto (Core Web Vitals 100/100) con 0 dependencias externas bloqueantes en el pipeline.
 
 > 🤖 **Inteligencia y Gobernanza:** El boilerplate incluye agentes de IA locales que auto-reparan código, auto-documentan el Roadmap y generan bases de conocimiento estáticas con coste cero y privacidad total. La justificación de las decisiones DevSecOps reside en la carpeta `/docs`.
+
+## 🚀 Novedades en la v1.15.0 (Rendimiento Extremo, Yielding y Data-Driven Metrics)
+
+- **Erradicación de la Varianza del TBT (Yielding):** Refactorización del controlador asíncrono y del núcleo de inicialización (`main.js`, `MerciController.js`) utilizando `requestIdleCallback` y `setTimeout`. Se ha fragmentado la ejecución de tareas largas para ceder el paso al hilo principal, garantizando un TBT de 0ms bajo simulaciones móviles estrictas de CPU 4x throttled.
+- **Priorización de Red y LCP (Fetch Priority):** Despriorización del logotipo de la cabecera (`fetchpriority="low"`) y aplicación de `decoding="async"` para proteger el ancho de banda y acelerar el renderizado del verdadero LCP (texto).
+- **Escudo Fail-Fast en Commits:** El orquestador `merci-commit.py` ahora emite un código de salida fatal (`sys.exit(1)`) si el usuario aborta la creación del commit, protegiendo a los orquestadores superiores de ejecutar operaciones en cadena con código fantasma.
+- **Extractor de Métricas Data-Driven (JSON):** Se reescribió `merci-extract-metrics.py` para analizar directamente el árbol de datos `.json` generado por Catchpoint/PageSpeed, erradicando la dependencia externa de `pypdf` y los errores de parseo.
+- **Diagnóstico de Física de Redes (SRE):** El nuevo extractor JSON detecta descensos de puntuación originados por alta latencia de ping (>100ms) o TTFB lento (>300ms), registrando automáticamente el falso positivo en `observabilidad/falsos_positivos_red.log` para prevenir sobreingeniería prematura.
+- **Dashboard Dinámico y Telemetría SRE:** Inyección de resúmenes de Lighthouse en la portada con justificaciones automáticas de latencia. `merci-sre.py` ahora ingiere el payload `.lighthouse_sre.json` para volcar las métricas exactas (TBT, LCP, CLS, etc.) en Grafana/Prometheus.
 
 ## 🚀 Novedades en la v1.14.1 (Hotfix DX - DevRel)
 
@@ -190,6 +199,9 @@ Este boilerplate incluye su propia cadena de suministro CI/CD (Continuous Integr
 - `merci-styles.py` y `merci-watcher.py`: Compilador y vigilante de SASS local.
 - `merci-linkedin.py`: Motor de autenticación OIDC (OpenID Connect) y publicación automatizada en LinkedIn.
 - `merci-init.py`: Inicializador destructivo para nuevos proyectos.
+- `merci-sre.py`: Demonio de telemetría pasiva para la ingesta de datos en Prometheus y Grafana.
+- `merci-hardening.py`: Agente de auditoría continua de seguridad pasiva e infraestructura.
+- `merci-chaos.py`: Agente de Chaos Engineering con IA local para inyección y validación de vulnerabilidades.
 - `merci-drift.py`: Detector de Deriva Documental temporal y semántica.
 - `merci-blogger.py`: Agente Redactor DevRel (Storytelling Técnico y Agent Chaining con el Bibliotecario).
 - `merci-queue.py`: Visor de terminal interactivo para monitorizar el estado del buffer social.

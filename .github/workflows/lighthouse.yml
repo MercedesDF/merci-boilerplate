@@ -30,5 +30,6 @@ jobs:
       - name: Run Lighthouse CI
         uses: treosh/lighthouse-ci-action@v12
         with:
+          runs: 3
           budgetPath: ./lighthouserc.json
           uploadArtifacts: true

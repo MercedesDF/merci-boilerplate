@@ -495,7 +495,7 @@ def audit_inline_scripts(state: AuditState, path: Path, text: str) -> None:
 
 def audit_external_assets(state: AuditState, path: Path, text: str) -> None:
     """
-    Detecta cargas de recursos externos (CSS, JS) en HTML, violando la regla
+    Detecta cargas de recursos externos (CSS, JS, Imágenes) en HTML, violando la regla
     de cero dependencias externas (Zero Bloat).
     """
     if path.suffix.lower() not in {".html", ".htm", ".php"}:
@@ -517,6 +517,22 @@ def audit_external_assets(state: AuditState, path: Path, text: str) -> None:
         if "stylesheet" in full_tag and "merci-boilerplate.es" not in url and "localhost" not in url:
             line_number = text.count('\n', 0, match.start()) + 1
             state.add(Finding(path, line_number, "error", "UI_EXTERNAL_ASSET", f"CSS externo detectado: {url[:30]}..."))
+                
+    # Buscar imágenes externas
+    img_pattern = re.compile(r'<img[^>]*\bsrc\s*=\s*["\'](https?://[^"\']+)["\']', re.IGNORECASE)
+    for match in img_pattern.finditer(text):
+        url = match.group(1)
+        if "merci-boilerplate.es" not in url and "localhost" not in url:
+            line_number = text.count('\n', 0, match.start()) + 1
+            state.add(Finding(path, line_number, "error", "UI_EXTERNAL_ASSET", f"Imagen externa detectada: {url[:30]}..."))
+            
+    # Buscar metadatos con URLs externas (ej. og:image)
+    meta_pattern = re.compile(r'<meta[^>]*\bcontent\s*=\s*["\'](https?://[^"\']+)["\']', re.IGNORECASE)
+    for match in meta_pattern.finditer(text):
+        url = match.group(1)
+        if "merci-boilerplate.es" not in url and "localhost" not in url:
+            line_number = text.count('\n', 0, match.start()) + 1
+            state.add(Finding(path, line_number, "error", "UI_EXTERNAL_ASSET", f"Meta URL externa detectada: {url[:30]}..."))
 
 class SeoHTMLParser(HTMLParser):
     """
@@ -535,6 +551,8 @@ class SeoHTMLParser(HTMLParser):
         self.description: Optional[str] = None
         self.canonical: Optional[str] = None
         self.json_ld_scripts = 0
+        self.has_noindex = False
+        self.noindex_content = ""
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, Optional[str]]]) -> None:
         # Normalizamos nombres de atributos a minúsculas para comparar sin sorpresas.
@@ -554,6 +572,10 @@ class SeoHTMLParser(HTMLParser):
 
             if name == "description" and content:
                 self.description = content
+                
+            if name == "robots" and ("noindex" in content.lower() or "nofollow" in content.lower()):
+                self.has_noindex = True
+                self.noindex_content = content
             if name == "viewport":
                 self.has_viewport = True
 
@@ -616,6 +638,17 @@ def audit_html_seo(state: AuditState, path: Path, text: str, strict_json_ld: boo
         return
 
     title_text = "".join(parser.title_chunks).strip()
+
+    if parser.has_noindex:
+        state.add(
+            Finding(
+                path,
+                1,
+                "error",
+                "SEO_NOINDEX",
+                f'Detectada directiva robots destructiva: "{parser.noindex_content}". Peligro de desindexación.',
+            )
+        )
 
     if not parser.html_lang:
         state.add(Finding(path, 1, "error", "SEO_LANG", 'Falta atributo lang en <html lang="...">.'))

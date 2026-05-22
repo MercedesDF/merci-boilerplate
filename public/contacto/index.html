@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contacto — merci-boilerplate.es</title>
     <link rel="icon" href="/favicon.ico?v=2" type="image/x-icon">
-    <link rel="stylesheet" href="/css/main.css?v=1779365275">
-    <script src="/js/MerciController.js?v=1778974789" defer></script>
-    <script src="/js/main.js?v=1777153888" defer></script>
+    <link rel="stylesheet" href="/css/main.css?v=1779476885">
+    <script src="/js/MerciController.js?v=1779476855" defer></script>
+    <script src="/js/main.js?v=1779476809" defer></script>
     <link rel="canonical" href="https://merci-boilerplate.es/contacto">
     <script type="application/ld+json">
     {
@@ -22,7 +22,7 @@
     <div id="top" tabindex="-1" style="position: absolute; top: 0; left: 0;"></div>
     <header class="header">
         <a href="/" class="header__brand">
-            <img src="/assets/images/logo.webp?v=2" alt="merci-boilerplate" class="header__logo" width="263" height="65">
+            <img src="/assets/images/logo.webp?v=2" alt="merci-boilerplate" class="header__logo" width="263" height="65" fetchpriority="low" decoding="async">
         </a>
         <button class="header__toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false">
             <span class="header__toggle-icon"></span>
@@ -41,25 +41,19 @@
             <a href="/contacto/" class="nav__link">Contacto</a>
         </nav>
     </header>
-    <main class="main">
+    <main class="main" id="main">
         <section class="hero">
-            <h1 class="hero__title">Contacto</h1>
-            <p class="hero__subtitle">Comunicación directa y sin intermediarios. Cero formularios, cero rastreadores y máxima privacidad.</p>
+            <h1 class="hero__title">con<span class="hero__highlight">tacto</span></h1>
+            <h2 class="hero__statement">Hablemos de código e infraestructura.</h2>
         </section>
-
-        <section class="home-section">
-            <h2 class="home-section__title">Canales Operativos</h2>
-            
-            <h3>Correo Electrónico</h3>
-            <p>Para propuestas de arquitectura, auditorías DevSecOps, consultoría técnica o simplemente charlar puedes escribirme directamente a:</p>
-            <p><strong><a href="mailto:merci-boilerplate@merci-boilerplate.es" aria-label="Enviar un correo electrónico a merci-boilerplate">merci-boilerplate@merci-boilerplate.es</a></strong></p>
-
-            <br>
-            
-            <h3>Comunicaciones Cifradas (PGP)</h3>
-            <p>Si necesitas transmitir información sensible o reportar una vulnerabilidad en la infraestructura, por favor cifra tu mensaje utilizando mi clave pública:</p>
-            <p><strong><a href="/llave-publica.asc" aria-label="Descargar clave pública PGP de merci-boilerplate">Descargar Clave Pública PGP</a></strong> (Huella: <code>9198 EDF7 40BD 027C 6746  62DB 7D76 23BE 599F D138</code>)</p>
-            <p><small><em>¿No estás familiarizado con PGP? 👉 <a href="/biblioteca/tutorial-como-enviar-correos-cifrados-con-pgp.html"><strong>Lee la guía paso a paso para cifrar tus mensajes</strong></a>.</em></small></p>
+        <section class="section">
+            <article class="prose">
+                <div class="prose__content">
+                    <h2>Comunicaciones Seguras</h2>
+                    <p>Utiliza este espacio para añadir tu correo electrónico, formulario o tu clave pública PGP.</p>
+                    <p>👉 Abre el archivo <code>public/contacto/index.html</code> para configurar tus canales.</p>
+                </div>
+            </article>
         </section>
     </main>
     <footer class="footer">
@@ -82,7 +76,7 @@
         </div>
         <!-- QUÉ HACE: Usa un botón nativo (<button>) para atrapar el foco del tabulador (Accesibilidad) -->
         <button class="merci-ui__trigger" aria-controls="merci-message" aria-expanded="false">
-            <img class="merci-ui__avatar" src="/assets/images/Merci-en-la-nube.webp" alt="Interactuar con el asistente" width="80" height="80" loading="lazy">
+            <img class="merci-ui__avatar" src="/assets/images/Merci-en-la-nube.webp" alt="Interactuar con el asistente" width="80" height="80" fetchpriority="low" decoding="async">
         </button>
     </aside>
 

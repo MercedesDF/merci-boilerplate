@@ -26,9 +26,9 @@
     <link rel="icon" href="/favicon.ico?v=2" type="image/x-icon">
     <!-- QUÉ HACE: Cache Busting dinámico incrementado a v14 -->
     <!-- POR QUÉ: Obliga a Varnish y a navegadores móviles a purgar la caché y descargar la nueva rejilla de 5 columnas. -->
-    <link rel="stylesheet" href="/css/main.css?v=1779365275">
-    <script src="/js/MerciController.js?v=1778974789" defer></script>
-    <script src="/js/main.js?v=1777153888" defer></script>
+    <link rel="stylesheet" href="/css/main.css?v=1779476885">
+    <script src="/js/MerciController.js?v=1779476855" defer></script>
+    <script src="/js/main.js?v=1779476809" defer></script>
     <link rel="canonical" href="https://merci-boilerplate.es">
     
     <!-- JSON-LD Mínimo Fase 2 -->
@@ -46,7 +46,7 @@
     <div id="top" tabindex="-1" style="position: absolute; top: 0; left: 0;"></div>
     <header class="header">
         <a href="/" class="header__brand">
-            <img src="/assets/images/logo.webp?v=2" alt="merci-boilerplate" class="header__logo" width="263" height="65">
+            <img src="/assets/images/logo.webp?v=2" alt="merci-boilerplate" class="header__logo" width="263" height="65" fetchpriority="low" decoding="async">
         </a>
         <button class="header__toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false">
             <span class="header__toggle-icon"></span>
@@ -95,19 +95,19 @@
         <!-- ENGINEERING DASHBOARD -->
         <!-- ===================== -->
         <section class="section">
-            <h2 class="home-section__title">Auditoría de la web actual (mobile-first)</h2>
+            <h2 class="home-section__title">Auditoría de la última Release (Mobile 4G)</h2>
             <div class="hero__dashboard hero__dashboard--standalone" role="group" aria-label="Métricas de rendimiento — Auditoría Mobile (PageSpeed Insights)">
                 <div class="hero__metric">
                     <span class="hero__metric-label">FCP</span>
-                    <span class="hero__metric-value">0.8 s</span>
+                    <span class="hero__metric-value">1.8 s</span>
                 </div>
                 <div class="hero__metric">
                     <span class="hero__metric-label">LCP</span>
-                    <span class="hero__metric-value">1.1 s</span>
+                    <span class="hero__metric-value">2.0 s</span>
                 </div>
                 <div class="hero__metric">
                     <span class="hero__metric-label">INP</span>
-                    <span class="hero__metric-value">&lt;100ms</span>
+                    <span class="hero__metric-value"><100ms</span>
                 </div>
                 <div class="hero__metric">
                     <span class="hero__metric-label">CLS</span>
@@ -115,11 +115,11 @@
                 </div>
                 <div class="hero__metric">
                     <span class="hero__metric-label">TBT</span>
-                    <span class="hero__metric-value">0 ms</span>
+                    <span class="hero__metric-value">468 ms</span>
                 </div>
                 <div class="hero__metric">
                     <span class="hero__metric-label">SI</span>
-                    <span class="hero__metric-value">0.8 s</span>
+                    <span class="hero__metric-value">2.0 s</span>
                 </div>
                 <div class="hero__metric">
                     <span class="hero__metric-label">Payload</span>
@@ -138,6 +138,11 @@
                     <span class="hero__metric-value">3-layer</span>
                 </div>
             </div>
+            
+            <!-- QUÉ HACE: Expone las puntuaciones de Lighthouse (CWV) y diagnostica problemas de red. -->
+            <div id="lighthouse-scores" class="hero__scores-summary">
+                96* en Rendimiento | 100 en Accesibilidad | 100 en Mejores Prácticas | 100 en SEO<br><small>* Penalización externa por latencia de red (Ping: 170ms, TTFB: 766ms).</small>
+            </div>
 
             <!-- ===================== -->
             <!-- PROSE (EDITORIAL)     -->
@@ -146,7 +151,7 @@
             <div class="prose__content">
                 <h2>¡Bienvenido a tu Boilerplate DevSecOps!</h2>
                 <p>Esta plataforma ha sido instanciada con éxito y el código base está listo para ti.</p>
-                <p>Arriba puedes ver los Dashboards de rendimiento en tiempo real calculados por el agente <code>merci-telemetry.py</code>. Este espacio es tuyo para presentar tu proyecto o tesis de ingeniería.</p>
+                <p>Arriba puedes ver el Dashboard de rendimiento calculado empíricamente. Este espacio es tuyo para presentar tu proyecto o tesis de ingeniería.</p>
                 <p>👉 Edita el bloque <code>&lt;article class="prose"&gt;</code> en <code>public/index.html</code> para comenzar a construir tu identidad.</p>
             </div>
         </article>
@@ -173,7 +178,7 @@
         </div>
         <!-- QUÉ HACE: Usa un botón nativo (<button>) para atrapar el foco del tabulador (Accesibilidad) -->
         <button class="merci-ui__trigger" aria-controls="merci-message" aria-expanded="false">
-            <img class="merci-ui__avatar" src="/assets/images/Merci-en-la-nube.webp" alt="Interactuar con el asistente" width="80" height="80" loading="lazy">
+            <img class="merci-ui__avatar" src="/assets/images/Merci-en-la-nube.webp" alt="Interactuar con el asistente" width="80" height="80" fetchpriority="low" decoding="async">
         </button>
     </aside>
 </body>

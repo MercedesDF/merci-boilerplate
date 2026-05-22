@@ -49,6 +49,11 @@ class MerciController {
             if (!response.ok) return;
             
             const brainData = await response.json();
+            
+            // QUÉ HACE: Cede el control al hilo principal (Yielding) tras el parseo del JSON.
+            // POR QUÉ: Evita que la asignación en memoria sature el límite de 50ms de la CPU.
+            await new Promise(resolve => setTimeout(resolve, 0));
+            
             const currentPath = window.location.pathname;
             
             if (brainData[currentPath]) {
