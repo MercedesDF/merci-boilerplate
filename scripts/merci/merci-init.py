@@ -187,6 +187,90 @@ def anonimizar_paginas_secundarias(nuevo_nombre: str, nuevo_dominio: str):
         content = re.sub(r'<main[^>]*>.*?</main>', nuevo_main_contacto, content, flags=re.DOTALL | re.IGNORECASE)
         contacto_path.write_text(content, encoding="utf-8")
 
+def anonimizar_enlaces_y_textos(preserve_socials=False):
+    """
+    QUÉ HACE: Limpia enlaces sociales del footer y frases hardcodeadas del asistente.
+    POR QUÉ: Garantiza un "Marca Blanca" total sin depender del reemplazo de identidad global.
+    """
+    print("  🔗 Anonimizando enlaces sociales y frases del asistente...")
+    # Footer (Mantiene el enlace de atribución a Merci Boilerplate)
+    if not preserve_socials:
+        replace_in_files('href="https://www.linkedin.com/in/mercedesdf-ingenieria/"', 'href="https://linkedin.com/in/tu-perfil/"')
+        replace_in_files('href="https://github.com/MercedesDF" target="_blank"', 'href="https://github.com/tu-usuario" target="_blank"')
+    
+    # Controller (Frases hardcodeadas)
+    replace_in_files("¡Hola! Me llamo Mercí, asistente de mercedev👋", "¡Hola! Soy tu asistente virtual👋")
+    replace_in_files("merci-boilerplate es la base de este proyecto🚀 y tiene su propio repositorio en GitHub", "Este proyecto está construido sobre una arquitectura DevSecOps🚀")
+    replace_in_files("habla con Mercedes-mercedev, el cerebro de la web", "habla con el administrador de la web")
+    replace_in_files("La tienda no tienda de merchandising conmigo de como protagonista", "Catálogo oficial de demostración")
+
+def generar_placeholders_directorios(nuevo_dominio: str):
+    """
+    QUÉ HACE: Genera archivos index.html en carpetas estructurales vacías.
+    POR QUÉ: Al vaciar estas carpetas por DLP, Nginx devuelve 403 Forbidden. 
+    Entregar plantillas básicas evita que los enlaces del menú parezcan rotos (Mejora la OOBE).
+    """
+    # QUÉ HACE: Extrae el layout común de la portada para mantener la consistencia visual.
+    # POR QUÉ: Reutilizar el header y footer reales en las páginas de contingencia
+    # hace que la experiencia de navegación sea 100% coherente, incluso en rutas vacías.
+    header_html, footer_html = "", ""
+    index_path = REPO_ROOT / "public" / "index.html"
+    if index_path.exists():
+        index_content = index_path.read_text(encoding="utf-8")
+        h_match = re.search(r"(<header.*?</header>)", index_content, re.DOTALL | re.IGNORECASE)
+        f_match = re.search(r"(<footer.*?</footer>)", index_content, re.DOTALL | re.IGNORECASE)
+        m_match = re.search(r"(<!-- Asistente Merci -->.*?</aside>)", index_content, re.DOTALL | re.IGNORECASE)
+        header_html = h_match.group(1) if h_match else ""
+        footer_html = f_match.group(1) if f_match else ""
+        if m_match:
+            footer_html += f"\n\n    {m_match.group(1)}"
+
+    print("  🏗️  Generando páginas de contingencia (Anti-403 Forbidden)...")
+    blog_symlink = REPO_ROOT / "public" / "blog"
+    if blog_symlink.is_symlink() or blog_symlink.exists():
+        try:
+            blog_symlink.unlink()
+        except Exception:
+            shutil.rmtree(blog_symlink, ignore_errors=True)
+            
+    rutas = [
+        ("biblioteca", "La Biblioteca", "El conocimiento inmutable se almacena aquí. Las páginas estáticas se autogenerarán con el orquestador."),
+        ("art-de-cote", "Art de Coté", "Índice de scripts experimentales, andamiajes y código colateral."),
+        ("blog", "El Blog", "Capa dinámica. Si no usas Headless CMS, puedes usar esta ruta para páginas estáticas."),
+        ("blog/tienda", "La Tienda", "Catálogo oficial de productos y demostración e-commerce.")
+    ]
+    for ruta, titulo, desc in rutas:
+        dir_path = REPO_ROOT / "public" / ruta
+        dir_path.mkdir(parents=True, exist_ok=True)
+        
+        body_id = f"page-{'blog-tienda' if ruta == 'blog/tienda' else ruta}"
+        html_content = f"""<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{titulo} - {nuevo_dominio}</title>
+    <!-- merci-audit:silence-seo -->
+    <link rel="stylesheet" href="/css/main.css?v=1">
+    <script src="/js/MerciController.js?v=1" defer></script>
+    <script src="/js/main.js?v=1" defer></script>
+</head>
+<body class="page" id="{body_id}">
+    <div id="top" tabindex="-1" style="position: absolute; top: 0; left: 0;"></div> <!-- merci-audit:silence-style -->
+    {header_html}
+    <main class="main" id="main">
+        <section class="hero hero--compact">
+            <h1 class="hero__title">{titulo}</h1>
+            <p class="hero__subtitle">{desc}</p>
+            <br>
+            <a href="/" class="nav__link" style="color: #ea580c; text-decoration: underline;">← Volver al inicio</a> <!-- merci-audit:silence-style -->
+        </section>
+    </main>
+    {footer_html}
+</body>
+</html>"""
+        (dir_path / "index.html").write_text(html_content, encoding="utf-8")
+
 def resetear_telemetria_html():
     """
     QUÉ HACE: Resetea los contadores del dashboard inyectados por merci-telemetry.py.
@@ -284,6 +368,7 @@ def main():
     nuevo_dominio = input("Introduce el nuevo dominio (ej. midominio.com): ").strip()
     nuevo_nombre = input("Introduce el nombre del proyecto (ej. Mi Empresa): ").strip()
     incluir_ia = input("\n🤖 ¿Deseas incluir el módulo de Inteligencia Artificial (Shift-Left AI) en tu proyecto? [Y/n]: ").strip().lower() != 'n'
+    preserve_socials = "--preserve-socials" in sys.argv
     
     if not nuevo_dominio or not nuevo_nombre:
         print("❌ Error: Los datos no pueden estar vacíos.")
@@ -292,6 +377,8 @@ def main():
     # 0. Reparación de Metadatos de Autor antes de proteger el usuario de GitHub
     # POR QUÉ: Evita que el nuevo sitio declare a MercedesDF como autora en el <meta name="author">
     replace_in_files('content="MercedesDF"', f'content="{nuevo_nombre}"')
+
+    anonimizar_enlaces_y_textos(preserve_socials)
 
     # QUÉ HACE: Protege los créditos originales de la autora en los enlaces (Boilerplate, GitHub, LinkedIn).
     # POR QUÉ: Permite anonimizar el resto de la web sin romper los enlaces "publicitarios" de atribución.
@@ -374,6 +461,8 @@ def main():
     if incluir_ia:
         imagenes_a_conservar.append("Merci-en-la-nube.webp")
     purge_directory(REPO_ROOT / "assets" / "images", exclude=imagenes_a_conservar)
+    
+    generar_placeholders_directorios(nuevo_dominio)
     
     # Purga selectiva de manuales operativos exclusivos de la matriz
     print("  🗑️  Purgando manuales SOP exclusivos del proyecto matriz...")

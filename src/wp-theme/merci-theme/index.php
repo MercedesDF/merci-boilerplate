@@ -3,7 +3,7 @@
 <head>
     <?php
     // Rompe-cachés dinámico para scripts: lee la fecha de modificación del archivo
-    $root_dir = dirname(ABSPATH) . '/merci-boilerplate.es/public';
+    $root_dir = dirname(ABSPATH) . '/boilerplate.mercedev.es/public';
     $css_v = time();
     $js_merci_v = time();
     $js_main_v = time();
@@ -35,7 +35,7 @@ if ( is_page('tienda') || (function_exists('is_shop') && is_shop()) ) {
     <div id="top" tabindex="-1" style="position: absolute; top: 0; left: 0;"></div>
     <header class="header">
         <a href="/" class="header__brand">
-            <img src="/assets/images/logo.webp?v=2" alt="merci-boilerplate" class="header__logo" width="263" height="65" fetchpriority="low" decoding="async">
+            <img src="/assets/images/logo.webp?v=2" alt="mercedev" class="header__logo" width="263" height="65" fetchpriority="low" decoding="async">
         </a>
         <button class="header__toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false">
             <span class="header__toggle-icon"></span>
@@ -141,13 +141,13 @@ if ( is_page('tienda') || (function_exists('is_shop') && is_shop()) ) {
     </main>
     <footer class="footer">
         <div class="footer__links">
-            <a href="https://www.linkedin.com/in/mercedesdf-ingenieria/" target="_blank" rel="noopener noreferrer" class="footer__link">LinkedIn</a>
-            <a href="https://github.com/MercedesDF" target="_blank" rel="noopener noreferrer" class="footer__link">GitHub</a>
+            <a href="https://linkedin.com/in/tu-perfil/" target="_blank" rel="noopener noreferrer" class="footer__link">LinkedIn</a>
+            <a href="https://github.com/tu-usuario" target="_blank" rel="noopener noreferrer" class="footer__link">GitHub</a>
             <a href="https://github.com/MercedesDF/merci-boilerplate" target="_blank" rel="noopener noreferrer" class="footer__link">Merci Boilerplate</a>
         </div>
         <div class="footer__text">
             <a href="#top">↑ Volver arriba</a><br>
-            &copy; 2026 <strong>merci-boilerplate</strong> — Base de código abierto bajo Licencia MIT.
+            &copy; 2026 <strong>mercedev</strong> — Base de código abierto bajo Licencia MIT.
         </div>
     </footer>
 

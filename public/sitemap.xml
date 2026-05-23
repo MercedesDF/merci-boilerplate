@@ -1,20 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
    <url>
-      <loc>https://merci-boilerplate.es/</loc>
-      <lastmod>2026-05-22</lastmod>
+      <loc>https://boilerplate.mercedev.es/</loc>
+      <lastmod>2026-05-23</lastmod>
       <changefreq>weekly</changefreq>
       <priority>1.0</priority>
    </url>
    <url>
-      <loc>https://merci-boilerplate.es/contacto/</loc>
-      <lastmod>2026-05-22</lastmod>
+      <loc>https://boilerplate.mercedev.es/biblioteca/</loc>
+      <lastmod>2026-05-23</lastmod>
       <changefreq>weekly</changefreq>
       <priority>0.8</priority>
    </url>
    <url>
-      <loc>https://merci-boilerplate.es/sobre-mi/</loc>
-      <lastmod>2026-05-22</lastmod>
+      <loc>https://boilerplate.mercedev.es/blog/</loc>
+      <lastmod>2026-05-23</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.8</priority>
+   </url>
+   <url>
+      <loc>https://boilerplate.mercedev.es/contacto/</loc>
+      <lastmod>2026-05-23</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.8</priority>
+   </url>
+   <url>
+      <loc>https://boilerplate.mercedev.es/art-de-cote/</loc>
+      <lastmod>2026-05-23</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.8</priority>
+   </url>
+   <url>
+      <loc>https://boilerplate.mercedev.es/sobre-mi/</loc>
+      <lastmod>2026-05-23</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.8</priority>
+   </url>
+   <url>
+      <loc>https://boilerplate.mercedev.es/blog/tienda/</loc>
+      <lastmod>2026-05-23</lastmod>
       <changefreq>weekly</changefreq>
       <priority>0.8</priority>
    </url>

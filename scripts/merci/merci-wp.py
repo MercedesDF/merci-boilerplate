@@ -27,12 +27,6 @@ except ImportError:
     print("ℹ️ [Merci Info] Falta la librería 'markdown' (pip install markdown). Omitiendo sincronización Headless.")
     sys.exit(0)
 
-try:
-    from weasyprint import HTML
-except ImportError:
-    HTML = None
-    print("ℹ️ [Merci Info] Falta la librería 'weasyprint' (pip install weasyprint). No se generarán PDFs.")
-
 REPO_ROOT = Path(__file__).resolve().parents[2]
 ENV_FILE = REPO_ROOT / ".env"
 WP_DIRS = [
@@ -141,7 +135,7 @@ def publicar_en_wordpress(filepath: str, creds: dict, sync_cache: dict, verbose:
     file_key = str(target_path.relative_to(REPO_ROOT))
     # Usamos int() para evitar pérdida de precisión de microsegundos al serializar en JSON
     md_mtime = int(target_path.stat().st_mtime)
-    if file_key in sync_cache and sync_cache[file_key] >= md_mtime:
+    if file_key in sync_cache and sync_cache[file_key] >= md_mtime and "--force" not in sys.argv:
         return True
 
     wp_url = creds.get("WP_URL", "").rstrip("/")
@@ -228,85 +222,11 @@ def publicar_en_wordpress(filepath: str, creds: dict, sync_cache: dict, verbose:
             nuevo_id = res_data.get("id")
             
             if verbose:
-                print(f"  ✅ ¡Éxito! Post transferido correctamente (Paso 1/2).")
+                print(f"  ✅ ¡Éxito! Post transferido correctamente.")
                 print(f"  🔗 Enlace de WP: {link}")
             
-            # 3.5 Generar PDF localmente (Paridad con Biblioteca)
-            # QUÉ HACE: Genera el PDF utilizando el slug definitivo asignado por WordPress en su base de datos.
-            # POR QUÉ: Asegura que el enlace dinámico ($post->post_name) de la web coincida matemáticamente con el archivo local.
-            pdf_msg = ""
-            pdf_generado_ok = False
-            wp_slug = res_data.get("slug")
-            if wp_slug and estado == "publicado":
-                out_pdf_filename = f"{wp_slug}.pdf"
-                out_pdf_path = REPO_ROOT / "public" / "descargas" / out_pdf_filename
-                out_pdf_path.parent.mkdir(parents=True, exist_ok=True)
-                
-                titulo_html = html.escape(titulo)
-                pdf_html_content = f"""<!DOCTYPE html> # merci-audit:silence-style
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>{titulo_html}</title>
-    <style>
-        @page {{ size: A4; margin: 2.5cm; }} # merci-audit:silence-style
-        body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #334155; }}
-        .portada {{ text-align: center; page-break-after: always; padding-top: 30%; }}
-        .portada h1 {{ font-size: 2.5em; color: #ea580c; margin-bottom: 0.2em; }}
-        .portada p {{ font-size: 1.2em; color: #64748b; }}
-        h2 {{ color: #ea580c; margin-top: 2em; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5em; }}
-        pre {{ background: #f1f5f9; padding: 1em; border-radius: 4px; white-space: pre-wrap; word-wrap: break-word; font-size: 0.9em; }}
-        code {{ font-family: monospace; background: #f1f5f9; padding: 0.2em 0.4em; border-radius: 3px; font-size: 0.9em; }}
-        img {{ max-width: 100%; height: auto; border-radius: 4px; }}
-    </style>
-</head>
-<body>
-    <div class="portada">
-        <h1>{titulo_html}</h1>
-        <p>Art de Coté | Cuadernillo</p>
-    </div>
-    <div class="contenido">
-        {html_content}
-    </div>
-</body>
-</html>"""
-                if HTML:
-                    if out_pdf_path.exists() and out_pdf_path.stat().st_mtime >= target_path.stat().st_mtime:
-                        pdf_generado_ok = True
-                    else:
-                        try:
-                            HTML(string=pdf_html_content, base_url=str(REPO_ROOT / "public")).write_pdf(out_pdf_path)
-                            if out_pdf_path.exists():
-                                if verbose: print(f"  📄 PDF generado con éxito: public/descargas/{out_pdf_filename}")
-                                pdf_generado_ok = True
-                        except Exception as e:
-                            print(f"  ❌ Error al generar PDF para {target_path.name}: {e}")
-            
-            # Si se generó un PDF, actualizamos el post para inyectar el enlace de descarga
-            if pdf_generado_ok:
-                if verbose: print("  🔄 Inyectando enlace PDF en el post (Paso 2/2)...")
-                pdf_download_link = f'\n<p><a href="/descargas/{out_pdf_filename}" class="card__download" download>📄 Descargar Edición PDF</a></p>'
-                
-                update_payload = {"content": html_content + pdf_download_link}
-                update_data = json.dumps(update_payload).encode("utf-8")
-                
-                update_endpoint = f"{wp_url}/wp-json/wp/v2/posts/{nuevo_id}"
-                update_req = urllib.request.Request(update_endpoint, data=update_data, method="POST")
-                update_req.add_header("Content-Type", "application/json")
-                update_req.add_header("Authorization", f"Basic {auth_b64}")
-                update_req.add_header("X-Authorization", f"Basic {auth_b64}")
-                update_req.add_header("User-Agent", "Merci-Boilerplate-Agent/1.0")
-                
-                try:
-                    with urllib.request.urlopen(update_req):
-                        if verbose: print("  ✅ Enlace PDF inyectado con éxito.")
-                except HTTPError as e_update:
-                    print(f"  ❌ Error al inyectar enlace PDF: {e_update.read().decode('utf-8')}")
-
-            pdf_msg = " (+ PDF)" if pdf_generado_ok else ""
-
             if not verbose and estado == "publicado":
-                print(f"  ✅ Sincronizado en WP: {target_path.name}{pdf_msg}")
+                print(f"  ✅ Sincronizado en WP: {target_path.name}")
 
             # QUÉ HACE: Expulsa físicamente el archivo origen hacia el entorno de incubación si es borrador.
             # POR QUÉ: Paridad de flujos. Mantiene las carpetas dinámicas raíz exclusivas para contenido en producción.

@@ -1,4 +1,4 @@
-# Checklist de Hardening (Endurecimiento) de merci-boilerplate.es
+# Checklist de Hardening (Endurecimiento) de boilerplate.mercedev.es
 
 Este documento consolida las medidas de seguridad aplicadas en la arquitectura híbrida del proyecto (Núcleo Estático + WordPress aislado). Actúa como lista de verificación de obligado cumplimiento antes de cualquier paso a producción.
 

@@ -1,4 +1,4 @@
-# Merci Boilerplate v1.15.0
+# Merci Boilerplate v1.15.1
 
 Un ecosistema DevSecOps autónomo impulsado por Inteligencia Artificial Local (Shift-Left AI) y Desarrollo Guiado por Especificaciones (Spec-Driven Development). 
 
@@ -6,13 +6,21 @@ Combina un orquestador local en Python puro (Sistema Merci) que automatiza la ca
 
 > 🤖 **Inteligencia y Gobernanza:** El boilerplate incluye agentes de IA locales que auto-reparan código, auto-documentan el Roadmap y generan bases de conocimiento estáticas con coste cero y privacidad total. La justificación de las decisiones DevSecOps reside en la carpeta `/docs`.
 
+## 🚀 Novedades en la v1.15.1 (Hotfix OOBE & Infraestructura)
+
+- **Navegación Anti-403:** El script de inicialización (`merci-init.py`) ahora genera plantillas HTML de contingencia que heredan el layout principal (menú, footer y asistente) en los directorios dinámicos vaciados por DLP (`/blog`, `/biblioteca`), evitando errores 403 y mejorando la *Out-of-the-Box Experience*.
+- **Marca Blanca Mejorada:** Se ha refinado la anonimización de la IA y del Footer para proteger la identidad original sin destruir los componentes visuales.
+- **Garbage Collector de Binarios:** El orquestador `merci-publish.py` ahora implementa un recolector de basura (Mark & Sweep) que elimina físicamente los PDFs huérfanos del directorio `public/descargas/`.
+- **Bypass de Caché WP (--force):** `merci-wp.py` incorpora la directiva `--force` para forzar la sincronización con WordPress ignorando la fecha de modificación local, resolviendo desincronizaciones severas (*Data Drift*).
+- **Zero-Noise en Auditoría:** Inyectada la variable `LITELLM_LOCAL_MODEL_COST_MAP` en `merci-audit.py` para aislar localmente la librería y erradicar advertencias por *timeouts* de red.
+
 ## 🚀 Novedades en la v1.15.0 (Rendimiento Extremo, Yielding y Data-Driven Metrics)
 
-- **Erradicación de la Varianza del TBT (Yielding):** Refactorización del controlador asíncrono y del núcleo de inicialización (`main.js`, `MerciController.js`) utilizando `requestIdleCallback` y `setTimeout`. Se ha fragmentado la ejecución de tareas largas para ceder el paso al hilo principal, garantizando un TBT de 0ms bajo simulaciones móviles estrictas de CPU 4x throttled.
+- **Erradicación de la Varianza del TBT (Yielding):** Refactorización del controlador asíncrono y del núcleo de inicialización (`main.js`, `MerciController.js`) utilizando `requestIdleCallback` y `setTimeout`. Se ha fragmentado la ejecución de tareas largas para ceder el paso al hilo principal, garantizando un TBT de 0ms bajo simulaciones móviles estrictas de CPU (Central Processing Unit - Unidad Central de Procesamiento) 4x throttled.
 - **Priorización de Red y LCP (Fetch Priority):** Despriorización del logotipo de la cabecera (`fetchpriority="low"`) y aplicación de `decoding="async"` para proteger el ancho de banda y acelerar el renderizado del verdadero LCP (texto).
 - **Escudo Fail-Fast en Commits:** El orquestador `merci-commit.py` ahora emite un código de salida fatal (`sys.exit(1)`) si el usuario aborta la creación del commit, protegiendo a los orquestadores superiores de ejecutar operaciones en cadena con código fantasma.
 - **Extractor de Métricas Data-Driven (JSON):** Se reescribió `merci-extract-metrics.py` para analizar directamente el árbol de datos `.json` generado por Catchpoint/PageSpeed, erradicando la dependencia externa de `pypdf` y los errores de parseo.
-- **Diagnóstico de Física de Redes (SRE):** El nuevo extractor JSON detecta descensos de puntuación originados por alta latencia de ping (>100ms) o TTFB lento (>300ms), registrando automáticamente el falso positivo en `observabilidad/falsos_positivos_red.log` para prevenir sobreingeniería prematura.
+- **Diagnóstico de Física de Redes (SRE):** El nuevo extractor JSON detecta descensos de puntuación originados por alta latencia de ping (>100ms) o TTFB (Time to First Byte - Tiempo hasta el Primer Byte) lento (>300ms), registrando automáticamente el falso positivo en `observabilidad/falsos_positivos_red.log` para prevenir sobreingeniería prematura.
 - **Dashboard Dinámico y Telemetría SRE:** Inyección de resúmenes de Lighthouse en la portada con justificaciones automáticas de latencia. `merci-sre.py` ahora ingiere el payload `.lighthouse_sre.json` para volcar las métricas exactas (TBT, LCP, CLS, etc.) en Grafana/Prometheus.
 
 ## 🚀 Novedades en la v1.14.1 (Hotfix DX - DevRel)

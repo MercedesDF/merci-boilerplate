@@ -32,3 +32,6 @@ docs/matriz/
 
 # Manuales locales en PDF (Protege los PDFs legítimos generados por el SSG en otras carpetas)
 docs/*.pdf
+
+# Scripts privados de la matriz
+scripts/matriz/

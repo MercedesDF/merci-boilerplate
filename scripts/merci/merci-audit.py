@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-merci-audit.py — Auditoría local del proyecto merci-boilerplate.es (Fase 1).
+merci-audit.py — Auditoría local del proyecto boilerplate.mercedev.es (Fase 1).
 
 ¿Qué problema resuelve?
     Evitar que secretos o errores básicos lleguen al repositorio, y adelantar
@@ -38,6 +38,10 @@ from pathlib import Path
 from typing import Iterable, Iterator, Optional
 
 try:
+    import logging
+    os.environ["LITELLM_LOCAL_MODEL_COST_MAP"] = "True"
+    logging.getLogger('LiteLLM').setLevel(logging.ERROR)
+    
     import litellm
     from litellm import completion
     litellm.telemetry = False  # Desactivar telemetría por privacidad (Zero Trust)
@@ -505,7 +509,7 @@ def audit_external_assets(state: AuditState, path: Path, text: str) -> None:
     script_pattern = re.compile(r'<script[^>]*\bsrc\s*=\s*["\'](https?://[^"\']+)["\']', re.IGNORECASE)
     for match in script_pattern.finditer(text):
         url = match.group(1)
-        if "merci-boilerplate.es" not in url and "localhost" not in url:
+        if "boilerplate.mercedev.es" not in url and "localhost" not in url:
             line_number = text.count('\n', 0, match.start()) + 1
             state.add(Finding(path, line_number, "error", "UI_EXTERNAL_ASSET", f"Script externo detectado: {url[:30]}..."))
             
@@ -514,7 +518,7 @@ def audit_external_assets(state: AuditState, path: Path, text: str) -> None:
     for match in link_pattern.finditer(text):
         full_tag = match.group(0).lower()
         url = match.group(1)
-        if "stylesheet" in full_tag and "merci-boilerplate.es" not in url and "localhost" not in url:
+        if "stylesheet" in full_tag and "boilerplate.mercedev.es" not in url and "localhost" not in url:
             line_number = text.count('\n', 0, match.start()) + 1
             state.add(Finding(path, line_number, "error", "UI_EXTERNAL_ASSET", f"CSS externo detectado: {url[:30]}..."))
                 
@@ -522,7 +526,7 @@ def audit_external_assets(state: AuditState, path: Path, text: str) -> None:
     img_pattern = re.compile(r'<img[^>]*\bsrc\s*=\s*["\'](https?://[^"\']+)["\']', re.IGNORECASE)
     for match in img_pattern.finditer(text):
         url = match.group(1)
-        if "merci-boilerplate.es" not in url and "localhost" not in url:
+        if "boilerplate.mercedev.es" not in url and "localhost" not in url:
             line_number = text.count('\n', 0, match.start()) + 1
             state.add(Finding(path, line_number, "error", "UI_EXTERNAL_ASSET", f"Imagen externa detectada: {url[:30]}..."))
             
@@ -530,7 +534,7 @@ def audit_external_assets(state: AuditState, path: Path, text: str) -> None:
     meta_pattern = re.compile(r'<meta[^>]*\bcontent\s*=\s*["\'](https?://[^"\']+)["\']', re.IGNORECASE)
     for match in meta_pattern.finditer(text):
         url = match.group(1)
-        if "merci-boilerplate.es" not in url and "localhost" not in url:
+        if "boilerplate.mercedev.es" not in url and "localhost" not in url:
             line_number = text.count('\n', 0, match.start()) + 1
             state.add(Finding(path, line_number, "error", "UI_EXTERNAL_ASSET", f"Meta URL externa detectada: {url[:30]}..."))
 
@@ -618,6 +622,10 @@ def audit_html_seo(state: AuditState, path: Path, text: str, strict_json_ld: boo
         - Advertencias: mejores prácticas (viewport, canonical, JSON-LD si no es estricto).
     """
     if path.suffix.lower() not in {".html", ".htm"}:
+        return
+
+    # Válvula de escape para Placeholders estructurales (Anti-403)
+    if "merci-audit:silence-seo" in text:
         return
 
     parser = SeoHTMLParser()
@@ -728,6 +736,7 @@ def audit_json(state: AuditState, path: Path, text: str) -> None:
         return
     if path.name == "package-lock.json" or "lock" in path.name.lower():
         return
+        
     try:
         json.loads(text)
     except json.JSONDecodeError as exc:

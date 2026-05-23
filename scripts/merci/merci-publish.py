@@ -139,7 +139,7 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
         print(f"  ❌ Error: Falta el atributo 'alt_portada' obligatorio en {filepath.name}")
         return False
     
-    canonical_url = f"https://merci-boilerplate.es{base_url_path}{out_filename}"
+    canonical_url = f"https://boilerplate.mercedev.es{base_url_path}{out_filename}"
 
     # QUÉ HACE: Pre-procesador de multimedia. Busca sintaxis de imagen que apunte a un vídeo.
     # POR QUÉ: Markdown nativo no soporta la etiqueta <video>. Usamos expresiones regulares para transformar 
@@ -195,7 +195,7 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
     <div class="portada">
         <h1>{titulo_html}</h1>
         <p>{tipo_html} | Vol. {volumen_html}</p>
-        <p><strong>merci-boilerplate.es</strong> — {fecha_html}{fase_pdf_text}</p>
+        <p><strong>boilerplate.mercedev.es</strong> — {fecha_html}{fase_pdf_text}</p>
     </div>
     <div class="contenido">
         {html_content}
@@ -222,7 +222,7 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
                     print(f"  ❌ Error crítico al generar PDF para {filepath.name}: {e}")
                     
             if pdf_generado:
-                pdf_download_link = f'\n                <a href="/descargas/{out_pdf_filename}" class="card__download" download>📄 Descargar Edición PDF</a>'
+                pdf_download_link = f'\n                <a href="/descargas/{out_pdf_filename}" class="card__download" target="_blank" rel="noopener noreferrer">📄 Abrir Edición PDF</a>'
 
     # 5. Generar el HTML final inyectando las clases BEM estructurales
     # QUÉ HACE: Asigna la clase CSS BEM dinámicamente basándose en el atributo 'tipo'.
@@ -235,7 +235,7 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{titulo_html} — merci-boilerplate.es</title>
+    <title>{titulo_html} — boilerplate.mercedev.es</title>
     <meta name="description" content="{descripcion_html}">
     <link rel="canonical" href="{canonical_url}">
     <link rel="stylesheet" href="/css/main.css?v={css_v}">
@@ -396,7 +396,7 @@ def generar_indice(publicaciones, out_path, title, meta_desc, hero_subtitle, can
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{title_html} — merci-boilerplate.es</title>
+    <title>{title_html} — boilerplate.mercedev.es</title>
     <meta name="description" content="{meta_desc_html}">
     <link rel="canonical" href="{canonical_url}">
     <link rel="stylesheet" href="/css/main.css?v={css_v}">
@@ -406,7 +406,7 @@ def generar_indice(publicaciones, out_path, title, meta_desc, hero_subtitle, can
     {{
       "@context": "https://schema.org",
       "@type": "CollectionPage",
-      "name": {json.dumps(title + " - merci-boilerplate.es")},
+      "name": {json.dumps(title + " - boilerplate.mercedev.es")},
       "description": {json.dumps(meta_desc)},
       "url": {json.dumps(canonical_url)}
     }}
@@ -481,6 +481,10 @@ def main(): # type: ignore
     publicaciones_bib = []
     publicaciones_art = []
 
+    # Añadimos los índices principales a la lista de archivos válidos
+    archivos_validos.add((PUBLIC_BIBLIOTECA / "index.html").resolve())
+    archivos_validos.add((PUBLIC_ART_DE_COTE / "index.html").resolve())
+
     # QUÉ HACE: Lee recursivamente todos los archivos .md en la biblioteca y sus subcarpetas.
     # POR QUÉ: Permite al autor organizar los archivos fuente en subdirectorios temáticos 
     # sin alterar la estructura plana de URLs de salida (/biblioteca/archivo.html).
@@ -489,22 +493,27 @@ def main(): # type: ignore
             meta = procesar_archivo(md_file, header_html, footer_html, css_version, js_controller_version, js_main_version)
             if meta:
                 publicaciones_bib.append(meta)
+                archivos_validos.add(meta["out_html_path"].resolve())
+                archivos_validos.add(meta["out_pdf_path"].resolve())
                 
     if ART_DE_COTE_DIR.exists():
         for md_file in ART_DE_COTE_DIR.rglob("*.md"):
             meta = procesar_archivo(md_file, header_html, footer_html, css_version, js_controller_version, js_main_version)
             if meta:
                 publicaciones_art.append(meta)
+                archivos_validos.add(meta["out_html_path"].resolve())
+                archivos_validos.add(meta["out_pdf_path"].resolve())
                 
     if publicaciones_bib:
         PUBLIC_BIBLIOTECA.mkdir(parents=True, exist_ok=True)
-        generar_indice(publicaciones_bib, PUBLIC_BIBLIOTECA / "index.html", "La Biblioteca", "Índice de publicaciones técnicas y proyectos de la Biblioteca.", "Documentación técnica, proyectos DevSecOps y arquitectura de software. El activo de conocimiento central del ecosistema.", "https://merci-boilerplate.es/biblioteca/", header_html, footer_html, css_version, js_controller_version, js_main_version)
+        generar_indice(publicaciones_bib, PUBLIC_BIBLIOTECA / "index.html", "La Biblioteca", "Índice de publicaciones técnicas y proyectos de la Biblioteca.", "Documentación técnica, proyectos DevSecOps y arquitectura de software. El activo de conocimiento central del ecosistema.", "https://boilerplate.mercedev.es/biblioteca/", header_html, footer_html, css_version, js_controller_version, js_main_version)
         
     if publicaciones_art:
         PUBLIC_ART_DE_COTE.mkdir(parents=True, exist_ok=True)
-        generar_indice(publicaciones_art, PUBLIC_ART_DE_COTE / "index.html", "Art de Coté", "Índice de scripts experimentales, andamiajes y código colateral.", "Scripts, flujos de automatización y código experimental preservado bajo la filosofía Zero Waste (Cero Desperdicio).", "https://merci-boilerplate.es/art-de-cote/", header_html, footer_html, css_version, js_controller_version, js_main_version)
+        generar_indice(publicaciones_art, PUBLIC_ART_DE_COTE / "index.html", "Art de Coté", "Índice de scripts experimentales, andamiajes y código colateral.", "Scripts, flujos de automatización y código experimental preservado bajo la filosofía Zero Waste (Cero Desperdicio).", "https://boilerplate.mercedev.es/art-de-cote/", header_html, footer_html, css_version, js_controller_version, js_main_version)
             
     total_pubs = len(publicaciones_bib) + len(publicaciones_art)
+    limpiar_archivos_zombis(archivos_validos)
     print(f"  ✅ {total_pubs} documentos estáticos compilados y publicados exitosamente.")
     print("🚀 [Merci Publish] Pipeline de conversión finalizado.")
 

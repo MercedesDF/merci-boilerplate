@@ -21,6 +21,7 @@ if not AUDITORIAS_DIR.exists():
     AUDITORIAS_DIR = REPO_ROOT / "auditorias-pagespedd.web.dev"
 INDEX_HTML = REPO_ROOT / "public" / "index.html"
 OBSERVABILIDAD_DIR = REPO_ROOT / "observabilidad"
+CACHE_FILE = OBSERVABILIDAD_DIR / ".metrics_cache"
 
 def extract_metrics_from_json(json_path: Path):
     print(f"📄 Leyendo JSON: {json_path.name}")
@@ -152,6 +153,11 @@ def main():
         
     # Obtener el archivo JSON más reciente
     latest_json = max(jsons, key=lambda p: p.stat().st_mtime)
+    
+    # Lógica Cache Hit (Zero Noise)
+    if CACHE_FILE.exists() and CACHE_FILE.read_text(encoding="utf-8").strip() == latest_json.name:
+        print("  ⚡ [Cache Hit] Métricas SRE sin cambios. Omitiendo inyección en portada.")
+        sys.exit(0)
     metrics = extract_metrics_from_json(latest_json)
     
     print("\n📊 Resultados extraídos:")
@@ -161,6 +167,10 @@ def main():
         
     print()
     update_index_html(metrics)
+    
+    # Guardamos en caché el nombre del archivo recién procesado
+    OBSERVABILIDAD_DIR.mkdir(exist_ok=True)
+    CACHE_FILE.write_text(latest_json.name, encoding="utf-8")
 
 if __name__ == "__main__":
     main()

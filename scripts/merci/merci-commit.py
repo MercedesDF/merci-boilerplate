@@ -21,7 +21,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 # POR QUÉ: Zero Maintenance. Permite crear nuevas épicas sin modificar el código en Python.
 def obtener_bitacoras_activas():
     """Busca dinámicamente todas las bitácoras de épicas en el laboratorio."""
-    return list((REPO_ROOT / "laboratorio").glob("bitacora-merci-boilerplate-epic-*.md"))
+    return list((REPO_ROOT / "laboratorio").glob("bitacora-mercedev-epic-*.md"))
 
 def check_repo_changes():
     """Verifica si hay algún cambio en el repositorio (staged, unstaged o untracked)."""

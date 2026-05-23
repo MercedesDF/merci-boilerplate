@@ -109,7 +109,7 @@ def main():
 
     # 4.5 Escudo de Referencias Cruzadas (Shift-Left DAST)
     # QUÉ HACE: Bloquea la promoción si el post enlaza a un cuadernillo que aún no ha sido promovido.
-    enlaces_internos = re.findall(r'https://merci-boilerplate\.es/(biblioteca|art-de-cote)/([^/]+)\.html', md_body)
+    enlaces_internos = re.findall(r'https://mercedev\.es/(biblioteca|art-de-cote)/([^/]+)\.html', md_body)
     if enlaces_internos:
         slugs_produccion = set()
         for dest in [REPO_ROOT / "biblioteca", REPO_ROOT / "art-de-cote"]:

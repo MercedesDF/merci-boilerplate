@@ -55,7 +55,7 @@ def consultar_ia_local(prompt, system_prompt):
 
 def get_bitacora_context(nota_cruda: str) -> str:
     """Extrae palabras clave de la nota y filtra entradas relevantes de la bitácora (RAG Optimizado)."""
-    bitacoras = [LAB_DIR / "bitacora-merci-boilerplate-orquestacion-ia.md", LAB_DIR / "bitacora-merci-boilerplate.md"]
+    bitacoras = [LAB_DIR / "bitacora-mercedev-orquestacion-ia.md", LAB_DIR / "bitacora-mercedev.md"]
     contexto = ""
     palabras_clave = [p.lower() for p in re.findall(r'\b[a-zA-Z]{5,}\b', nota_cruda)]
 

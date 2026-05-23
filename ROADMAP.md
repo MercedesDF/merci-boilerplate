@@ -1,4 +1,4 @@
-# 🗺️ ROADMAP MAESTRO: Ecosistema merci-boilerplate
+# 🗺️ ROADMAP MAESTRO: Ecosistema mercedev
 
 Única Fuente de Verdad (SSOT) del avance del proyecto y de las automatizaciones DevSecOps.
 
