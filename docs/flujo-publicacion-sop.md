@@ -48,6 +48,21 @@ Por diseño arquitectónico (Environment Segregation), el núcleo estático (Bib
 
 ---
 
+## FLUJO 3: Tienda (WooCommerce Headless)
+**Destino:** API REST de WooCommerce.
+**Características:** Catálogo de productos (Mock E-commerce), gestionado mediante archivos Markdown con metadatos de precio e imagen.
+
+### Paso a Paso:
+1. **Incubación:** Crear un producto en `laboratorio/incubacion/` con `tema: "tienda"` y metadatos obligatorios como `precio` y `imagen`. Cambiar su estado a `"borrador"`.
+2. **Promoción:** Ejecutar `merci promote`. El sistema lo detectará automáticamente por sus variables y lo moverá al directorio raíz `/tienda/`.
+3. **Sincronización Headless:** Ejecutar el orquestador de la tienda:
+   ```bash
+   merci shop
+   ```
+   *(Nota: El script creará o actualizará el producto resolviéndolo por su slug. Si un producto en `/tienda/` vuelve a estado `"borrador"`, `merci shop` ejecutará el Kill-Switch, eliminándolo de WooCommerce mediante Hard Delete para prevenir colisiones WAI-ARIA, y devolviendo el archivo a la incubadora).*
+
+---
+
 ## ⚠️ Reglas de Oro (Hardening Operativo)
 
 - **Prevención de Posts Fantasma (Data Drift):** Nunca borrar un archivo `.md` dinámico del disco si ya ha sido sincronizado con WordPress. En caso de eliminación física, el script Headless lo ignorará y la base de datos jamás recibirá la orden de ocultarlo. Para despublicar, cambiar su YAML a `estado: "borrador"` y ejecutar `merci wp` (El script lo ocultará del CMS y lo expulsará físicamente al laboratorio). Solo entonces se debe eliminar del entorno local.

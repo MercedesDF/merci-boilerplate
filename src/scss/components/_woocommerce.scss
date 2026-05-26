@@ -57,23 +57,6 @@
       font-size: 1.1rem;
       color: $color-text-base;
     }
-
-    /* QUÉ HACE: Estiliza el botón nativo de "Añadir al carrito" o "Leer más". */
-    .button {
-      display: inline-block;
-      background-color: $color-primary;
-      color: #ffffff;
-      padding: 0.6rem 1.2rem;
-      border-radius: 4px;
-      font-weight: 700;
-      margin-top: 1rem;
-      transition: background-color 0.2s ease;
-
-      &:hover, &:focus {
-        background-color: color.scale($color-primary, $lightness: -15%);
-        color: #ffffff;
-      }
-    }
   }
 
   /* ========================================================
@@ -182,6 +165,26 @@
   /* ========================================================
      Vistas de Carrito y Checkout (Zero-JS Simulation)
      ======================================================== */
+
+  /* QUÉ HACE: Unifica y blinda todos los botones nativos de WooCommerce */
+  button.button, a.button, input.button, #respond input#submit {
+    background-color: #9a3412 !important; /* Contraste accesible WCAG 4.5:1 */
+    color: #ffffff !important;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 4px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    text-align: center;
+    display: inline-block;
+
+    &:hover, &:focus {
+      background-color: color.scale(#9a3412, $lightness: -10%) !important;
+      color: #ffffff !important;
+      transform: translateY(-2px);
+    }
+  }
   
   .woocommerce-notices-wrapper {
     margin-bottom: 2rem;
@@ -266,3 +269,20 @@
     }
   }
 } /* Cierra .woocommerce */
+
+/* ========================================================
+   Corrección de Navegación Contextual (Zero-JS Routing)
+   ======================================================== */
+
+/* QUÉ HACE: Fuerza el resaltado de la pestaña "Tienda" y apaga "Blog" en flujos de compra. */
+/* POR QUÉ: El carrito y checkout nativos heredan el body id="page-blog". Anulamos el CSS base. */
+#page-blog.woocommerce-cart, #page-blog.woocommerce-checkout {
+  .header .nav__link[href="/blog/"] {
+    color: $color-text-base;
+    font-weight: 500;
+  }
+  .header .nav__link[href="/blog/tienda/"] {
+    color: #c2410c;
+    font-weight: 600;
+  }
+}

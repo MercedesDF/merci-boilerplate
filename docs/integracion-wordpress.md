@@ -66,6 +66,7 @@ La sobreposición de rutas tiene el riesgo de romper la cadena de rastreo de SEO
 
 1. **Bloqueo del Canibalismo de Portada:** En las opciones globales de WordPress, las rutas `siteurl` y `home` se unifican obligatoriamente como `https://tu_dominio.com/blog`. No se debe instalar en la raíz ni usar plugins para desviar "la portada de WordPress" a la raíz del dominio principal.
 2. **Jerarquía Unificada del Sitemap:** Un sitemap de índice (`sitemap_index.xml`) puede declarar dónde localizar los XML locales estáticos creados por `merci_sitemap.py` y dónde iniciar la traza generada automáticamente por WordPress para el contenido.
+3. **Aislamiento de E-commerce (Zero-JS):** La tienda de WooCommerce se despliega bajo `/blog/tienda/` en una arquitectura "Headless en catálogo / Nativa en carrito". El frontend purga (dequeue) el 100% de los scripts dinámicos (AJAX) y delega las operaciones a formularios POST clásicos, logrando un TBT de 0ms.
 
 ---
-*Conclusión de Fase 4.1. Este documento sella la decisión de diseño arquitectónico y marca la pauta de despliegue antes de iniciar el Child Theme en la Fase 4.2.*
+*Conclusión de Épica 6. Este documento sella la decisión de diseño arquitectónico y marca la pauta de despliegue del ecosistema híbrido (Blog + E-commerce).*

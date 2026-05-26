@@ -101,7 +101,11 @@ if ( is_page('tienda') || (function_exists('is_shop') && is_shop()) ) {
                     <?php else : ?>
                         <!-- VISTA DE LECTURA DENSA (Biblioteca / Art de Coté) -->
                         <article class="card card--booklet">
+                        <?php if ( function_exists('is_cart') && ( is_cart() || is_checkout() ) ) : ?>
+                            <a href="/blog/tienda/" class="card__back-link">← Volver a la Tienda</a>
+                        <?php else : ?>
                             <a href="/blog/" class="card__back-link">← Volver al Blog</a>
+                        <?php endif; ?>
                         <header class="card__header">
                                 <?php if ( ! $header_title ) : ?>
                                 <h1 class="card__title card__title--highlight"><?php the_title(); ?></h1>

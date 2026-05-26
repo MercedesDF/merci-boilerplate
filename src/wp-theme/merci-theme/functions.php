@@ -25,7 +25,9 @@ function merci_limpiar_estilos_por_defecto() {
     wp_dequeue_style('wp-block-library-theme');
     // Elimina el CSS masivo de los bloques de WooCommerce (causa #1 de pérdida de rendimiento)
     wp_dequeue_style('wc-blocks-style');
+    wp_deregister_style('wc-blocks-style');
     wp_dequeue_style('wc-blocks-vendors-style');
+    wp_deregister_style('wc-blocks-vendors-style');
     // Elimina el CSS de variables globales (theme.json inyectado en línea)
     wp_dequeue_style('global-styles');
     // Elimina estilos clásicos residuales
@@ -86,6 +88,22 @@ function merci_limpiar_scripts_wc() {
     wp_dequeue_script('wc-add-to-cart');
     wp_dequeue_script('woocommerce');
     wp_dequeue_script('wc-order-attribution');
+    wp_dequeue_script('sourcebuster');
+    wp_deregister_script('sourcebuster');
+    
+    // Erradicar scripts de la vista individual de producto (Galería)
+    wp_dequeue_script('wc-single-product');
+    wp_dequeue_script('zoom');
+    wp_dequeue_script('flexslider');
+    wp_dequeue_script('photoswipe');
+    wp_dequeue_script('photoswipe-ui-default');
+    
+    // Erradicar scripts del checkout clásico y dependencias select2
+    wp_dequeue_script('wc-checkout');
+    wp_dequeue_script('wc-country-select');
+    wp_dequeue_script('wc-address-i18n');
+    wp_dequeue_script('selectWoo');
+    wp_dequeue_script('wc-password-strength-meter');
     
     // Erradicar los scripts pesados de los bloques de WooCommerce (Gutenberg/React)
     wp_deregister_script('wc-cart-block-frontend');
@@ -108,7 +126,7 @@ function merci_limpiar_scripts_wc() {
     // Erradicar jQuery del frontend para mantener la regla de 0 dependencias
     wp_deregister_script('jquery');
 }
-add_action('wp_enqueue_scripts', 'merci_limpiar_scripts_wc', 100);
+add_action('wp_enqueue_scripts', 'merci_limpiar_scripts_wc', 999);
 
 // Desencolar ABSOLUTAMENTE TODO el CSS por defecto de WooCommerce
 add_filter( 'woocommerce_enqueue_styles', '__return_empty_array' );
@@ -136,28 +154,9 @@ add_action('init', 'merci_purgar_inyecciones_inline');
 // 3.5 AUTO-REPARACIÓN ZERO-JS PARA WOOCOMMERCE
 // =========================================================================
 
-// QUÉ HACE: Convierte automáticamente los bloques modernos de WC a shortcodes clásicos.
-// POR QUÉ: Los bloques modernos dependen de React y decenas de scripts pesados. 
-// Al usar shortcodes, WC renderiza formularios HTML puros (POST) compatibles con Zero-JS.
-function merci_forzar_shortcodes_zero_js() {
-    $paginas = get_posts(array('post_type' => 'page', 'post_status' => 'publish', 'posts_per_page' => -1));
-    foreach ($paginas as $pagina) {
-        $modificado = false;
-        $contenido = $pagina->post_content;
-        if (strpos($contenido, '<!-- wp:woocommerce/cart') !== false) {
-            $contenido = '[woocommerce_cart]';
-            $modificado = true;
-        }
-        if (strpos($contenido, '<!-- wp:woocommerce/checkout') !== false) {
-            $contenido = '[woocommerce_checkout]';
-            $modificado = true;
-        }
-        if ($modificado) {
-            wp_update_post(array('ID' => $pagina->ID, 'post_content' => $contenido));
-        }
-    }
-}
-add_action('init', 'merci_forzar_shortcodes_zero_js');
+// NOTA ARQUITECTÓNICA: La rutina de auto-sanación (merci_forzar_shortcodes_zero_js) 
+// ha sido extirpada tras cumplir su objetivo de curar la base de datos.
+// Mantener un escaneo de get_posts() masivo en el hook 'init' destruía el TTFB del servidor.
 
 // QUÉ HACE: Intercepta el HTML final y elimina enlaces a PDFs en páginas dinámicas.
 // POR QUÉ: Evita que plantillas genéricas filtren enlaces a recursos PDF inexistentes (404).
@@ -166,6 +165,17 @@ add_action('template_redirect', function() {
         ob_start(function($html) { return preg_replace('|<a[^>]*href="/descargas/[^"]+\.pdf"[^>]*>.*?</a>|is', '', $html); });
     }
 }, 0);
+
+// QUÉ HACE: Enruta los enlaces "Volver a la tienda" y "Continuar comprando" del carrito.
+// POR QUÉ: Al no tener una página "Shop" estática configurada en WP, WC redirige al blog por defecto.
+add_filter( 'woocommerce_return_to_shop_redirect', function() { return '/blog/tienda/'; } );
+add_filter( 'woocommerce_continue_shopping_redirect', function() { return '/blog/tienda/'; } );
+
+// QUÉ HACE: Desactiva el rastreo de origen de pedidos de WooCommerce.
+// POR QUÉ: Esta característica inyecta 'sourcebuster.min.js' de forma tardía (evadiendo wp_deregister_script),
+// destruyendo el TBT (Total Blocking Time) al ejecutar tracking de cookies en el lado del cliente.
+add_filter( 'woocommerce_order_attribution_tracking_enabled', '__return_false' );
+add_filter( 'pre_option_woocommerce_order_attribution_tracking_enabled', function() { return 'no'; } );
 
 // =========================================================================
 // 4. HARDENING Y SEGURIDAD (Fase 5.2)

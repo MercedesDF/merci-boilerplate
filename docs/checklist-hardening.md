@@ -18,6 +18,12 @@ Este documento consolida las medidas de seguridad aplicadas en la arquitectura h
   - *Motivo:* Evita la enumeración de usuarios válidos (el atacante no sabe si falla el usuario o la contraseña).
 - [x] **Limpieza de Cabeceras:** Eliminación de enlaces Solicitud para una decisión de seguridad (RSD) y Trabajo con WebLogic (WLW) Manifest.
   - *Motivo:* Reducción de superficie de ataque y limpieza de código basura no utilizado.
+- [x] **Inhibición de Telemetría y Rastreo (WooCommerce):**
+  - Desactivación forzosa del rastreador "Order Attribution" (`sourcebuster.min.js`) mediante intercepción directa en la base de datos (`pre_option_woocommerce_order_attribution_tracking_enabled`).
+  - *Motivo:* Plugins de e-commerce inyectan scripts de rastreo que degradan el TBT (Total Blocking Time) evadiendo hooks estándar. Aniquilarlos desde el backend blinda el frontend.
+- [x] **Bloqueo de Inyecciones en Línea de Bloques (Gutenberg/WC):**
+  - Extirpación de *Speculation Rules* y filtros SVG inyectados dinámicamente en el footer/body.
+  - *Motivo:* Prevención de inyecciones de código incontrolables que violan la directiva CSP estricta.
 
 ## 3. Capa de Infraestructura (Servidor LEMP (Linux, Nginx, MySQL/MariaDB, PHP))
 
@@ -61,4 +67,4 @@ Este documento consolida las medidas de seguridad aplicadas en la arquitectura h
   - *Motivo:* Un Cache Hit válido para `localhost` es un Cache Hit falso para producción. Sin esta guardia, el publicador omite silenciosamente todos los artículos al cambiar el `WP_URL` del `.env`.
 
 ---
-*Última revisión: Épica 3 — Fase 2 Completada (2026-05-21). Blindaje Supply Chain y Caché Multi-Entorno incorporados.*
+*Última revisión: Épica 6 — E-commerce Híbrido Extremo (2026-05-26). Hardening de WooCommerce y E-commerce Headless incorporados.*

@@ -13,3 +13,5 @@
 [2026-05-23 12:59:56] 260523_instant_56665d38319c476481aa1d83c133e407.-mercedev-mobile-4g.json | TTFB: 780ms, Latency: 170ms | Posible penalización por red, no por CPU.
 [2026-05-23 13:26:56] 260523_instant_aa60e1c4e2f14a85bb0481f94aabcba1-mercedev-mobile-4g.json | TTFB: 751ms, Latency: 170ms | Posible penalización por red, no por CPU.
 [2026-05-23 15:33:25] 260523_instant_872f404839d340a79b5dad9a6564e5ad-mobile-4g-100.json | TTFB: 783ms, Latency: 170ms | Posible penalización por red, no por CPU.
+[2026-05-26 14:41:21] 260526_instant_3c8ca604c9a84402bcc78e1db5f2d6c3-mercedev-mobile-4g.json | TTFB: 786ms, Latency: 170ms | Posible penalización por red, no por CPU.
+[2026-05-26 19:17:43] 260526_instant_bdef8c9c6aa648abbc696484dcb07e1d-mercedev-tienda-mobile-4g-81.json | TTFB: 941ms, Latency: 170ms | Posible penalización por red, no por CPU.
