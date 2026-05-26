@@ -81,12 +81,12 @@
      ======================================================== */
   
   /* QUÉ HACE: Deshace el estilo de tarjeta y crea un layout de 2 columnas. */
-  .single-product & {
+  &.single-product {
     div.product {
       background-color: transparent;
       border: none;
       box-shadow: none;
-      text-align: left;
+      text-align: center;
       padding: 0;
       display: grid;
       gap: 3rem;
@@ -96,37 +96,173 @@
       }
 
       @media (min-width: 768px) {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 4fr 6fr;
         align-items: start;
+        text-align: left;
       }
-    }
 
-    .price {
-      font-size: 1.5rem;
-      color: $color-primary;
-      margin-bottom: 1.5rem;
-    }
+      /* Anidado estricto dentro de div.product para máxima especificidad */
+      div.images, .woocommerce-product-gallery {
+        opacity: 1 !important;
+        visibility: visible !important;
+        display: block !important;
+        width: 100%;
+        max-width: 450px;
+        margin: 0 auto 2rem auto;
+        
+        figure, .woocommerce-product-gallery__wrapper, .woocommerce-product-gallery__image, a {
+          margin: 0;
+          opacity: 1 !important;
+          visibility: visible !important;
+          display: block !important;
+          width: 100%;
+        }
 
-    /* QUÉ HACE: Obliga a las pestañas de descripción a caer a una nueva fila ocupando el 100%. */
-    .woocommerce-tabs {
-      grid-column: 1 / -1;
-      margin-top: 3rem;
-      
-      ul.tabs {
-        list-style: none;
-        padding: 0;
-        display: flex;
-        gap: 2rem;
-        border-bottom: 1px solid rgba($color-text-base, 0.1);
-        margin-bottom: 2rem;
+        img {
+          display: block !important;
+          width: 100% !important;
+          height: auto !important;
+          border-radius: 8px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+          opacity: 1 !important;
+          visibility: visible !important;
+        }
+      }
 
-        li {
-          padding-bottom: 0.5rem;
-          font-weight: 700;
-          cursor: pointer;
+      div.summary {
+        .product_title {
+          font-size: 2.5rem;
+          margin: 0 0 1rem 0;
           color: $color-text-base;
         }
+
+        .price {
+          font-size: 1.75rem;
+          font-weight: bold;
+          color: $color-primary;
+          margin-bottom: 2rem;
+          display: block;
+        }
+
+        .woocommerce-product-details__short-description {
+          margin-bottom: 2.5rem;
+          line-height: 1.7;
+          color: rgba($color-text-base, 0.9);
+        }
+
+        .product_meta {
+          display: none; /* Ocultamos basura de categorías y SKUs de WC */
+        }
+      }
+
+      /* QUÉ HACE: Obliga a las pestañas de descripción a caer a una nueva fila ocupando el 100%. */
+      .woocommerce-tabs {
+        grid-column: 1 / -1;
+        margin-top: 3rem;
+        
+        ul.tabs {
+          list-style: none;
+          padding: 0;
+          display: flex;
+          gap: 2rem;
+          border-bottom: 1px solid rgba($color-text-base, 0.1);
+          margin-bottom: 2rem;
+
+          li {
+            padding-bottom: 0.5rem;
+            font-weight: 700;
+            cursor: pointer;
+            color: $color-text-base;
+          }
+        }
+      }
+    } /* Cierra div.product */
+  } /* Cierra .single-product & */
+
+  /* ========================================================
+     Vistas de Carrito y Checkout (Zero-JS Simulation)
+     ======================================================== */
+  
+  .woocommerce-notices-wrapper {
+    margin-bottom: 2rem;
+    
+    .woocommerce-message, .woocommerce-error, .woocommerce-info {
+      background-color: rgba(16, 185, 129, 0.1);
+      color: #065f46;
+      padding: 1rem;
+      border-left: 4px solid #10b981;
+      border-radius: 4px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      
+      a.button {
+        background-color: #065f46;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+        margin-top: 0;
+      }
+    }
+    
+    .woocommerce-error {
+      background-color: rgba(220, 38, 38, 0.1);
+      color: #991b1b;
+      border-color: #dc2626;
+    }
+  }
+
+  table.shop_table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 2rem;
+    
+    th, td {
+      padding: 1rem;
+      border-bottom: 1px solid rgba(15, 23, 42, 0.1);
+      text-align: left;
+    }
+    
+    img {
+      max-width: 60px;
+      border-radius: 4px;
+    }
+    
+    .actions {
+      text-align: right;
+      padding-top: 1rem;
+    }
+  }
+
+  .cart-collaterals, .woocommerce-checkout-payment {
+    background-color: hsl(0, 0%, 98%);
+    padding: 2rem;
+    border-radius: 8px;
+    border: 1px solid rgba(15, 23, 42, 0.1);
+  }
+
+  form.checkout {
+    display: grid;
+    gap: 2rem;
+    
+    @media (min-width: 768px) {
+      grid-template-columns: 1fr 1fr;
+    }
+    
+    h3 {
+      color: $color-primary;
+    }
+    
+    .form-row {
+      margin-bottom: 1rem;
+      label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
+      input, textarea, select {
+        width: 100%;
+        padding: 0.8rem;
+        border: 1px solid rgba(15, 23, 42, 0.2);
+        border-radius: 4px;
       }
     }
   }
-}
+} /* Cierra .woocommerce */

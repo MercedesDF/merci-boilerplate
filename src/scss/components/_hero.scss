@@ -37,7 +37,7 @@
         }
 
         &-tag {
-            background: $color-primary;
+            background: $color-regular; /* Fix WCAG AA: Contraste > 6:1 sobre blanco */
             color: $color-bg-base;
             padding: 0.2rem 0.75rem;
             border-radius: 50px;
@@ -149,13 +149,12 @@
     &__scores-summary {
         text-align: center;
         font-size: 1rem; /* Mismo tamaño que los párrafos normales */
-        color: color.scale($color-text-base, $lightness: 40%); /* Gris elegante */
+        color: #334155; /* Fix WCAG AA: Gris Pizarra (Ratio > 7:1 sobre blanco) */
         margin: 0 auto 4rem; /* Bottom de 4rem para empujar la prosa (H3) hacia abajo */
         line-height: 1.6;
         
         small {
             font-size: 0.85em; /* Ligeramente más pequeño para el asterisco de SRE */
-            opacity: 0.8;
             display: inline-block;
             margin-top: 0.25rem;
         }
@@ -204,12 +203,12 @@
         }
 
         &--primary {
-            background-color: $color-primary;
+            background-color: $color-regular; /* Fix WCAG AA */
             color: #ffffff;
-            border: 1px solid $color-primary;
+            border: 1px solid $color-regular;
 
             &:hover {
-                background-color: color.scale($color-primary, $lightness: -8%);
+                background-color: color.scale($color-regular, $lightness: -8%);
                 color: #ffffff;
             }
         }

@@ -10,6 +10,7 @@ manteniendo la seguridad de las credenciales mediante .env.
 """
 
 import sys
+import os
 import re
 import json
 import base64
@@ -52,18 +53,19 @@ def cargar_credenciales():
     POR QUÉ: Evita la dependencia externa de 'python-dotenv', manteniendo el script ultraligero 
     (regla de 0 dependencias) y asegurando las credenciales localmente (Shift-Left Security).
     """
-    if not ENV_FILE.exists():
-        print("❌ [Merci WP] Error: No se encontró el archivo .env seguro.")
-        print("Crea un archivo .env en la raíz con WP_URL, WP_USER y WP_APP_PASSWORD.")
-        sys.exit(1)
-        
     credenciales = {}
-    content = ENV_FILE.read_text(encoding="utf-8")
-    for line in content.splitlines():
-        line = line.strip()
-        if line and not line.startswith("#"):
-            key, val = line.split("=", 1)
-            credenciales[key.strip()] = val.strip().strip('"\'')
+    if ENV_FILE.exists():
+        content = ENV_FILE.read_text(encoding="utf-8")
+        for line in content.splitlines():
+            line = line.strip()
+            if line and not line.startswith("#"):
+                key, val = line.split("=", 1)
+                credenciales[key.strip()] = val.strip().strip('"\'')
+                
+    # Prioridad a las variables inyectadas por el SO (vital para merci-deploy.py)
+    if os.environ.get("WP_URL"): credenciales["WP_URL"] = os.environ.get("WP_URL")
+    if os.environ.get("WP_USER"): credenciales["WP_USER"] = os.environ.get("WP_USER")
+    if os.environ.get("WP_APP_PASSWORD"): credenciales["WP_APP_PASSWORD"] = os.environ.get("WP_APP_PASSWORD")
             
     return credenciales
 
@@ -225,16 +227,13 @@ def publicar_en_wordpress(filepath: str, creds: dict, sync_cache: dict, verbose:
                 print(f"  ✅ ¡Éxito! Post transferido correctamente.")
                 print(f"  🔗 Enlace de WP: {link}")
             
-            if not verbose and estado == "publicado":
-                print(f"  ✅ Sincronizado en WP: {target_path.name}")
-
             # QUÉ HACE: Expulsa físicamente el archivo origen hacia el entorno de incubación si es borrador.
             # POR QUÉ: Paridad de flujos. Mantiene las carpetas dinámicas raíz exclusivas para contenido en producción.
             if estado != "publicado" and not target_path.is_relative_to(REPO_ROOT / "laboratorio"):
                 destino_lab = REPO_ROOT / "laboratorio" / "incubacion" / target_path.name
                 destino_lab.parent.mkdir(parents=True, exist_ok=True)
                 shutil.move(str(target_path), str(destino_lab))
-                print(f"  🔙 Expulsando (Estado: {estado}): Moviendo '{target_path.name}' de vuelta a laboratorio/incubacion/")
+                if verbose: print(f"  🔙 Expulsando (Estado: {estado}): Moviendo '{target_path.name}' de vuelta a laboratorio/incubacion/")
             
             # Registrar sincronización exitosa en la caché
             sync_cache[file_key] = md_mtime
@@ -250,61 +249,69 @@ def publicar_en_wordpress(filepath: str, creds: dict, sync_cache: dict, verbose:
     return True
 
 if __name__ == "__main__":
-    is_verbose = "--verbose" in sys.argv or "-v" in sys.argv
-    args = [arg for arg in sys.argv[1:] if not arg.startswith("-")]
-    
-    print("🚀 [Merci WP] Iniciando conexión Headless con WordPress...")
-    creds = cargar_credenciales()
-    
-    if not creds.get("WP_URL") or not creds.get("WP_USER") or not creds.get("WP_APP_PASSWORD"):
-        print("❌ [Merci WP] Error: Faltan credenciales completas en tu archivo .env.")
-        sys.exit(1)
+    try:
+        is_verbose = "--verbose" in sys.argv or "-v" in sys.argv
+        args = [arg for arg in sys.argv[1:] if not arg.startswith("-")]
         
-    sync_cache = {}
-    if SYNC_CACHE_PATH.exists():
-        try:
-            sync_cache = json.loads(SYNC_CACHE_PATH.read_text(encoding="utf-8"))
-        except json.JSONDecodeError:
-            pass
+        print("🚀 [Merci WP] Iniciando conexión Headless con WordPress...")
+        creds = cargar_credenciales()
+        
+        if not creds.get("WP_URL") or not creds.get("WP_USER") or not creds.get("WP_APP_PASSWORD"):
+            print("  ℹ️ [Merci Info] Faltan credenciales completas en tu archivo .env. Omitiendo sincronización.")
+            sys.exit(0)
+            
+        sync_cache = {}
+        if SYNC_CACHE_PATH.exists():
+            try:
+                sync_cache = json.loads(SYNC_CACHE_PATH.read_text(encoding="utf-8"))
+            except json.JSONDecodeError:
+                pass
 
-    # QUÉ HACE: Invalida la caché si el entorno destino (WP_URL) ha cambiado desde el último ciclo.
-    # POR QUÉ: La caché registra mtime de archivos locales, no el destino al que se subieron.
-    # Cambiar de local a producción sin invalidar la caché provoca que el script omita todos
-    # los archivos silenciosamente (Cache Hit falso). Guardar el entorno activo como clave
-    # centinela (_entorno) permite detectar y descartar la caché de forma automática.
-    entorno_activo = creds.get("WP_URL", "")
-    if sync_cache.get("_entorno") != entorno_activo:
-        print(f"🔄 [Merci WP] Entorno cambiado a '{entorno_activo}'. Invalidando caché de sincronización...")
-        sync_cache = {"_entorno": entorno_activo}
-    else:
-        # Asegurar que la clave centinela está presente aunque la caché sea antigua
-        sync_cache.setdefault("_entorno", entorno_activo)
-
-    # QUÉ HACE: Si se pasa un argumento, procesa ese archivo o carpeta. Si no, sincroniza masivamente.
-    # POR QUÉ: Permite sincronizaciones atómicas globales (SSOT) evitando la deriva de configuración.
-    if len(args) > 0:
-        target = Path(args[0]).resolve()
-        if target.is_dir():
-            for md_file in target.rglob("*.md"):
-                publicar_en_wordpress(str(md_file), creds, sync_cache, is_verbose)
+        # QUÉ HACE: Invalida la caché si el entorno destino (WP_URL) ha cambiado desde el último ciclo.
+        # POR QUÉ: La caché registra mtime de archivos locales, no el destino al que se subieron.
+        # Cambiar de local a producción sin invalidar la caché provoca que el script omita todos
+        # los archivos silenciosamente (Cache Hit falso). Guardar el entorno activo como clave
+        # centinela (_entorno) permite detectar y descartar la caché de forma automática.
+        entorno_activo = creds.get("WP_URL", "")
+        if sync_cache.get("_entorno") != entorno_activo:
+            if is_verbose: print(f"🔄 [Merci WP] Entorno cambiado a '{entorno_activo}'. Invalidando caché de sincronización...")
+            sync_cache = {"_entorno": entorno_activo}
         else:
-            publicar_en_wordpress(str(target), creds, sync_cache, is_verbose)
-    else:
-        if is_verbose:
-            print("🔄 Sincronización masiva de carpetas dinámicas detectada...")
-        for wp_dir in WP_DIRS:
-            if wp_dir.exists():
-                if is_verbose: print(f"\n📂 Escaneando directorio: {wp_dir.name}/")
-                for md_file in wp_dir.rglob("*.md"):
-                    publicar_en_wordpress(str(md_file), creds, sync_cache, is_verbose)
-            else:
-                if is_verbose: print(f"\n⚠️  Directorio no encontrado: {wp_dir.name}/. Omitiendo.")
-                
-    # QUÉ HACE: Persiste la clave centinela junto con los registros de mtime.
-    # POR QUÉ: Garantiza que en el próximo ciclo el script compare el entorno guardado
-    # con el activo y descarte la caché si ha habido un cambio de entorno.
-    sync_cache["_entorno"] = entorno_activo
-    SYNC_CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
-    SYNC_CACHE_PATH.write_text(json.dumps(sync_cache, indent=2), encoding="utf-8")
+            # Asegurar que la clave centinela está presente aunque la caché sea antigua
+            sync_cache.setdefault("_entorno", entorno_activo)
 
-    print("\n✅ [Merci WP] Sincronización finalizada.")
+        # QUÉ HACE: Si se pasa un argumento, procesa ese archivo o carpeta. Si no, sincroniza masivamente.
+        # POR QUÉ: Permite sincronizaciones atómicas globales (SSOT) evitando la deriva de configuración.
+        publicaciones_procesadas = 0
+        if len(args) > 0:
+            target = Path(args[0]).resolve()
+            if target.is_dir():
+                for md_file in target.rglob("*.md"):
+                    if publicar_en_wordpress(str(md_file), creds, sync_cache, is_verbose):
+                        publicaciones_procesadas += 1
+            else:
+                if publicar_en_wordpress(str(target), creds, sync_cache, is_verbose):
+                    publicaciones_procesadas += 1
+        else:
+            if is_verbose:
+                print("🔄 Sincronización masiva de carpetas dinámicas detectada...")
+            for wp_dir in WP_DIRS:
+                if wp_dir.exists():
+                    if is_verbose: print(f"\n📂 Escaneando directorio: {wp_dir.name}/")
+                    for md_file in wp_dir.rglob("*.md"):
+                        if publicar_en_wordpress(str(md_file), creds, sync_cache, is_verbose):
+                            publicaciones_procesadas += 1
+                else:
+                    if is_verbose: print(f"\n⚠️  Directorio no encontrado: {wp_dir.name}/. Omitiendo.")
+                    
+        # QUÉ HACE: Persiste la clave centinela junto con los registros de mtime.
+        # POR QUÉ: Garantiza que en el próximo ciclo el script compare el entorno guardado
+        # con el activo y descarte la caché si ha habido un cambio de entorno.
+        sync_cache["_entorno"] = entorno_activo
+        SYNC_CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
+        SYNC_CACHE_PATH.write_text(json.dumps(sync_cache, indent=2), encoding="utf-8")
+
+        print(f"✅ [Merci WP] Sincronización finalizada. {publicaciones_procesadas} publicacion(es) procesada(s).")
+    except KeyboardInterrupt:
+        print("\n🛑 [Merci WP] Sincronización interrumpida por la usuaria.")
+        sys.exit(130)

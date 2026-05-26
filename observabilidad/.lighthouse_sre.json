@@ -4,8 +4,8 @@
   "lighthouse_best_practices": 100,
   "lighthouse_seo": 100,
   "network_latency_ms": 170,
-  "network_ttfb_ms": 766,
-  "cwv_tbt_ms": 468,
-  "cwv_lcp_ms": 2005,
+  "network_ttfb_ms": 783,
+  "cwv_tbt_ms": 0,
+  "cwv_lcp_ms": 2482,
   "cwv_cls": 0.0
 }

@@ -3,23 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>La Biblioteca - boilerplate.mercedev.es</title>
-    <!-- merci-audit:silence-seo -->
-    <link rel="stylesheet" href="/css/main.css?v=1">
-    <script src="/js/MerciController.js?v=1" defer></script>
-    <script src="/js/main.js?v=1" defer></script>
+    <title>La Biblioteca — tudominio.com</title>
+    <meta name="description" content="Índice de publicaciones técnicas y proyectos de la Biblioteca.">
+    <link rel="canonical" href="https://tudominio.com/biblioteca/">
+    <link rel="stylesheet" href="/css/main.css?v=1779796521">
+    <script src="/js/MerciController.js?v=1779796520" defer></script>
+    <script src="/js/main.js?v=1779435201" defer></script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "name": "La Biblioteca - tudominio.com",
+      "description": "\u00cdndice de publicaciones t\u00e9cnicas y proyectos de la Biblioteca.",
+      "url": "https://tudominio.com/biblioteca/"
+    }
+    </script>
 </head>
 <body class="page" id="page-biblioteca">
-    <div id="top" tabindex="-1" style="position: absolute; top: 0; left: 0;"></div> <!-- merci-audit:silence-style -->
+    <div id="top" tabindex="-1" style="position: absolute; top: 0; left: 0;"></div>
     <header class="header">
         <a href="/" class="header__brand">
-            <img src="/assets/images/logo.webp?v=2" alt="mercedev" class="header__logo" width="263" height="65" fetchpriority="low" decoding="async">
+            <img src="/assets/images/logo.webp?v=2" alt="tuempresa" class="header__logo" width="263" height="65" fetchpriority="low" decoding="async">
         </a>
         <button class="header__toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false">
             <span class="header__toggle-icon"></span>
         </button>
         <nav class="header__nav nav" id="main-nav" aria-label="Navegación principal">
-            <a href="/" class="nav__link">Home</a>
+            <a href="/" class="nav__link">Portada</a>
             <a href="/biblioteca/" class="nav__link">Biblioteca</a>
             <!-- QUÉ HACE: Inyecta la ruta del Perfil Semántico (Anti-ATS). -->
             <!-- POR QUÉ: Integra la autoridad profesional directamente en el flujo de navegación de infraestructura. -->
@@ -33,11 +43,50 @@
         </nav>
     </header>
     <main class="main" id="main">
-        <section class="hero hero--compact">
+        <!-- QUÉ HACE: Sección Hero unificada con el resto del ecosistema -->
+        <section class="hero">
             <h1 class="hero__title">La Biblioteca</h1>
-            <p class="hero__subtitle">El conocimiento inmutable se almacena aquí. Las páginas estáticas se autogenerarán con el orquestador.</p>
-            <br>
-            <a href="/" class="nav__link" style="color: #ea580c; text-decoration: underline;">← Volver al inicio</a> <!-- merci-audit:silence-style -->
+            <p class="hero__subtitle">Índice de publicaciones técnicas y proyectos de la Biblioteca.</p>
+            <a href="/biblioteca/glosario-tecnico.html" class="hero__badge">
+            <span class="hero__badge-tag">Diccionario Data-Driven</span>
+            Glosario Técnico DevSecOps →
+        </a>
+        </section>
+        
+        <!-- QUÉ HACE: Índice Curado (Table of Contents) autogenerado -->
+        <!-- POR QUÉ: Mejora la UX permitiendo navegación intra-página sin scroll excesivo. -->
+        <nav class="library-nav" aria-label="Índice de estanterías">
+            <h2 class="library-nav__title">Estanterías Temáticas</h2>
+            <ul class="library-nav__list">
+                <li class="library-nav__item">
+                    <a href="#devsecops-y-gobernanza" class="library-nav__theme-title" aria-label="Explorar estantería: devsecops y gobernanza">devsecops y gobernanza</a>
+                    <ul class="library-nav__article-list">
+                        <li class="library-nav__article-item">
+                            <a href="#glosario-tecnico" class="library-nav__article-link" aria-label="Ir al resumen de: Glosario Técnico (2026-05-26)">Glosario Técnico</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+        
+        
+        <section class="library-section" id="devsecops-y-gobernanza">
+            <div class="library-section__header">
+                <h2 class="library-section__title home-card__title--highlight"><a href="#devsecops-y-gobernanza" aria-label="Ver sección: devsecops y gobernanza">devsecops y gobernanza</a></h2>
+                <a href="#top" class="library-section__back-link">↑ Volver arriba</a>
+            </div>
+            <div class="home-grid">
+                
+                <article class="card card--book" id="glosario-tecnico">
+                    <header>
+                        <span class="card__meta">2026-05-26 — Proyecto</span>
+                        <h2 class="card__title"><a href="/biblioteca/glosario-tecnico.html" aria-label="Leer artículo completo: Glosario Técnico (2026-05-26)">Glosario Técnico</a></h2>
+                    </header>
+                    <div class="card__content">
+                        <p>Diccionario Data-Driven compilado automáticamente por el Agente Glosario.</p>
+                    </div>
+                </article>
+            </div>
         </section>
     </main>
     <footer class="footer">
@@ -48,8 +97,20 @@
         </div>
         <div class="footer__text">
             <a href="#top">↑ Volver arriba</a><br>
-            &copy; 2026 <strong>mercedev</strong> — Base de código abierto bajo Licencia MIT.
+            &copy; 2026 <strong>tuempresa</strong> — Base de código abierto bajo Licencia MIT.
         </div>
     </footer>
+
+    <!-- Asistente Virtual -->
+    <aside class="merci-ui" id="merci-ui" aria-label="Asistente virtual Merci">
+        <!-- QUÉ HACE: Oculta el globo de mensaje a lectores de pantalla (aria-hidden) hasta que haya texto -->
+        <div class="merci-ui__message-box" id="merci-message" aria-live="polite" aria-hidden="true">
+            <span class="merci-ui__message-text"></span>
+        </div>
+        <!-- QUÉ HACE: Usa un botón nativo (<button>) para atrapar el foco del tabulador (Accesibilidad) -->
+        <button class="merci-ui__trigger" aria-controls="merci-message" aria-expanded="false">
+            <img class="merci-ui__avatar" src="/assets/images/Merci-en-la-nube.webp" alt="Interactuar con el asistente" width="80" height="80" fetchpriority="low" decoding="async">
+        </button>
+    </aside>
 </body>
 </html>

@@ -16,7 +16,7 @@ fase: ""
 <!-- linkedin:
 Escribe aquí tu anuncio para LinkedIn.
 Acepta saltos de línea sin problemas.
-https://boilerplate.mercedev.es/blog/tu-url
+https://tudominio.com/blog/tu-url
 -->
 
 Escribe aquí el contenido de tu artículo. 

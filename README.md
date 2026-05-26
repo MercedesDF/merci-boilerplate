@@ -1,10 +1,17 @@
-# Merci Boilerplate v1.15.1
+# Merci Boilerplate v1.16.0
 
 Un ecosistema DevSecOps autónomo impulsado por Inteligencia Artificial Local (Shift-Left AI) y Desarrollo Guiado por Especificaciones (Spec-Driven Development). 
 
 Combina un orquestador local en Python puro (Sistema Merci) que automatiza la calidad del código, un núcleo estático ultrarrápido (HTML5, SASS, Vanilla JS, BEM) y un motor dinámico aislado opcional (WordPress Headless). Diseñado para alcanzar un rendimiento perfecto (Core Web Vitals 100/100) con 0 dependencias externas bloqueantes en el pipeline.
 
 > 🤖 **Inteligencia y Gobernanza:** El boilerplate incluye agentes de IA locales que auto-reparan código, auto-documentan el Roadmap y generan bases de conocimiento estáticas con coste cero y privacidad total. La justificación de las decisiones DevSecOps reside en la carpeta `/docs`.
+
+## 🚀 Novedades en la v1.16.0 (E-commerce Híbrido Extremo & Zero-JS Cart)
+
+- **Catálogo Headless (`merci-shop.py`):** Inyección de productos mediante archivos Markdown con metadatos YAML directamente a la API REST de WooCommerce. La base de datos es pasiva, el código fuente es la Única Fuente de Verdad (SSOT).
+- **Carrito Zero-JS (0ms TBT):** Erradicación de todos los scripts AJAX (`wc-cart-fragments`), librerías de bloques Gutenberg y frameworks de React en WooCommerce. Reemplazados por formularios HTML nativos (`POST`) para recargas instantáneas.
+- **Auto-sanación de Bases de Datos:** Rutina de auto-sanación en `functions.php` que convierte bloques modernos de Gutenberg en shortcodes clásicos automáticamente para garantizar el renderizado Zero-JS.
+- **Prioridad de Entorno y OS (`os.environ`):** Los publicadores Headless priorizan las variables de entorno del sistema operativo sobre el archivo físico `.env`, permitiendo al orquestador falsificar credenciales de producción desatendidamente.
 
 ## 🚀 Novedades en la v1.15.1 (Hotfix OOBE & Infraestructura)
 

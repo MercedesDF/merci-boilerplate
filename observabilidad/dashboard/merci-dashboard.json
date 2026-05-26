@@ -42,7 +42,7 @@
       }
     ],
     "cursorSync": "Off",
-    "description": "métricas de boilerplate.mercedev.es en local",
+    "description": "métricas de tudominio.com en local",
     "editable": true,
     "elements": {
       "panel-1": {
@@ -975,7 +975,7 @@
       "hideTimepicker": false,
       "fiscalYearStartMonth": 0
     },
-    "title": "boilerplate.mercedev.es",
+    "title": "tudominio.com",
     "variables": [],
     "preferences": {
       "layout": {

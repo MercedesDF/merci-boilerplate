@@ -2,23 +2,24 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="description" content="Contacto - Merci Boilerplate">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contacto — tudominio.com</title>
-    <link rel="icon" href="/favicon.ico?v=2" type="image/x-icon">
+    <title>Glosario Técnico — tudominio.com</title>
+    <meta name="description" content="Diccionario Data-Driven compilado automáticamente por el Agente Glosario.">
+    <link rel="canonical" href="https://tudominio.com/biblioteca/glosario-tecnico.html">
     <link rel="stylesheet" href="/css/main.css?v=1779796521">
     <script src="/js/MerciController.js?v=1779796520" defer></script>
     <script src="/js/main.js?v=1779435201" defer></script>
-    <link rel="canonical" href="https://tudominio.com/contacto">
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "ContactPage",
-      "name": "Contacto - tudominio.com"
+      "@type": "Article",
+      "headline": "Glosario T\u00e9cnico",
+      "description": "Diccionario Data-Driven compilado autom\u00e1ticamente por el Agente Glosario.",
+      "url": "https://tudominio.com/biblioteca/glosario-tecnico.html"
     }
     </script>
 </head>
-<body class="page" id="page-contacto">
+<body class="page" id="page-biblioteca">
     <div id="top" tabindex="-1" style="position: absolute; top: 0; left: 0;"></div>
     <header class="header">
         <a href="/" class="header__brand">
@@ -41,20 +42,23 @@
             <a href="/contacto/" class="nav__link">Contacto</a>
         </nav>
     </header>
-    <main class="main" id="main">
-        <section class="hero">
-            <h1 class="hero__title">con<span class="hero__highlight">tacto</span></h1>
-            <h2 class="hero__statement">Hablemos de código e infraestructura.</h2>
-        </section>
-        <section class="section">
-            <article class="prose">
-                <div class="prose__content">
-                    <h2>Comunicaciones Seguras</h2>
-                    <p>Utiliza este espacio para añadir tu correo electrónico, formulario o tu clave pública PGP.</p>
-                    <p>👉 Abre el archivo <code>public/contacto/index.html</code> para configurar tus canales.</p>
-                </div>
-            </article>
-        </section>
+    <main class="main--padded section" id="main">
+        <article class="card card--book">
+            <a href="/biblioteca/" class="card__back-link">← Volver a la Biblioteca</a>
+            <header>
+                    <h1 class="home-card__title--highlight">Glosario Técnico</h1>
+                <a href="/descargas/glosario-tecnico.pdf" class="card__download" target="_blank" rel="noopener noreferrer">📄 Abrir Edición PDF</a>
+            </header>
+            <div class="card__content">
+                <h1>Glosario Técnico DevSecOps &amp; Arquitectura</h1>
+<blockquote>
+<p><strong>Estado del Documento:</strong> Glosario vivo y autónomo. Un agente rastrea continuamente las bitácoras para extraer y definir nueva terminología DevSecOps.
+<strong>Versión de control:</strong> 0 términos consolidados (Última actualización de datos: 2026-05-26).</p>
+</blockquote>
+<h2>Índice Alfabético</h2>
+<p><em>Aún no se han consolidado términos técnicos en el glosario. El Agente Autónomo está a la espera de procesar la próxima remesa de la bitácora.</em></p>
+            </div>
+        </article>
     </main>
     <footer class="footer">
         <div class="footer__links">
@@ -68,7 +72,7 @@
         </div>
     </footer>
 
-     <!-- Asistente Virtual -->
+    <!-- Asistente Virtual -->
     <aside class="merci-ui" id="merci-ui" aria-label="Asistente virtual Merci">
         <!-- QUÉ HACE: Oculta el globo de mensaje a lectores de pantalla (aria-hidden) hasta que haya texto -->
         <div class="merci-ui__message-box" id="merci-message" aria-live="polite" aria-hidden="true">
@@ -79,6 +83,5 @@
             <img class="merci-ui__avatar" src="/assets/images/Merci-en-la-nube.webp" alt="Interactuar con el asistente" width="80" height="80" fetchpriority="low" decoding="async">
         </button>
     </aside>
-
 </body>
 </html>

@@ -80,16 +80,30 @@ function merci_theme_setup() {
 }
 add_action('after_setup_theme', 'merci_theme_setup');
 
-// Escudo de rendimiento: Eliminar botones de "Añadir al carrito"
-remove_action('woocommerce_after_shop_loop_item', 'woocommerce_template_loop_add_to_cart', 10);
-remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_add_to_cart', 30);
-
 // Desencolar scripts pesados del carrito (AJAX) que WC inyecta globalmente
 function merci_limpiar_scripts_wc() {
     wp_dequeue_script('wc-cart-fragments');
     wp_dequeue_script('wc-add-to-cart');
     wp_dequeue_script('woocommerce');
     wp_dequeue_script('wc-order-attribution');
+    
+    // Erradicar los scripts pesados de los bloques de WooCommerce (Gutenberg/React)
+    wp_deregister_script('wc-cart-block-frontend');
+    wp_deregister_script('wc-checkout-block-frontend');
+    wp_deregister_script('wc-settings');
+    wp_deregister_script('wc-blocks-data-store');
+    wp_deregister_script('wc-payment-method-cod');
+    wp_deregister_script('wp-i18n');
+    wp_deregister_script('wp-data');
+    wp_deregister_script('wp-components');
+    wp_deregister_script('wp-api-fetch');
+    wp_deregister_script('wp-html-entities');
+    wp_deregister_script('wp-url');
+    wp_deregister_script('wp-keycodes');
+    wp_deregister_script('wp-a11y');
+    wp_deregister_script('moment');
+    wp_deregister_script('wp-date');
+    wp_deregister_script('wp-rich-text');
     
     // Erradicar jQuery del frontend para mantener la regla de 0 dependencias
     wp_deregister_script('jquery');
@@ -119,6 +133,41 @@ function merci_purgar_inyecciones_inline() {
 add_action('init', 'merci_purgar_inyecciones_inline');
 
 // =========================================================================
+// 3.5 AUTO-REPARACIÓN ZERO-JS PARA WOOCOMMERCE
+// =========================================================================
+
+// QUÉ HACE: Convierte automáticamente los bloques modernos de WC a shortcodes clásicos.
+// POR QUÉ: Los bloques modernos dependen de React y decenas de scripts pesados. 
+// Al usar shortcodes, WC renderiza formularios HTML puros (POST) compatibles con Zero-JS.
+function merci_forzar_shortcodes_zero_js() {
+    $paginas = get_posts(array('post_type' => 'page', 'post_status' => 'publish', 'posts_per_page' => -1));
+    foreach ($paginas as $pagina) {
+        $modificado = false;
+        $contenido = $pagina->post_content;
+        if (strpos($contenido, '<!-- wp:woocommerce/cart') !== false) {
+            $contenido = '[woocommerce_cart]';
+            $modificado = true;
+        }
+        if (strpos($contenido, '<!-- wp:woocommerce/checkout') !== false) {
+            $contenido = '[woocommerce_checkout]';
+            $modificado = true;
+        }
+        if ($modificado) {
+            wp_update_post(array('ID' => $pagina->ID, 'post_content' => $contenido));
+        }
+    }
+}
+add_action('init', 'merci_forzar_shortcodes_zero_js');
+
+// QUÉ HACE: Intercepta el HTML final y elimina enlaces a PDFs en páginas dinámicas.
+// POR QUÉ: Evita que plantillas genéricas filtren enlaces a recursos PDF inexistentes (404).
+add_action('template_redirect', function() {
+    if ( is_page() ) {
+        ob_start(function($html) { return preg_replace('|<a[^>]*href="/descargas/[^"]+\.pdf"[^>]*>.*?</a>|is', '', $html); });
+    }
+}, 0);
+
+// =========================================================================
 // 4. HARDENING Y SEGURIDAD (Fase 5.2)
 // =========================================================================
 
@@ -137,6 +186,7 @@ remove_action('wp_head', 'wp_oembed_add_discovery_links');
 remove_action('wp_head', 'wp_oembed_add_host_js');
 remove_action('wp_head', 'rest_output_link_wp_head', 10);
 remove_action('template_redirect', 'rest_output_link_header', 11);
+remove_action('wp_head', 'wp_shortlink_wp_head', 10, 0);
 
 // Ofuscar mensajes de error en el inicio de sesión (Evita enumeración de usuarios)
 function merci_ofuscar_errores_login() {
@@ -292,4 +342,26 @@ if ( isset( $_SERVER['HTTP_X_AUTHORIZATION'] ) && ! isset( $_SERVER['HTTP_AUTHOR
 // También cubrimos el caso de redirecciones FastCGI estándar
 if ( isset( $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ) && ! isset( $_SERVER['HTTP_AUTHORIZATION'] ) ) {
     $_SERVER['HTTP_AUTHORIZATION'] = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
+}
+
+// =========================================================================
+// 9. SOPORTE PARA MERCI-COINS (Criptodivisa Mock)
+// =========================================================================
+add_filter('woocommerce_currencies', 'merci_add_custom_currency');
+function merci_add_custom_currency($currencies) {
+    $currencies['MC'] = __('Merci-coins', 'woocommerce');
+    return $currencies;
+}
+
+add_filter('woocommerce_currency_symbol', 'merci_add_custom_currency_symbol', 10, 2);
+function merci_add_custom_currency_symbol($currency_symbol, $currency) {
+    if ($currency === 'MC') {
+        $currency_symbol = 'MC 🪙';
+    }
+    return $currency_symbol;
+}
+
+add_filter('woocommerce_currency', 'merci_force_custom_currency');
+function merci_force_custom_currency($currency) {
+    return 'MC'; // Fuerza a que la tienda use siempre Merci-coins sin tocar el wp-admin
 }

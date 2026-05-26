@@ -1,5 +1,5 @@
-# robots.txt para boilerplate.mercedev.es
+# robots.txt para tudominio.com
 User-agent: *
 Allow: /
 
-Sitemap: https://boilerplate.mercedev.es/sitemap.xml
+Sitemap: https://tudominio.com/sitemap.xml

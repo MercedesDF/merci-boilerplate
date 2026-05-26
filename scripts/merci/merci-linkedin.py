@@ -235,13 +235,13 @@ def procesar_linkedin(modo_auto=False):
                     tema_match = re.search(r'^tema:\s*["\']?([^"\'\n]+)["\']?', yaml_block, re.MULTILINE)
                     tema_val = tema_match.group(1).lower() if tema_match else ""
                     if "blog" in tema_val:
-                        enlace = f"https://boilerplate.mercedev.es/blog/{archivo.stem}/"
+                        enlace = f"https://tudominio.com/blog/{archivo.stem}/"
                     else:
                         titulo_match = re.search(r'^titulo:\s*["\']?([^"\'\n]+)["\']?', yaml_block, re.MULTILINE)
                         titulo_val = titulo_match.group(1) if titulo_match else archivo.stem
                         slug = slugify(titulo_val)
                         base_path = "/art-de-cote/" if "art" in tema_val else "/biblioteca/"
-                        enlace = f"https://boilerplate.mercedev.es{base_path}{slug}.html"
+                        enlace = f"https://tudominio.com{base_path}{slug}.html"
                     texto_post_final = f"{texto_post_base}\n\n🔗 Lee el artículo completo aquí:\n{enlace}"
                 else:
                     texto_post_final = texto_post_base

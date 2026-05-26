@@ -1,4 +1,4 @@
-# Checklist de Hardening (Endurecimiento) de boilerplate.mercedev.es
+# Checklist de Hardening (Endurecimiento) de tudominio.com
 
 Este documento consolida las medidas de seguridad aplicadas en la arquitectura híbrida del proyecto (Núcleo Estático + WordPress aislado). Actúa como lista de verificación de obligado cumplimiento antes de cualquier paso a producción.
 
@@ -16,7 +16,7 @@ Este documento consolida las medidas de seguridad aplicadas en la arquitectura h
   - *Motivo:* Cierra uno de los vectores más comunes para ataques DDoS (Distributed Denial of Service - Denegación de Servicio Distribuida) y de fuerza bruta en WordPress.
 - [x] **Ofuscación de Errores de Login:** Mensajes de error genéricos implementados (`login_errors`).
   - *Motivo:* Evita la enumeración de usuarios válidos (el atacante no sabe si falla el usuario o la contraseña).
-- [x] **Limpieza de Cabeceras:** Eliminación de enlaces RSD y WLW Manifest.
+- [x] **Limpieza de Cabeceras:** Eliminación de enlaces Solicitud para una decisión de seguridad (RSD) y Trabajo con WebLogic (WLW) Manifest.
   - *Motivo:* Reducción de superficie de ataque y limpieza de código basura no utilizado.
 
 ## 3. Capa de Infraestructura (Servidor LEMP (Linux, Nginx, MySQL/MariaDB, PHP))
@@ -24,7 +24,7 @@ Este documento consolida las medidas de seguridad aplicadas en la arquitectura h
 - [x] **Principio de Mínimo Privilegio (Usuarios):**
   - Base de datos (`tu_base_datos`): Accedida mediante un usuario de MySQL dedicado (`tu_usuario_db`), sin privilegios globales.
   - WordPress no usa el usuario por defecto "admin".
-- [x] **Permisos de Sistema de Archivos (CHMOD/CHOWN):**
+- [x] **Permisos de Sistema de Archivos CHMOD/Cambiar Propietario (CHOWN):**
   - Directorio base: Propiedad exclusiva de `www-data:www-data`.
   - Directorios (`755`): Lectura/Ejecución para todos, escritura solo para `www-data`.
   - Archivos (`644`): Lectura para todos, escritura solo para `www-data`.

@@ -88,7 +88,7 @@ class MerciController {
         } else if (path.includes('/biblioteca')) {
             return [
                 'Estás en la Biblioteca 📚',
-                'Aquí se guarda el conocimiento inmutable generado mientras se crea el proyecto boilerplate.mercedev.es',
+                'Aquí se guarda el conocimiento inmutable generado mientras se crea el proyecto tudominio.com',
                 'Recuerda que puedes descargar los artículos en PDF 📄'
             ];
         } else if (path.includes('/art-de-cote')) {
@@ -102,6 +102,18 @@ class MerciController {
                 '¡Bienvenid@ a la Tienda! 🛒',
                 'Catálogo oficial de demostración',
                 'Gestionado por WooCommerce bajo el capó 🛍️'
+            ];
+        } else if (path.includes('/carrito')) {
+            return [
+                'Estás en el Carrito 🛒',
+                'Aquí puedes revisar tus productos antes de finalizar la simulación.',
+                'Fíjate qué rápido carga sin los pesados scripts AJAX nativos ⚡'
+            ];
+        } else if (path.includes('/checkout') || path.includes('/finalizar-comprar')) {
+            return [
+                'Estás en el Checkout (Caja) 💳',
+                'Finaliza tu pedido de prueba pagando con Merci-coins 🪙',
+                'Tranquila, al ser un entorno Zero-JS no hay pasarelas de pago reales aquí.'
             ];
         } else if (path.includes('/blog')) {
             return [

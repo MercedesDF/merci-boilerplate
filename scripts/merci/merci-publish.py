@@ -101,11 +101,22 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
     # POR QUÉ: Previene ataques XSS y la rotura del DOM si los metadatos contienen comillas o etiquetas HTML literales.
     titulo_html = html.escape(titulo)
     descripcion_html = html.escape(descripcion)
+    
+    # QUÉ HACE: Trunca metadatos para SEO técnico (Shift-Left SEO)
+    # POR QUÉ: Evita advertencias del linter y truncamientos en buscadores (SERPs).
+    titulo_seo = f"{titulo_html} — tudominio.com"
+    if len(titulo_seo) > 65:
+        titulo_seo = f"{titulo_html[:60]}..." if len(titulo_html) > 60 else titulo_html
+        
+    desc_seo = descripcion_html
+    if len(desc_seo) > 150:
+        desc_seo = desc_seo[:147] + "..."
 
     # QUÉ HACE: Genera los nombres de salida basándose en el título del YAML, no en el archivo.
     # POR QUÉ: Desacopla el sistema de archivos del routing web (Auto-nombrado).
-    out_filename = slugify(titulo) + ".html"
-    out_pdf_filename = slugify(titulo) + ".pdf"
+    slug = meta.get("slug", slugify(titulo))
+    out_filename = slug + ".html"
+    out_pdf_filename = slug + ".pdf"
     
     is_art = "art-de-cote" in filepath.parts
     out_base_dir = PUBLIC_ART_DE_COTE if is_art else PUBLIC_BIBLIOTECA
@@ -139,7 +150,7 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
         print(f"  ❌ Error: Falta el atributo 'alt_portada' obligatorio en {filepath.name}")
         return False
     
-    canonical_url = f"https://boilerplate.mercedev.es{base_url_path}{out_filename}"
+    canonical_url = f"https://tudominio.com{base_url_path}{out_filename}"
 
     # QUÉ HACE: Pre-procesador de multimedia. Busca sintaxis de imagen que apunte a un vídeo.
     # POR QUÉ: Markdown nativo no soporta la etiqueta <video>. Usamos expresiones regulares para transformar 
@@ -156,6 +167,23 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
     # POR QUÉ: Evita el colapso total del pipeline si un solo documento contiene caracteres o sintaxis corrupta.
     try:
         html_content = markdown.markdown(md_body, extensions=['fenced_code'])
+        
+        # --- INYECCIÓN DE LA BURBUJA MERCI (TOOLTIPS) ---
+        # QUÉ HACE: Escanea el HTML generado y envuelve los términos del glosario en una etiqueta <abbr>.
+        # POR QUÉ: Implementa la "Burbuja Merci" nativa. Muestra la traducción a lenguaje llano al pasar
+        # el ratón, con 0 dependencias JavaScript y 100/100 en Accesibilidad (WAI-ARIA).
+        json_path = REPO_ROOT / 'laboratorio' / 'biblioteca' / 'glosario-tecnico.json'
+        if json_path.exists():
+            glosario_data = json.loads(json_path.read_text(encoding='utf-8', errors='ignore'))
+            for term, data in glosario_data.get("terminos", {}).items():
+                explica = data.get("merci_explica")
+                if explica:
+                    # Lookahead negativo (?![^<]*>) evita reemplazar dentro de atributos de etiquetas HTML
+                    pattern = rf'\b({re.escape(term)})\b(?![^<]*>)'
+                    # Reemplazamos solo la primera aparición (count=1) y le damos tabindex de accesibilidad
+                    replacement = rf'<abbr title="Merci Explica: {html.escape(explica)}" tabindex="0">\1</abbr>'
+                    html_content = re.sub(pattern, replacement, html_content, count=1)
+                    
     except Exception as e:
         print(f"  ❌ Error al compilar Markdown en {filepath.name}: {e}")
         return False
@@ -195,7 +223,7 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
     <div class="portada">
         <h1>{titulo_html}</h1>
         <p>{tipo_html} | Vol. {volumen_html}</p>
-        <p><strong>boilerplate.mercedev.es</strong> — {fecha_html}{fase_pdf_text}</p>
+        <p><strong>tudominio.com</strong> — {fecha_html}{fase_pdf_text}</p>
     </div>
     <div class="contenido">
         {html_content}
@@ -235,8 +263,8 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{titulo_html} — boilerplate.mercedev.es</title>
-    <meta name="description" content="{descripcion_html}">
+    <title>{titulo_seo}</title>
+    <meta name="description" content="{desc_seo}">
     <link rel="canonical" href="{canonical_url}">
     <link rel="stylesheet" href="/css/main.css?v={css_v}">
     <script src="/js/MerciController.js?v={js_c_v}" defer></script>
@@ -290,7 +318,8 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
         "tema": tema,
         "fase": fase,
         "out_html_path": out_path,
-        "out_pdf_path": out_pdf_path
+        "out_pdf_path": out_pdf_path,
+        "slug": slug
     }
 
 def generar_indice(publicaciones, out_path, title, meta_desc, hero_subtitle, canonical_url, header_html, footer_html, css_v: int, js_c_v: int, js_m_v: int):
@@ -333,7 +362,7 @@ def generar_indice(publicaciones, out_path, title, meta_desc, hero_subtitle, can
         cards_html = ""
         for pub in pubs_tema:
             # QUÉ HACE: Genera un ID válido para la tarjeta del artículo.
-            pub_slug = slugify(pub["titulo"])
+            pub_slug = pub.get("slug", slugify(pub["titulo"]))
             # QUÉ HACE: Escapa los títulos y descripciones antes de inyectarlos en las tarjetas.
             # POR QUÉ: Impide que etiquetas literales en las descripciones rompan la interfaz visual.
             pub_titulo_html = html.escape(pub["titulo"])
@@ -381,23 +410,43 @@ def generar_indice(publicaciones, out_path, title, meta_desc, hero_subtitle, can
             </div>
         </section>"""
                 
-    # QUÉ HACE: Inyecta el "Announcement Badge" dinámicamente solo en la portada de Art de Coté
+    # QUÉ HACE: Inyecta el "Announcement Badge" dinámicamente en las portadas
     badge_html = ""
     page_id = "page-biblioteca"
     if title == "Art de Coté":
         page_id = "page-art-de-cote"
-        badge_html = """<a href="/art-de-cote/anatomia-de-merci-boilerplate-arquitectura-devsecops-de-zero-bloat.html" class="hero__badge">
-            <span class="hero__badge-tag">Primer Art de Coté</span>
-            Anatomía de Merci Boilerplate →
+        
+        # Búsqueda dinámica de la última versión de la Anatomía del Boilerplate
+        docs_anatomia = [p for p in publicaciones if "Anatomía de Merci Boilerplate" in p.get("titulo", "")]
+        if docs_anatomia:
+            # Ordenamos por fecha descendente (Data-Driven) para obtener la más reciente
+            latest_anatomia = sorted(docs_anatomia, key=lambda x: x.get("fecha", "1970-01-01"), reverse=True)[0]
+            badge_html = f"""<a href="{latest_anatomia['url']}" class="hero__badge">
+            <span class="hero__badge-tag">Última Release</span>
+            {html.escape(latest_anatomia['titulo'])} →
         </a>"""
+    elif title == "La Biblioteca":
+        badge_html = """<a href="/biblioteca/glosario-tecnico.html" class="hero__badge">
+            <span class="hero__badge-tag">Diccionario Data-Driven</span>
+            Glosario Técnico DevSecOps →
+        </a>"""
+        
+    # QUÉ HACE: Trunca metadatos para el índice
+    titulo_seo = f"{title_html} — tudominio.com"
+    if len(titulo_seo) > 65:
+        titulo_seo = f"{title_html[:60]}..." if len(title_html) > 60 else title_html
+        
+    desc_seo = meta_desc_html
+    if len(desc_seo) > 150:
+        desc_seo = desc_seo[:147] + "..."
 
     html_final = f"""<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{title_html} — boilerplate.mercedev.es</title>
-    <meta name="description" content="{meta_desc_html}">
+    <title>{titulo_seo}</title>
+    <meta name="description" content="{desc_seo}">
     <link rel="canonical" href="{canonical_url}">
     <link rel="stylesheet" href="/css/main.css?v={css_v}">
     <script src="/js/MerciController.js?v={js_c_v}" defer></script>
@@ -406,7 +455,7 @@ def generar_indice(publicaciones, out_path, title, meta_desc, hero_subtitle, can
     {{
       "@context": "https://schema.org",
       "@type": "CollectionPage",
-      "name": {json.dumps(title + " - boilerplate.mercedev.es")},
+      "name": {json.dumps(title + " - tudominio.com")},
       "description": {json.dumps(meta_desc)},
       "url": {json.dumps(canonical_url)}
     }}
@@ -506,11 +555,11 @@ def main(): # type: ignore
                 
     if publicaciones_bib:
         PUBLIC_BIBLIOTECA.mkdir(parents=True, exist_ok=True)
-        generar_indice(publicaciones_bib, PUBLIC_BIBLIOTECA / "index.html", "La Biblioteca", "Índice de publicaciones técnicas y proyectos de la Biblioteca.", "Documentación técnica, proyectos DevSecOps y arquitectura de software. El activo de conocimiento central del ecosistema.", "https://boilerplate.mercedev.es/biblioteca/", header_html, footer_html, css_version, js_controller_version, js_main_version)
+        generar_indice(publicaciones_bib, PUBLIC_BIBLIOTECA / "index.html", "La Biblioteca", "Índice de publicaciones técnicas y proyectos de la Biblioteca.", "Documentación técnica, proyectos DevSecOps y arquitectura de software. El activo de conocimiento central del ecosistema.", "https://tudominio.com/biblioteca/", header_html, footer_html, css_version, js_controller_version, js_main_version)
         
     if publicaciones_art:
         PUBLIC_ART_DE_COTE.mkdir(parents=True, exist_ok=True)
-        generar_indice(publicaciones_art, PUBLIC_ART_DE_COTE / "index.html", "Art de Coté", "Índice de scripts experimentales, andamiajes y código colateral.", "Scripts, flujos de automatización y código experimental preservado bajo la filosofía Zero Waste (Cero Desperdicio).", "https://boilerplate.mercedev.es/art-de-cote/", header_html, footer_html, css_version, js_controller_version, js_main_version)
+        generar_indice(publicaciones_art, PUBLIC_ART_DE_COTE / "index.html", "Art de Coté", "Índice de scripts experimentales, andamiajes y código colateral.", "Scripts, flujos de automatización y código experimental preservado bajo la filosofía Zero Waste (Cero Desperdicio).", "https://tudominio.com/art-de-cote/", header_html, footer_html, css_version, js_controller_version, js_main_version)
             
     total_pubs = len(publicaciones_bib) + len(publicaciones_art)
     limpiar_archivos_zombis(archivos_validos)

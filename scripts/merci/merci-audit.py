@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-merci-audit.py — Auditoría local del proyecto boilerplate.mercedev.es (Fase 1).
+merci-audit.py — Auditoría local del proyecto tudominio.com (Fase 1).
 
 ¿Qué problema resuelve?
     Evitar que secretos o errores básicos lleguen al repositorio, y adelantar
@@ -27,6 +27,7 @@ from __future__ import annotations
 
 import argparse
 import ast
+import hashlib
 import json
 import os
 import re
@@ -72,6 +73,9 @@ SKIP_DIR_NAMES = frozenset(
         "node_modules",
         ".assets-raw",
         "evidencias",
+        ".privado",
+        "auditorias-pagespeed.web.dev",
+        "observabilidad",
     }
 )
 
@@ -125,6 +129,8 @@ SECRET_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     ("Posible clave Stripe en vivo (sk_live_)", re.compile(r"\bsk_live_[0-9a-zA-Z]{24,}\b")),
     ("Posible clave API de Google (AIza…)", re.compile(r"\bAIza[0-9A-Za-z\-_]{35}\b")),
     ("Posible API key SendGrid (SG.)", re.compile(r"\bSG\.[0-9A-Za-z\-_]{22}\.[0-9A-Za-z\-_]{43}\b")),
+    ("Clave API de WooCommerce (ck_)", re.compile(r"\bck_[0-9a-fA-F]{40}\b")),
+    ("Clave Secreta WooCommerce (cs_)", re.compile(r"\bcs_[0-9a-fA-F]{40}\b")),
 ]
 
 
@@ -320,7 +326,40 @@ def audit_python_imports(state: AuditState, path: Path, text: str) -> None:
         elif isinstance(node, ast.ImportFrom) and node.module:
             _verify(node.lineno, node.module)
 
+def audit_python_smells(state: AuditState, path: Path, text: str) -> None:
+    """
+    Escudo contra inyección de comandos o ejecución de código remoto (RCE) en Python.
+    Detecta el uso de funciones peligrosas.
+    """
+    if path.suffix.lower() != ".py":
+        return
+        
+    try:
+        tree = ast.parse(text, filename=str(path))
+    except SyntaxError:
+        return
+        
+    dangerous_functions = {"eval", "exec", "system", "Popen"}
+    lines = text.splitlines()
+    
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Call):
+            func_name = None
+            if isinstance(node.func, ast.Name):
+                func_name = node.func.id
+            elif isinstance(node.func, ast.Attribute):
+                func_name = node.func.attr
+                
+            if func_name in dangerous_functions:
+                lineno = getattr(node, "lineno", 1)
+                line_content = lines[lineno - 1] if 0 < lineno <= len(lines) else ""
+                if "merci-audit:silence-py" in line_content:
+                    continue
+                state.add(Finding(path, lineno, "error", "PY_DANGEROUS_FUNC", f"Uso de función peligrosa '{func_name}()' detectado. Riesgo de ejecución de código (RCE)."))
+
 GLOBAL_ACRONYM_COUNTS: dict[str, int] = {}
+# Caché global de contenidos para evitar asfixiar el disco (I/O) en cada acrónimo
+MD_CONTENTS_CACHE: dict[Path, str] = {}
 
 def get_global_acronym_count(acronym: str) -> int:
     """Cuenta las apariciones de un acrónimo en todos los archivos .md del repositorio."""
@@ -329,14 +368,24 @@ def get_global_acronym_count(acronym: str) -> int:
         
     count = 0
     pattern = re.compile(rf"\b{re.escape(acronym)}\b")
-    for path in REPO_ROOT.rglob("*.md"):
-        if any(part in SKIP_DIR_NAMES for part in path.parts):
-            continue
-        try:
-            content = path.read_text(encoding="utf-8", errors="replace")
-            count += len(pattern.findall(content))
-        except Exception:
-            continue
+    
+    # Si la caché está vacía, leemos todos los Markdowns una sola vez a memoria RAM
+    if not MD_CONTENTS_CACHE:
+        for path in REPO_ROOT.rglob("*.md"):
+            try:
+                relative = path.relative_to(REPO_ROOT)
+            except ValueError:
+                continue
+            if any(part in SKIP_DIR_NAMES for part in relative.parts):
+                continue
+            try:
+                MD_CONTENTS_CACHE[path] = path.read_text(encoding="utf-8", errors="replace")
+            except Exception:
+                pass
+                
+    # Contamos sobre la memoria RAM (Ultrarrápido)
+    for content in MD_CONTENTS_CACHE.values():
+        count += len(pattern.findall(content))
             
     GLOBAL_ACRONYM_COUNTS[acronym] = count
     return count
@@ -373,6 +422,31 @@ def audit_js_smells(state: AuditState, path: Path, text: str) -> None:
                 )
             )
 
+GLOSARIO_WATCHLIST_CACHE: Optional[list[str]] = None
+
+def get_glosario_watchlist() -> list[str]:
+    """Carga y cachea la lista de acrónimos desde el JSON maestro."""
+    global GLOSARIO_WATCHLIST_CACHE
+    if GLOSARIO_WATCHLIST_CACHE is not None:
+        return GLOSARIO_WATCHLIST_CACHE
+        
+    json_path = REPO_ROOT / 'laboratorio' / 'biblioteca' / 'glosario-tecnico.json'
+    watchlist = []
+    if json_path.exists():
+        try:
+            data = json.loads(json_path.read_text(encoding='utf-8', errors='replace'))
+            # Solo vigilamos términos que sean estrictamente acrónimos (todo mayúsculas y > 1 letra)
+            watchlist = [k for k in data.get("terminos", {}).keys() if k.isupper() and len(k) > 1]
+        except Exception:
+            pass
+            
+    if not watchlist: # Fallback de seguridad
+        watchlist = ["AJAX", "PHP", "CPU", "TTFB", "INP", "JSON-LD", "SEO", "DOM", "BEM", "CMS"]
+        
+    ignored_acronyms = {"TIMESTAMP", "UTF-8", "LF", "NAS", "NFKD", "WC", "DR", "IEEE", "TL", "VCL"}
+    GLOSARIO_WATCHLIST_CACHE = [acronym for acronym in watchlist if acronym not in ignored_acronyms]
+    return GLOSARIO_WATCHLIST_CACHE
+
 def audit_md_acronyms(state: AuditState, path: Path, text: str) -> None:
     """
     Vigila que los acrónimos clave del proyecto incluyan su expansión explicativa.
@@ -381,15 +455,17 @@ def audit_md_acronyms(state: AuditState, path: Path, text: str) -> None:
     if path.suffix.lower() != ".md":
         return
         
-    # Lista de vigilancia de acrónimos críticos (Watchlist)
-    watchlist = ["AJAX", "PHP", "CPU", "TTFB", "INP", "JSON-LD", "SEO", "DOM", "BEM", "CMS"]
-    
+    # El glosario es la fuente de las definiciones, auditarlo crearía un bucle de falsos positivos
+    if path.name == "glosario-tecnico.md":
+        return
+        
+    watchlist = get_glosario_watchlist()
+
     for acronym in watchlist:
         # Si el acrónimo existe en el texto como palabra exacta...
         if re.search(rf"\b{re.escape(acronym)}\b", text):
-            # ...buscamos si está expandido en formato: ACRONIMO (Explicación)
-            expansion_pattern = rf"\b{re.escape(acronym)}\s*\([^)]+\)"
-            if re.search(expansion_pattern, text):
+            # ...buscamos si está expandido en formato: Concepto en Español (ACRONIMO) o ACRONIMO (Explicación)
+            if re.search(rf"\(\s*{re.escape(acronym)}\s*\)", text) or re.search(rf"\b{re.escape(acronym)}\s*\([^)]+\)", text):
                 continue
                 
             # Si no está expandido, verificamos si es un término consolidado (> 3 apariciones globales)
@@ -402,7 +478,7 @@ def audit_md_acronyms(state: AuditState, path: Path, text: str) -> None:
                     state.add(
                         Finding(
                             path, i, "warn", "MD_ACRONYM",
-                            f"El acrónimo '{acronym}' no está expandido y no está consolidado (aparece 3 veces o menos). Regla: {acronym} (Inglés - Español)."
+                                f"El acrónimo '{acronym}' no está expandido ni consolidado. Regla Soberanía: Concepto en Español ({acronym})."
                         )
                     )
                     break
@@ -470,7 +546,14 @@ def audit_inline_scripts(state: AuditState, path: Path, text: str) -> None:
     Detecta etiquetas <script> con contenido en línea, que son un riesgo de XSS
     y violan la Política de Seguridad de Contenido (CSP).
     """
-    if path.suffix.lower() not in {".html", ".htm", ".php"}:
+    try:
+        relative = path.relative_to(REPO_ROOT)
+    except ValueError:
+        relative = path
+        
+    is_shop_md = relative.suffix.lower() == ".md" and "laboratorio" in relative.parts and "tienda" in relative.parts
+
+    if relative.suffix.lower() not in {".html", ".htm", ".php"} and not is_shop_md:
         return
 
     # Busca todas las etiquetas <script> y extrae sus atributos y contenido
@@ -509,7 +592,7 @@ def audit_external_assets(state: AuditState, path: Path, text: str) -> None:
     script_pattern = re.compile(r'<script[^>]*\bsrc\s*=\s*["\'](https?://[^"\']+)["\']', re.IGNORECASE)
     for match in script_pattern.finditer(text):
         url = match.group(1)
-        if "boilerplate.mercedev.es" not in url and "localhost" not in url:
+        if "tudominio.com" not in url and "localhost" not in url:
             line_number = text.count('\n', 0, match.start()) + 1
             state.add(Finding(path, line_number, "error", "UI_EXTERNAL_ASSET", f"Script externo detectado: {url[:30]}..."))
             
@@ -518,7 +601,7 @@ def audit_external_assets(state: AuditState, path: Path, text: str) -> None:
     for match in link_pattern.finditer(text):
         full_tag = match.group(0).lower()
         url = match.group(1)
-        if "stylesheet" in full_tag and "boilerplate.mercedev.es" not in url and "localhost" not in url:
+        if "stylesheet" in full_tag and "tudominio.com" not in url and "localhost" not in url:
             line_number = text.count('\n', 0, match.start()) + 1
             state.add(Finding(path, line_number, "error", "UI_EXTERNAL_ASSET", f"CSS externo detectado: {url[:30]}..."))
                 
@@ -526,7 +609,7 @@ def audit_external_assets(state: AuditState, path: Path, text: str) -> None:
     img_pattern = re.compile(r'<img[^>]*\bsrc\s*=\s*["\'](https?://[^"\']+)["\']', re.IGNORECASE)
     for match in img_pattern.finditer(text):
         url = match.group(1)
-        if "boilerplate.mercedev.es" not in url and "localhost" not in url:
+        if "tudominio.com" not in url and "localhost" not in url:
             line_number = text.count('\n', 0, match.start()) + 1
             state.add(Finding(path, line_number, "error", "UI_EXTERNAL_ASSET", f"Imagen externa detectada: {url[:30]}..."))
             
@@ -534,9 +617,37 @@ def audit_external_assets(state: AuditState, path: Path, text: str) -> None:
     meta_pattern = re.compile(r'<meta[^>]*\bcontent\s*=\s*["\'](https?://[^"\']+)["\']', re.IGNORECASE)
     for match in meta_pattern.finditer(text):
         url = match.group(1)
-        if "boilerplate.mercedev.es" not in url and "localhost" not in url:
+        if "tudominio.com" not in url and "localhost" not in url:
             line_number = text.count('\n', 0, match.start()) + 1
             state.add(Finding(path, line_number, "error", "UI_EXTERNAL_ASSET", f"Meta URL externa detectada: {url[:30]}..."))
+            
+def audit_shop_yaml(state: AuditState, path: Path, text: str) -> None:
+    """
+    Valida que los productos de la tienda tengan precios seguros (>= 0)
+    para evitar inyecciones de lógica de negocio o descuentos anómalos.
+    """
+    try:
+        relative = path.relative_to(REPO_ROOT)
+    except ValueError:
+        return
+        
+    if relative.suffix.lower() != ".md" or "laboratorio" not in relative.parts or "tienda" not in relative.parts:
+        return
+        
+    in_yaml = False
+    for line_number, line in enumerate(text.splitlines(), start=1):
+        if line.strip() == "---":
+            in_yaml = not in_yaml
+            continue
+                
+        if in_yaml and line.startswith("precio:"):
+            val = line.split(":", 1)[1].strip().strip('"\'')
+            try:
+                precio_float = float(val)
+                if precio_float < 0:
+                    state.add(Finding(path, line_number, "error", "SHOP_PRICE_ERROR", f"El precio del producto no puede ser negativo ({precio_float})."))
+            except ValueError:
+                state.add(Finding(path, line_number, "error", "SHOP_PRICE_ERROR", f"El precio '{val}' no es un número válido."))
 
 class SeoHTMLParser(HTMLParser):
     """
@@ -662,8 +773,13 @@ def audit_html_seo(state: AuditState, path: Path, text: str, strict_json_ld: boo
         state.add(Finding(path, 1, "error", "SEO_LANG", 'Falta atributo lang en <html lang="...">.'))
     if not title_text:
         state.add(Finding(path, 1, "error", "SEO_TITLE", "Falta <title> no vacío."))
+    elif len(title_text) > 65:
+        state.add(Finding(path, 1, "warn", "SEO_TITLE_LENGTH", f"El <title> excede los 65 caracteres óptimos para SEO ({len(title_text)})."))
+        
     if not parser.description:
         state.add(Finding(path, 1, "error", "SEO_DESC", 'Falta <meta name="description" content="...">.'))
+    elif len(parser.description) > 150:
+        state.add(Finding(path, 1, "warn", "SEO_DESC_LENGTH", f"La meta descripción excede los 150 caracteres óptimos ({len(parser.description)}). Riesgo de truncamiento en SERPs."))
 
     if not parser.charset:
         state.add(
@@ -752,16 +868,63 @@ def audit_json(state: AuditState, path: Path, text: str) -> None:
         )
 
 
-def run_on_files(paths: Iterable[Path], strict_json_ld: bool) -> AuditState:
+def run_on_files(paths: Iterable[Path], strict_json_ld: bool, verbose: bool = False) -> AuditState:
     """Orquesta todas las comprobaciones, archivo por archivo."""
     state = AuditState()
+    
+    # --- Lógica de Caché por HASH (Incremental Audit) ---
+    cache_path = REPO_ROOT / "observabilidad" / ".audit_hash_cache.json"
+    cache_data = {"globals": {}, "files": {}}
+    if cache_path.exists():
+        try:
+            cache_data = json.loads(cache_path.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+            
+    # Hashes de dependencias globales que alteran las reglas
+    script_hash = hashlib.md5(Path(__file__).read_bytes()).hexdigest()
+    req_path = REPO_ROOT / "requirements.txt"
+    req_hash = hashlib.md5(req_path.read_bytes()).hexdigest() if req_path.exists() else ""
+    glosario_path = REPO_ROOT / 'laboratorio' / 'biblioteca' / 'glosario-tecnico.json'
+    glosario_hash = hashlib.md5(glosario_path.read_bytes()).hexdigest() if glosario_path.exists() else ""
+    
+    current_globals = {"script": script_hash, "req": req_hash, "glos": glosario_hash, "strict": strict_json_ld}
+    
+    if cache_data.get("globals") != current_globals:
+        if verbose:
+            print("🔄 [Merci Audit] Reglas globales cambiadas. Invalidando caché HASH...")
+        cache_data["files"] = {}
+        cache_data["globals"] = current_globals
+        
+    new_cache_files = cache_data.get("files", {})
+    skipped_count = 0
+
     for path in sorted(set(paths)):
         text = read_text(path)
         if text is None:
             continue
+            
+        file_hash = hashlib.md5(text.encode("utf-8")).hexdigest()
+        path_str = str(path)
+        
+        if path_str in new_cache_files and new_cache_files[path_str] == file_hash:
+            skipped_count += 1
+            continue
+
+        if verbose:
+            try:
+                display = path.resolve().relative_to(REPO_ROOT.resolve())
+            except ValueError:
+                display = path
+            print(f"🔍 [Merci Audit] Analizando: {display}")
+            
+        errores_previos = len(state.errors)
+        warns_previos = len(state.warns)
+
         scan_secrets(state, path, text)
         audit_python_syntax(state, path, text)
         audit_python_imports(state, path, text)
+        audit_python_smells(state, path, text)
         audit_js_smells(state, path, text)
         audit_json(state, path, text)
         audit_html_seo(state, path, text, strict_json_ld)
@@ -770,6 +933,24 @@ def run_on_files(paths: Iterable[Path], strict_json_ld: bool) -> AuditState:
         audit_inline_styles(state, path, text)
         audit_inline_scripts(state, path, text)
         audit_external_assets(state, path, text)
+        audit_shop_yaml(state, path, text)
+        
+        # Solo cacheamos el archivo si está inmaculado (0 errores, 0 advertencias)
+        if len(state.errors) == errores_previos and len(state.warns) == warns_previos:
+            new_cache_files[path_str] = file_hash
+        else:
+            new_cache_files.pop(path_str, None)
+
+    if verbose and skipped_count > 0:
+        print(f"⚡ [Merci Audit] Archivos omitidos (Cache Hit HASH): {skipped_count}")
+
+    cache_data["files"] = new_cache_files
+    try:
+        cache_path.parent.mkdir(exist_ok=True)
+        cache_path.write_text(json.dumps(cache_data, indent=2), encoding="utf-8")
+    except Exception:
+        pass
+        
     return state
 
 
@@ -889,6 +1070,11 @@ def main(argv: Optional[list[str]] = None) -> int:
         action="store_true",
         help="Exige al menos un bloque JSON-LD en cada HTML.",
     )
+    parser.add_argument(
+        "--verbose", "-v",
+        action="store_true",
+        help="Muestra información detallada de los archivos auditados.",
+    )
 
     try:
         args = parser.parse_args(argv)
@@ -911,7 +1097,11 @@ def main(argv: Optional[list[str]] = None) -> int:
             files = git_staged_paths(root)
         else:
             files = list(iter_repo_files(root))
-        state = run_on_files(files, args.strict_json_ld)
+            
+        if args.verbose:
+            print(f"🔍 [Merci Audit] Iniciando auditoría sobre {len(files)} archivos...")
+            
+        state = run_on_files(files, args.strict_json_ld, args.verbose)
         audit_banned_tracked_files(root, state, args.git_staged)
     except SystemExit:
         raise

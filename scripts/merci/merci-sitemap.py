@@ -17,7 +17,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[2]
 PUBLIC_DIR = REPO_ROOT / "public"
 SITEMAP_PATH = PUBLIC_DIR / "sitemap.xml"
-DOMAIN = "https://boilerplate.mercedev.es"
+DOMAIN = "https://tudominio.com"
 
 def generar_sitemap():
     print("🗺️ [Merci Sitemap] Escaneando páginas webs estáticas...")
@@ -48,6 +48,23 @@ def generar_sitemap():
       <loc>{full_url}</loc>
       <lastmod>{ahora}</lastmod>
       <changefreq>weekly</changefreq>
+      <priority>{prioridad}</priority>
+   </url>"""
+        bloques_url.append(bloque)
+
+    # QUÉ HACE: Inyecta las rutas dinámicas maestras (WordPress / WooCommerce)
+    # POR QUÉ: Al no ser archivos .html físicos, rglob no las encuentra, pero deben indexarse.
+    rutas_dinamicas = [
+        ("blog/", "0.9"),
+        ("blog/tienda/", "0.9")
+    ]
+    
+    for ruta, prioridad in rutas_dinamicas:
+        full_url = f"{DOMAIN}/{ruta}"
+        bloque = f"""   <url>
+      <loc>{full_url}</loc>
+      <lastmod>{ahora}</lastmod>
+      <changefreq>daily</changefreq>
       <priority>{prioridad}</priority>
    </url>"""
         bloques_url.append(bloque)

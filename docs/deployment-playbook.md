@@ -6,7 +6,7 @@ Este documento define el proceso estandarizado para desplegar la arquitectura h�
 ## PASO 0: Fundamentos y Preparación de Infraestructura
 **Concepto:** Separar el Registro del Dominio (el "nombre") de la Infraestructura IaaS (Infrastructure as a Service - Infraestructura como Servicio) donde residirán los datos (el VPS o Servidor Privado Virtual).
 
-1. Adquirir un servidor VPS (Virtual Private Server - Servidor Privado Virtual) "Bare Metal" o Cloud (ej. DigitalOcean, Hetzner, Linode) e instalar **Ubuntu 24.04 LTS o 22.04 LTS** en blanco.
+1. Adquirir un servidor VPS (Virtual Private Server - Servidor Privado Virtual) "Bare Metal" o Cloud (ej. DigitalOcean, Hetzner, Linode) e instalar **Ubuntu 24.04 Soporte a largo plazo (LTS) o 22.04 LTS** en blanco.
 2. Acceder al panel del registrador del dominio (proveedor donde se compró el dominio).
 3. Configurar la Zona DNS (Domain Name System - Sistema de Nombres de Dominio): modificar el Registro 'A' para que apunte a la dirección IPv4 pública del nuevo servidor VPS.
 4. Esperar el tiempo de propagación DNS (TTL) antes de emitir certificados de seguridad.

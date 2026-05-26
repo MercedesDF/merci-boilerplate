@@ -437,6 +437,7 @@ def main():
     (REPO_ROOT / "scripts" / "merci" / "merci-deploy.py").unlink(missing_ok=True)
     (REPO_ROOT / "scripts" / "merci" / "merci-completo.py").unlink(missing_ok=True)
     (REPO_ROOT / "scripts" / "merci" / "merci-showcase.py").unlink(missing_ok=True)
+    (REPO_ROOT / "scripts" / "merci" / "merci-release.py").unlink(missing_ok=True)
 
     # QUÉ HACE: Reconstruye las carpetas estructurales (Matriz y Laboratorio).
     # POR QUÉ: Recrearlas vacías garantiza que no haya fugas de datos (borradores antiguos)
@@ -515,4 +516,8 @@ WP_APP_PASSWORD="tu_contraseña_de_aplicacion"
     print("\n🎉 ¡Inicialización completada! Bienvenido a tu nuevo proyecto.")
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\n🛑 [Merci Init] Inicialización cancelada. El repositorio base no ha sido modificado.")
+        sys.exit(130)

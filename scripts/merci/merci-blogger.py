@@ -63,9 +63,12 @@ def main():
         print("  [2] Biblioteca (biblioteca/)")
         print("  [3] Art de Coté (art-de-cote/)")
         
-        opcion = input("  👉 Elige una opción [1]: ").strip() or "1"
+        opcion = input("  👉 Elige una opción (0 para cancelar) [1]: ").strip() or "1"
         
-        if opcion == "2":
+        if opcion == "0":
+            print("  🛑 Operación cancelada.")
+            sys.exit(0)
+        elif opcion == "2":
             target_dir = REPO_ROOT / "biblioteca"
             notas = sorted(list(target_dir.rglob("*.md")), key=lambda x: x.name)
         elif opcion == "3":

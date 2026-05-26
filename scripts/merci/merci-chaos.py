@@ -36,8 +36,11 @@ CHAOS_LOG_PATH = PRIVADO_DIR / "chaos-audit.json"
 def extract_json_array(text: str) -> list:
     match = re.search(r'\[.*?\]', text, re.DOTALL)
     if match:
+        json_str = match.group(0)
+        # Saneamiento: Los LLMs a veces escapan comillas simples (\'), lo cual es inválido en JSON
+        json_str = json_str.replace("\\'", "'")
         try:
-            return json.loads(match.group(0))
+            return json.loads(json_str)
         except json.JSONDecodeError:
             pass
     return []
@@ -77,6 +80,8 @@ def main():
         print("  ℹ️ [Merci Info] La IA falló en apuntar al código exacto. Abortando.")
         if sabotajes and sabotajes[0].get("buscar"):
             print(f"     [Debug] La IA intentó buscar:\n{sabotajes[0].get('buscar')}")
+        else:
+            print(f"     [Debug] Respuesta cruda de la IA:\n{respuesta.choices[0].message.content}")
         sys.exit(0)
 
     print(f"  😈 Mutando el archivo (Inyectando vulnerabilidad)...")

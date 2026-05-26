@@ -43,7 +43,7 @@ def main():
     md_content = md_file.read_text(encoding="utf-8")
     html_content = markdown.markdown(md_content, extensions=['fenced_code', 'tables'])
 
-    # Inyectar el CSS atómico basado en los estándares visuales de boilerplate.mercedev.es
+    # Inyectar el CSS atómico basado en los estándares visuales de tudominio.com
     html_string = f"""
     <!DOCTYPE html>
     <html lang="es">

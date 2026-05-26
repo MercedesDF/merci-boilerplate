@@ -1,6 +1,6 @@
 <?php
 // Resolutor dinámico de versiones
-$root_dir = dirname(ABSPATH) . '/boilerplate.mercedev.es/public';
+$root_dir = dirname(ABSPATH) . '/tudominio.com/public';
 $css_v = time();
 $js_merci_v = time();
 $js_main_v = time();
@@ -20,7 +20,7 @@ $js_main_v = time();
     <div id="top" tabindex="-1" style="position: absolute; top: 0; left: 0;"></div>
     <header class="header">
         <a href="/" class="header__brand">
-            <img src="/assets/images/logo.webp?v=2" alt="mercedev" class="header__logo" width="263" height="65" fetchpriority="low" decoding="async">
+            <img src="/assets/images/logo.webp?v=2" alt="tuempresa" class="header__logo" width="263" height="65" fetchpriority="low" decoding="async">
         </a>
         <button class="header__toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false">
             <span class="header__toggle-icon"></span>
@@ -32,6 +32,7 @@ $js_main_v = time();
             <a href="/blog/" class="nav__link" aria-label="Ir a la portada del Blog">Blog</a>
             <a href="/art-de-cote/" class="nav__link">Art de Coté</a>
             <a href="/blog/tienda/" class="nav__link">Tienda</a>
+            <a href="<?php echo function_exists('wc_get_cart_url') ? esc_url(wc_get_cart_url()) : '/blog/carrito/'; ?>" class="nav__link">🛒 Carrito</a>
             <a href="/contacto/" class="nav__link">Contacto</a>
         </nav>
     </header>
@@ -59,7 +60,7 @@ $js_main_v = time();
         </div>
         <div class="footer__text">
             <a href="#top">↑ Volver arriba</a><br>
-            &copy; 2026 <strong>mercedev</strong> — Base de código abierto bajo Licencia MIT.
+            &copy; 2026 <strong>tuempresa</strong> — Base de código abierto bajo Licencia MIT.
         </div>
     </footer>
     <aside class="merci-ui" id="merci-ui" aria-label="Asistente virtual Merci">

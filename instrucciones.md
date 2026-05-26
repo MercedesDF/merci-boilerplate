@@ -46,7 +46,7 @@ Este documento define las reglas de arquitectura e interacción de esta plantill
 7. **Filosofía de Dependencias:**
    - **Runtime (Navegador):** 0 dependencias externas. Prohibido inyectar librerías JS o CSS externas.
    - **Build-time (Pipeline):** Se permiten librerías Python para automatización, auditoría y compilación. Estas deben gestionarse siempre dentro de un entorno virtual (`.venv`) y estar declaradas en `requirements.txt`.
-8. **Higiene de Importaciones (PEP 8):** Todas las importaciones en scripts Python deben declararse estrictamente al principio del archivo. Queda terminantemente prohibido realizar importaciones en medio del código.
+8. **Higiene de Importaciones de la Propuesta de Mejora de Python (PEP) 8:** Todas las importaciones en scripts Python deben declararse estrictamente al principio del archivo. Queda terminantemente prohibido realizar importaciones en medio del código.
 9. **Blindaje Supply Chain (Cadena de Suministro):** La regla `audit_python_imports` del auditor valida mediante AST (Abstract Syntax Tree - Árbol de Sintaxis Abstracta) que todas las importaciones pertenezcan a la `stdlib` o a la lista blanca de `requirements.txt`. No incluir librerías no declaradas.
 
 ## 4. Flujo Maestro de Publicación (SOP Dual)

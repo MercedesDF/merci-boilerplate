@@ -13,6 +13,7 @@ import subprocess
 import time
 import json
 import sys
+import os
 from pathlib import Path
 
 # Definimos la ruta base donde residen los scripts
@@ -23,30 +24,32 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 # --- FASE DE CONSTRUCCIÓN (BUILD) ---
 # 1. Optimizador: Prepara las imágenes WebP necesarias.
 # 2. Styles: Compila el SASS final a main.css.
-# 3. Publish: SSG que compila la Biblioteca desde Markdown a HTML/PDF.
-# 4. WP Headless: Sincroniza los markdowns locales dinámicos hacia WordPress.
-# 5. Sync Pages: Propaga el header/footer maestro a las páginas secundarias.
-# 6. Extract Metrics: Inyecta las últimas estadísticas de PageSpeed Insight en home.
-# 7. Brain: Genera el JSON estático con respuestas contextuales de IA.
-# 8. Glosario AI: Agente autónomo que auto-completa definiciones DevSecOps (Shift-Left).
+# 3. Glosario AI: Compila el diccionario técnico a Markdown antes del SSG.
+# 4. Publish: SSG que compila la Biblioteca desde Markdown a HTML/PDF.
+# 5. WP Headless: Sincroniza los markdowns locales dinámicos hacia WordPress.
+# 6. Shop Headless: Sincroniza los productos mock a WooCommerce.
+# 7. Sync Pages: Propaga el header/footer maestro a las páginas secundarias.
+# 8. Extract Metrics: Inyecta las estadísticas de PageSpeed en home.
+# 9. Telemetry: Inyecta métricas de repositorio en la portada y sobre-mí.
+# 10. Brain: Genera el JSON estático con respuestas contextuales de IA.
 # --- FASE DE QA (QUALITY ASSURANCE) ---
-# 9. Sitemap: Escanea todos los HTML finales generados y actualiza el mapa XML.
-# 10. SSOT: Agente que sincroniza el Roadmap.
-# 11. Drift: Detecta asimetrías de fechas entre manuales y código fuente.
-# 12. Audit: Auditoría estricta de seguridad, SEO y sintaxis sobre el código final.
-# 13. Hardening: Audita la postura de seguridad de la infraestructura y el repositorio.
-# 14. Linkcheck: Rastreo dinámico de enlaces rotos sobre el HTML final compilado.
+# 11. Sitemap: Escanea todos los HTML finales generados y actualiza el mapa XML.
+# 12. Drift: Detecta asimetrías de fechas entre manuales y código fuente.
+# 13. Audit: Auditoría estricta de seguridad, SEO y sintaxis sobre el código final.
+# 14. Hardening: Audita la postura de seguridad de la infraestructura y el repositorio.
+# 15. Linkcheck: Rastreo dinámico de enlaces rotos sobre el HTML final compilado.
 
 PIPELINE = [
     "merci-optimizer.py",
     "merci-styles.py",
+    "merci-glosario.py",
     "merci-publish.py",
     "merci-wp.py",
+    "merci-shop.py",
     "merci-sync-pages.py",
     "merci-extract-metrics.py",
     "merci-telemetry.py",
     "merci-brain.py",
-    "merci-glosario.py",
     "merci-sitemap.py",
     "merci-drift.py",
     "merci-audit.py",
@@ -100,6 +103,9 @@ def main():
     for s_name, s_time in script_durations.items():
         print(f"  {s_name:<25} : {s_time:>5.2f}s")
     print("-" * 40)
+    
+    if not os.environ.get("MERCI_IS_COMPLETO"):
+        print("\n💡 [Merci DX] Todo en verde. Si tu iteración ha finalizado, ejecuta 'merci completo' para sellar y subir a producción.\n")
 
 if __name__ == "__main__":
     try:
