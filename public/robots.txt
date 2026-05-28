@@ -1,5 +1,5 @@
-# robots.txt para tudominio.com
+# robots.txt para tu_dominio.com
 User-agent: *
 Allow: /
 
-Sitemap: https://tudominio.com/sitemap.xml
+Sitemap: https://tu_dominio.com/sitemap.xml

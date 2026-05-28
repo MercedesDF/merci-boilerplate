@@ -3,8 +3,8 @@
 // Tarjeta base
 .card {
   position: relative;
-  background-color: transparent;
-  border: 1px solid rgba($color-text-base, 0.1);
+  background-color: $color-surface;
+  border: 1px solid $color-border;
   border-radius: 8px;
   padding: 2rem;
   display: flex;
@@ -14,7 +14,8 @@
 
   &:hover {
     transform: translateY(-4px);
-    border-color: $color-primary;
+    border-color: $color-border;
+    box-shadow: $shadow-hover;
 
     // Al hacer hover sobre cualquier parte de la tarjeta, el título se ilumina
     .card__title a {
@@ -27,7 +28,7 @@
     margin-bottom: 1.5rem;
     font-size: 0.875rem;
     font-weight: bold;
-    color: #64748b;
+    color: $color-text-muted;
     text-decoration: none;
     transition: color 0.2s ease;
 
@@ -88,7 +89,7 @@
 
   &__meta {
     font-size: 0.875rem;
-    color: #64748b; // Un gris pizarra para el modo claro
+    color: $color-text-muted;
   }
 
   // Modificador BEM para Cuadernillos (Blog cronológico)

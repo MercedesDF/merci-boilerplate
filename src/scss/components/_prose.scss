@@ -13,7 +13,7 @@
     font-weight: bold;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: #64748b;
+    color: $color-text-muted;
     text-decoration: none;
     transition: color 0.2s ease;
 
@@ -37,7 +37,7 @@
   &__content {
     font-size: 1.25rem;
     line-height: 1.8;
-    color: #334155;
+    color: $color-text-base;
     
     /* PATRÓN LANDING PAGE (Centrado y ancho completo) */
     text-align: center;
@@ -64,7 +64,7 @@
       margin: 2rem auto;
       max-width: 100%;
       height: auto;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      box-shadow: $shadow-md;
     }
 
     h2 { 
@@ -83,7 +83,7 @@
     /* Separadores horizontales editoriales (Línea fina expandida) */
     > h2 ~ h2 {
       padding-top: 4.5rem;
-      border-top: 1px solid rgba($color-text-base, 0.1);
+      border-top: 1px solid $color-border;
     }
 
     h3 { 

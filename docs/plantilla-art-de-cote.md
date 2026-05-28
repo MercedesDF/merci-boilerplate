@@ -15,7 +15,7 @@ fase: ""
 <!-- linkedin:
 Escribe aquí tu anuncio para LinkedIn.
 Acepta saltos de línea sin problemas.
-https://tudominio.com/art-de-cote/tu-url
+https://tu_dominio.com/art-de-cote/tu-url
 -->
 
 Escribe aquí el contenido de tu exploración colateral.

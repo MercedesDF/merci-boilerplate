@@ -17,8 +17,8 @@
     <meta property="og:title" content="tuempresa — Ingeniería de Rendimiento & DevSecOps">
     <meta property="og:description" content="Laboratorio DevSecOps gobernado por 25+ agentes IA y metodología Spec as Source.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://tudominio.com/">
-    <meta property="og:image" content="https://tudominio.com/assets/images/logo.webp">
+    <meta property="og:url" content="https://tu_dominio.com/">
+    <meta property="og:image" content="https://tu_dominio.com/assets/images/tu_logo.webp?v=1779989875">
 
     <title>tuempresa — Ingeniería de Rendimiento & DevSecOps</title>
     
@@ -26,10 +26,10 @@
     <link rel="icon" href="/favicon.ico?v=2" type="image/x-icon">
     <!-- QUÉ HACE: Cache Busting dinámico incrementado a v14 -->
     <!-- POR QUÉ: Obliga a Varnish y a navegadores móviles a purgar la caché y descargar la nueva rejilla de 5 columnas. -->
-    <link rel="stylesheet" href="/css/main.css?v=1779834038">
-    <script src="/js/MerciController.js?v=1779834037" defer></script>
+    <link rel="stylesheet" href="/css/main.css?v=1779989875">
+    <script src="/js/MerciController.js?v=1779989875" defer></script>
     <script src="/js/main.js?v=1779435201" defer></script>
-    <link rel="canonical" href="https://tudominio.com">
+    <link rel="canonical" href="https://tu_dominio.com">
     
     <!-- JSON-LD Mínimo Fase 2 -->
     <script type="application/ld+json">
@@ -37,16 +37,16 @@
       "@context": "https://schema.org",
       "@type": "WebSite",
       "name": "tuempresa",
-      "url": "https://tudominio.com"
+      "url": "https://tu_dominio.com"
     }
     </script>
 </head>
 <body class="page" id="page-home">
-    <!-- Ancla invisible WAI-ARIA para Volver Arriba -->
-    <div id="top" tabindex="-1" style="position: absolute; top: 0; left: 0;"></div>
-    <header class="header">
+    <!-- QUÉ HACE: Centraliza el foco de "Volver arriba" semánticamente en el header -->
+    <!-- POR QUÉ: Elimina el anti-patrón de accesibilidad de usar divs invisibles con tabindex="-1" -->
+    <header class="header" id="top">
         <a href="/" class="header__brand">
-            <img src="/assets/images/logo.webp?v=2" alt="tuempresa" class="header__logo" width="263" height="65" fetchpriority="low" decoding="async">
+            <img src="/assets/images/tu_logo.webp?v=1779989875" alt="tuempresa" class="header__logo" width="263" height="65" fetchpriority="low" decoding="async">
         </a>
         <button class="header__toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false">
             <span class="header__toggle-icon"></span>
@@ -60,7 +60,6 @@
             <!-- QUÉ HACE: Diferencia este enlace del autogenerado por WordPress en las tarjetas. -->
             <!-- POR QUÉ: Evita el error WAI-ARIA de "Enlaces idénticos con distinto destino". -->
             <a href="/blog/" class="nav__link" aria-label="Ir a la portada del Blog">Blog</a>
-            <a href="/art-de-cote/" class="nav__link">Art de Coté</a>
             <a href="/blog/tienda/" class="nav__link">Tienda</a>
             <a href="/contacto/" class="nav__link">Contacto</a>
         </nav>
@@ -71,7 +70,7 @@
         <!-- HERO SECTION          -->
         <!-- ===================== -->
         <section class="hero">
-            <h1 class="hero__title">tudominio.com</h1>
+            <h1 class="hero__title">tu_domi<span class="hero__highlight">nio</span>.com</h1>
             <h2 class="hero__statement">proyecto vivo<br>en producción desde abril 2026.</h2>
             <p class="hero__subtitle">
                 <strong>Infraestructura operacional pura.</strong><br>
@@ -111,15 +110,15 @@
                 </div>
                 <div class="hero__metric">
                     <span class="hero__metric-label">CLS</span>
-                    <span class="hero__metric-value">0</span>
+                    <span class="hero__metric-value">0.096</span>
                 </div>
                 <div class="hero__metric">
                     <span class="hero__metric-label">TBT</span>
-                    <span class="hero__metric-value">184 ms</span>
+                    <span class="hero__metric-value">1 ms</span>
                 </div>
                 <div class="hero__metric">
                     <span class="hero__metric-label">SI</span>
-                    <span class="hero__metric-value">1.9 s</span>
+                    <span class="hero__metric-value">1.8 s</span>
                 </div>
                 <div class="hero__metric">
                     <span class="hero__metric-label">Descarga</span>
@@ -141,7 +140,7 @@
             
             <!-- QUÉ HACE: Expone las puntuaciones de Lighthouse (CWV) y diagnostica problemas de red. -->
             <div id="lighthouse-scores" class="hero__scores-summary">
-                81* en Rendimiento | 100 en Accesibilidad | 100 en Mejores Prácticas | 100 en SEO<br><small>* Penalización externa por latencia de red (Ping: 170ms, TTFB: 941ms).</small>
+                98* en Rendimiento | 100 en Accesibilidad | 96* en Mejores Prácticas | 100 en SEO<br><small>* Penalización externa por latencia de red (Ping: 170ms, TTFB: 764ms).</small>
             </div>
 
             <!-- ===================== -->
@@ -178,7 +177,7 @@
         </div>
         <!-- QUÉ HACE: Usa un botón nativo (<button>) para atrapar el foco del tabulador (Accesibilidad) -->
         <button class="merci-ui__trigger" aria-controls="merci-message" aria-expanded="false">
-            <img class="merci-ui__avatar" src="/assets/images/Merci-en-la-nube.webp" alt="Interactuar con el asistente" width="80" height="80" fetchpriority="low" decoding="async">
+            <img class="merci-ui__avatar" src="/assets/images/tu_avatar.webp?v=1779989875" alt="Interactuar con el asistente" width="80" height="80" fetchpriority="low" decoding="async">
         </button>
     </aside>
 </body>

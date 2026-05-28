@@ -1,0 +1,68 @@
+@use '../abstracts/variables' as *;
+
+// ==========================================
+// Botón Flotante (Showcase Return)
+// ==========================================
+// QUÉ HACE: Estiliza el botón inyectado dinámicamente por merci-showcase.py
+// POR QUÉ: Evita inyectar CSS en línea, respetando la arquitectura SASS 7-1 y BEM.
+
+.showcase-return {
+    position: fixed;
+    bottom: 2rem;
+    left: 2rem;
+    z-index: 9999;
+    
+    // Mismos colores y formato que .hero__badge
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.35rem 1.5rem 0.35rem 0.35rem; 
+    background: $color-surface;
+    border: 1px solid $color-border;
+    border-radius: 50px;
+    color: $color-text-base;
+    font-family: $font-family-base;
+    font-weight: 500;
+    font-size: 0.9rem;
+    text-decoration: none;
+    box-shadow: $shadow-md;
+    transition: all 0.2s ease;
+    
+    &:visited {
+        color: $color-text-base; // Fix: Evita que el navegador lo vuelva naranja por ser un enlace visitado
+    }
+    
+    &:hover, &:focus {
+        transform: translateY(-2px);
+        border-color: $color-primary;
+        background: rgba($color-primary, 0.05);
+        color: $color-primary;
+        outline: none;
+        box-shadow: $shadow-hover;
+    }
+
+    &__tag {
+        background: $color-regular; /* WCAG AA: Contraste > 6:1 sobre blanco */
+        color: $color-bg-base;
+        padding: 0.2rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+}
+
+// Responsivo: En móvil lo centramos abajo para mejor ergonomía (pulgar)
+@media (max-width: $bp-medium) {
+    .showcase-return {
+        bottom: 1.5rem;
+        left: 50%;
+        transform: translateX(-50%);
+        width: max-content;
+        
+        &:hover, &:focus {
+            transform: translate(-50%, -2px);
+        }
+    }
+}

@@ -11,6 +11,7 @@ import os
 import sys
 import shutil
 import re
+import argparse
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -97,9 +98,20 @@ def anonimizar_portada(nuevo_dominio: str):
     index_path = REPO_ROOT / "public" / "index.html"
     if index_path.exists():
         content = index_path.read_text(encoding="utf-8")
+        # Preservar el estilo de tres últimas letras resaltadas en naranja
+        parts = nuevo_dominio.rsplit('.', 1)
+        if len(parts) == 2:
+            name, tld = parts
+            if len(name) > 3:
+                nuevo_hero_title = f'{name[:-3]}<span class="hero__highlight">{name[-3:]}</span>.{tld}'
+            else:
+                nuevo_hero_title = f'<span class="hero__highlight">{name}</span>.{tld}'
+        else:
+            nuevo_hero_title = f'<span class="hero__highlight">{nuevo_dominio}</span>'
+
         content = content.replace(
             '<h1 class="hero__title">merce<span class="hero__highlight">dev</span>.es</h1>',
-            f'<h1 class="hero__title">{nuevo_dominio}</h1>'
+            f'<h1 class="hero__title">{nuevo_hero_title}</h1>'
         )
         
         nuevo_prose = f"""<article class="prose">
@@ -214,16 +226,26 @@ def generar_placeholders_directorios(nuevo_dominio: str):
     # POR QUÉ: Reutilizar el header y footer reales en las páginas de contingencia
     # hace que la experiencia de navegación sea 100% coherente, incluso en rutas vacías.
     header_html, footer_html = "", ""
+    css_url, js_ctrl_url, js_main_url = "/css/main.css?v=1", "/js/MerciController.js?v=1", "/js/main.js?v=1"
     index_path = REPO_ROOT / "public" / "index.html"
     if index_path.exists():
         index_content = index_path.read_text(encoding="utf-8")
         h_match = re.search(r"(<header.*?</header>)", index_content, re.DOTALL | re.IGNORECASE)
         f_match = re.search(r"(<footer.*?</footer>)", index_content, re.DOTALL | re.IGNORECASE)
-        m_match = re.search(r"(<!-- Asistente Merci -->.*?</aside>)", index_content, re.DOTALL | re.IGNORECASE)
+        m_match = re.search(r"(<!-- Asistente .*?</aside>)", index_content, re.DOTALL | re.IGNORECASE)
+        
+        css_match = re.search(r'<link rel="stylesheet" href="(/css/main\.css\?v=\d+)">', index_content)
+        js_ctrl_match = re.search(r'<script src="(/js/MerciController\.js\?v=\d+)"', index_content)
+        js_main_match = re.search(r'<script src="(/js/main\.js\?v=\d+)"', index_content)
+        
         header_html = h_match.group(1) if h_match else ""
         footer_html = f_match.group(1) if f_match else ""
         if m_match:
             footer_html += f"\n\n    {m_match.group(1)}"
+            
+        if css_match: css_url = css_match.group(1)
+        if js_ctrl_match: js_ctrl_url = js_ctrl_match.group(1)
+        if js_main_match: js_main_url = js_main_match.group(1)
 
     print("  🏗️  Generando páginas de contingencia (Anti-403 Forbidden)...")
     blog_symlink = REPO_ROOT / "public" / "blog"
@@ -233,9 +255,12 @@ def generar_placeholders_directorios(nuevo_dominio: str):
         except Exception:
             shutil.rmtree(blog_symlink, ignore_errors=True)
             
+    art_cote_dir = REPO_ROOT / "public" / "art-de-cote"
+    if art_cote_dir.exists():
+        shutil.rmtree(art_cote_dir, ignore_errors=True)
+            
     rutas = [
         ("biblioteca", "La Biblioteca", "El conocimiento inmutable se almacena aquí. Las páginas estáticas se autogenerarán con el orquestador."),
-        ("art-de-cote", "Art de Coté", "Índice de scripts experimentales, andamiajes y código colateral."),
         ("blog", "El Blog", "Capa dinámica. Si no usas Headless CMS, puedes usar esta ruta para páginas estáticas."),
         ("blog/tienda", "La Tienda", "Catálogo oficial de productos y demostración e-commerce.")
     ]
@@ -251,9 +276,9 @@ def generar_placeholders_directorios(nuevo_dominio: str):
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{titulo} - {nuevo_dominio}</title>
     <!-- merci-audit:silence-seo -->
-    <link rel="stylesheet" href="/css/main.css?v=1">
-    <script src="/js/MerciController.js?v=1" defer></script>
-    <script src="/js/main.js?v=1" defer></script>
+    <link rel="stylesheet" href="{css_url}">
+    <script src="{js_ctrl_url}" defer></script>
+    <script src="{js_main_url}" defer></script>
 </head>
 <body class="page" id="{body_id}">
     <div id="top" tabindex="-1" style="position: absolute; top: 0; left: 0;"></div> <!-- merci-audit:silence-style -->
@@ -355,20 +380,36 @@ def configure_ai_module(include_ai: bool):
             publish_py.write_text(content, encoding="utf-8")
 
 def main():
-    print("🚀 [Merci Init] Preparación de nuevo proyecto a partir del Boilerplate.")
-    print("⚠️  ADVERTENCIA DE SEGURIDAD: Este script es DESTRUCTIVO.")
-    print("Destruirá la biblioteca actual y reemplazará todas las referencias de mercedev.es")
-    print("Solo debes ejecutar esto cuando hayas CLONADO este repo para un proyecto NUEVO.\n")
-    
-    confirm = input("¿Estás segura de querer formatear este código base? Escribe 'DESTRUIR' para continuar: ")
-    if confirm != "DESTRUIR":
-        print("Operación cancelada. El repositorio está a salvo.")
-        sys.exit(0)
+    parser = argparse.ArgumentParser(description="Inicializa un nuevo Boilerplate DevSecOps a partir del repositorio.")
+    parser.add_argument('--force', action='store_true', help="Ignora la advertencia destructiva")
+    parser.add_argument('--dominio', type=str, help="Nuevo dominio sin protocolo (ej. mi-proyecto.com)")
+    parser.add_argument('--nombre', type=str, help="Nuevo nombre del proyecto")
+    parser.add_argument('--ia', action='store_true', help="Incluye el módulo de Inteligencia Artificial")
+    parser.add_argument('--preserve-socials', action='store_true', help="Preserva los enlaces sociales originales")
+    args, unknown = parser.parse_known_args()
+
+    if not args.force:
+        print("🚀 [Merci Init] Preparación de nuevo proyecto a partir del Boilerplate.")
+        print("⚠️  ADVERTENCIA DE SEGURIDAD: Este script es DESTRUCTIVO.")
+        print("Destruirá la biblioteca actual y reemplazará todas las referencias de mercedev.es")
+        print("Solo debes ejecutar esto cuando hayas CLONADO este repo para un proyecto NUEVO.\n")
         
-    nuevo_dominio = input("Introduce el nuevo dominio (ej. midominio.com): ").strip()
-    nuevo_nombre = input("Introduce el nombre del proyecto (ej. Mi Empresa): ").strip()
-    incluir_ia = input("\n🤖 ¿Deseas incluir el módulo de Inteligencia Artificial (Shift-Left AI) en tu proyecto? [Y/n]: ").strip().lower() != 'n'
-    preserve_socials = "--preserve-socials" in sys.argv
+        confirm = input("¿Estás segura de querer formatear este código base? Escribe 'DESTRUIR' para continuar: ")
+        if confirm != "DESTRUIR":
+            print("Operación cancelada. El repositorio está a salvo.")
+            sys.exit(0)
+            
+    nuevo_dominio = args.dominio if args.dominio else input("Introduce el nuevo dominio (ej. midominio.com): ").strip()
+    nuevo_nombre = args.nombre if args.nombre else input("Introduce el nombre del proyecto (ej. Mi Empresa): ").strip()
+    
+    if args.ia:
+        incluir_ia = True
+    elif not args.force:
+        incluir_ia = input("\n🤖 ¿Deseas incluir el módulo de Inteligencia Artificial (Shift-Left AI) en tu proyecto? [Y/n]: ").strip().lower() != 'n'
+    else:
+        incluir_ia = False
+        
+    preserve_socials = args.preserve_socials
     
     if not nuevo_dominio or not nuevo_nombre:
         print("❌ Error: Los datos no pueden estar vacíos.")
@@ -442,13 +483,13 @@ def main():
     # QUÉ HACE: Reconstruye las carpetas estructurales (Matriz y Laboratorio).
     # POR QUÉ: Recrearlas vacías garantiza que no haya fugas de datos (borradores antiguos)
     # pero asegura que el andamiaje del Headless CMS esté listo para el nuevo usuario.
-    for dir_name in ["blog", "art-de-cote"]:
+    for dir_name in ["blog"]:
         dir_path = REPO_ROOT / dir_name
         dir_path.mkdir(parents=True, exist_ok=True)
         (dir_path / ".gitkeep").touch(exist_ok=True)
 
     # Reconstrucción del andamiaje interno del laboratorio
-    for lab_dir in ["blog", "art-de-cote", "incubacion", "notas_rapidas", "prompts", "historico", "biblioteca", "evidencias"]:
+    for lab_dir in ["blog", "incubacion", "notas_rapidas", "prompts", "historico", "biblioteca", "evidencias"]:
         dir_path = REPO_ROOT / "laboratorio" / lab_dir
         dir_path.mkdir(parents=True, exist_ok=True)
         (dir_path / ".gitkeep").touch(exist_ok=True)
@@ -458,10 +499,21 @@ def main():
     # los iconos estructurales de la UI (logos y el avatar del asistente Merci).
     purge_directory(REPO_ROOT / ".assets-raw")
     
-    imagenes_a_conservar = ["favicon.ico", "favicon.png", "logo.webp", "logo.png"]
+    # Mantenemos las imágenes base y los nuevos gemelos
+    imagenes_a_conservar = ["favicon.ico", "favicon.png", "tu_logo.webp"]
     if incluir_ia:
-        imagenes_a_conservar.append("Merci-en-la-nube.webp")
+        imagenes_a_conservar.append("tu_avatar.webp")
     purge_directory(REPO_ROOT / "assets" / "images", exclude=imagenes_a_conservar)
+    
+    # Aplicar patrón Gemelos Multimedia
+    print("  🖼️  Aplicando patrón Gemelos Multimedia (reemplazando recursos de matriz en el código)...")
+    import time
+    v_buste = int(time.time())
+    replace_in_files("/assets/images/logo.webp?v=2", f"/assets/images/tu_logo.webp?v={v_buste}")
+    replace_in_files("/assets/images/logo.webp", f"/assets/images/tu_logo.webp?v={v_buste}")
+    
+    if incluir_ia:
+        replace_in_files("/assets/images/Merci-en-la-nube.webp", f"/assets/images/tu_avatar.webp?v={v_buste}")
     
     generar_placeholders_directorios(nuevo_dominio)
     
@@ -473,6 +525,10 @@ def main():
     
     # 3. Intercambio Documental (Los Gemelos)
     print("  📄 Intercambiando documentación matriz por documentación agnóstica...")
+    
+    # Purga del enlace a Art de Coté en toda la navegación
+    replace_in_files('            <a href="/art-de-cote/" class="nav__link">Art de Coté</a>\n', '')
+    replace_in_files('<a href="/art-de-cote/" class="nav__link">Art de Coté</a>', '')
     
     # Borramos la identidad documental del autor original
     (REPO_ROOT / "README.md").unlink(missing_ok=True)

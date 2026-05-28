@@ -2,7 +2,10 @@
 
 // Colores (Light Mode Base)
 $color-bg-base: #ffffff; // Blanco puro
-$color-text-base: #0f172a; // Negro/Azul muy oscuro
+$color-surface: #f8fafc; // Slate 50 (Fondo sutil para tarjetas y bloques)
+$color-border: #e2e8f0; // Slate 200 (Bordes finos premium)
+$color-text-base: #0f172a; // Slate 900 (Negro/Azul muy oscuro)
+$color-text-muted: #64748b; // Slate 500 (Gris pizarra para meta-datos)
 $color-primary: #ea580c; // Naranja oscuro (Orange 600)
 $color-secondary: #10b981; // Emerald 500
 $color-accent: #f59e0b; // Amber 500
@@ -12,6 +15,12 @@ $color-regular: #9a3412; // Orange 800 - Ratio > 6:1 sobre blanco
 
 // Tipografía
 $font-family-base: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+$font-family-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+// Sombras (Escala Premium)
+$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 
 // Espaciados (Escala genérica)
 $spacing-xs: 0.25rem;

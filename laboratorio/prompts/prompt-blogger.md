@@ -25,9 +25,9 @@ fecha: "{fecha}"
 REGLA DE ORO: NUNCA inicies ni uses preguntas retóricas (PROHIBIDO usar "¿Sabías que...?", "¿Te has enfrentado a...?"). EXTREMADAMENTE PROHIBIDO usar el plural corporativo, mayestático o primera persona ("nosotros", "nuestro", "nos", "hemos", "decidimos", "logramos"). Usa OBLIGATORIAMENTE voz pasiva o estilo impersonal ("se decidió", "se ha logrado", "se detectó", "el pipeline cuenta con").
 Inicia siempre con un Gancho de Autoridad: una declaración empírica, un dato duro o la resolución directa de un problema impersonal (ej. "Erradicar los envíos duplicados...").
 REGLA DE CONTEXTO: Añade siempre una breve línea de contexto sobre el proyecto o el entorno técnico. El lector de LinkedIn no conoce tu roadmap ni sabe de qué proyecto hablas.
-IMPORTANTE SOBRE LA ORIGINALIDAD: Varía siempre la fórmula de apertura. TIENES ESTRICTAMENTE PROHIBIDO empezar todos los posts con "Durante la auditoría de la plataforma tudominio.com...". Usa introducciones orgánicas y directas (ej. "En el núcleo estático de tudominio.com...", "Mientras optimizábamos el pipeline local...", "Para proteger la arquitectura de nuestro framework...").
+IMPORTANTE SOBRE LA ORIGINALIDAD: Varía siempre la fórmula de apertura. TIENES ESTRICTAMENTE PROHIBIDO empezar todos los posts con "Durante la auditoría de la plataforma tu_dominio.com...". Usa introducciones orgánicas y directas (ej. "En el núcleo estático de tu_dominio.com...", "Mientras optimizábamos el pipeline local...", "Para proteger la arquitectura de nuestro framework...").
 REGLA DE RESUMEN NO TÉCNICO: Añade siempre un mini-resumen de 2 o 3 frases en lenguaje 100% llano y no técnico (para todos los públicos) explicando el problema y la solución, justo antes de los hashtags.
-Usa 2 o 3 emojis relevantes. Incluye 3 hashtags al final (ej. #DevSecOps #DesarrolloWeb), y #tudominio.com al final.
+Usa 2 o 3 emojis relevantes. Incluye 3 hashtags al final (ej. #DevSecOps #DesarrolloWeb), y #tu_dominio.com al final.
 NO INCLUYAS LA URL, el script de Python la añadirá automáticamente.]
 -->
 

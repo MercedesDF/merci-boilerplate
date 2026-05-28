@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-merci-audit.py — Auditoría local del proyecto tudominio.com (Fase 1).
+merci-audit.py — Auditoría local del proyecto tu_dominio.com (Fase 1).
 
 ¿Qué problema resuelve?
     Evitar que secretos o errores básicos lleguen al repositorio, y adelantar
@@ -592,7 +592,7 @@ def audit_external_assets(state: AuditState, path: Path, text: str) -> None:
     script_pattern = re.compile(r'<script[^>]*\bsrc\s*=\s*["\'](https?://[^"\']+)["\']', re.IGNORECASE)
     for match in script_pattern.finditer(text):
         url = match.group(1)
-        if "tudominio.com" not in url and "localhost" not in url:
+        if "tu_dominio.com" not in url and "localhost" not in url:
             line_number = text.count('\n', 0, match.start()) + 1
             state.add(Finding(path, line_number, "error", "UI_EXTERNAL_ASSET", f"Script externo detectado: {url[:30]}..."))
             
@@ -601,7 +601,7 @@ def audit_external_assets(state: AuditState, path: Path, text: str) -> None:
     for match in link_pattern.finditer(text):
         full_tag = match.group(0).lower()
         url = match.group(1)
-        if "stylesheet" in full_tag and "tudominio.com" not in url and "localhost" not in url:
+        if "stylesheet" in full_tag and "tu_dominio.com" not in url and "localhost" not in url:
             line_number = text.count('\n', 0, match.start()) + 1
             state.add(Finding(path, line_number, "error", "UI_EXTERNAL_ASSET", f"CSS externo detectado: {url[:30]}..."))
                 
@@ -609,7 +609,7 @@ def audit_external_assets(state: AuditState, path: Path, text: str) -> None:
     img_pattern = re.compile(r'<img[^>]*\bsrc\s*=\s*["\'](https?://[^"\']+)["\']', re.IGNORECASE)
     for match in img_pattern.finditer(text):
         url = match.group(1)
-        if "tudominio.com" not in url and "localhost" not in url:
+        if "tu_dominio.com" not in url and "localhost" not in url:
             line_number = text.count('\n', 0, match.start()) + 1
             state.add(Finding(path, line_number, "error", "UI_EXTERNAL_ASSET", f"Imagen externa detectada: {url[:30]}..."))
             
@@ -617,7 +617,7 @@ def audit_external_assets(state: AuditState, path: Path, text: str) -> None:
     meta_pattern = re.compile(r'<meta[^>]*\bcontent\s*=\s*["\'](https?://[^"\']+)["\']', re.IGNORECASE)
     for match in meta_pattern.finditer(text):
         url = match.group(1)
-        if "tudominio.com" not in url and "localhost" not in url:
+        if "tu_dominio.com" not in url and "localhost" not in url:
             line_number = text.count('\n', 0, match.start()) + 1
             state.add(Finding(path, line_number, "error", "UI_EXTERNAL_ASSET", f"Meta URL externa detectada: {url[:30]}..."))
             

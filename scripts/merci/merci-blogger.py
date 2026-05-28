@@ -13,6 +13,7 @@ from datetime import datetime
 from pathlib import Path
 import os
 import logging
+import unicodedata
 
 try:
     os.environ["LITELLM_LOCAL_MODEL_COST_MAP"] = "True"
@@ -31,7 +32,6 @@ NOTAS_DIR = REPO_ROOT / "laboratorio" / "notas_rapidas"
 INCUBACION_DIR = REPO_ROOT / "laboratorio" / "incubacion"
 
 def slugify(texto: str) -> str:
-    import unicodedata
     texto = str(texto)
     texto = re.sub(r'[—–]', '-', texto)
     texto = unicodedata.normalize('NFKD', texto).encode('ascii', 'ignore').decode('ascii')

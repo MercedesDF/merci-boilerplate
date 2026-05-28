@@ -3,7 +3,7 @@
 <head>
     <?php
     // Rompe-cachés dinámico para scripts: lee la fecha de modificación del archivo
-    $root_dir = dirname(ABSPATH) . '/tudominio.com/public';
+    $root_dir = dirname(ABSPATH) . '/tu_dominio.com/public';
     $css_v = time();
     $js_merci_v = time();
     $js_main_v = time();
@@ -35,7 +35,7 @@ if ( is_page('tienda') || (function_exists('is_shop') && is_shop()) ) {
     <div id="top" tabindex="-1" style="position: absolute; top: 0; left: 0;"></div>
     <header class="header">
         <a href="/" class="header__brand">
-            <img src="/assets/images/logo.webp?v=2" alt="tuempresa" class="header__logo" width="263" height="65" fetchpriority="low" decoding="async">
+            <img src="/assets/images/tu_logo.webp?v=1779989875" alt="tuempresa" class="header__logo" width="263" height="65" fetchpriority="low" decoding="async">
         </a>
         <button class="header__toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false">
             <span class="header__toggle-icon"></span>
@@ -45,7 +45,6 @@ if ( is_page('tienda') || (function_exists('is_shop') && is_shop()) ) {
             <a href="/biblioteca/" class="nav__link">Biblioteca</a>
             <a href="/sobre-mi/" class="nav__link">Sobre Mí</a>
             <a href="/blog/" class="nav__link" aria-label="Ir a la portada del Blog">Blog</a>
-            <a href="/art-de-cote/" class="nav__link">Art de Coté</a>
             <a href="/blog/tienda/" class="nav__link">Tienda</a>
             <a href="/contacto/" class="nav__link">Contacto</a>
         </nav>
@@ -161,7 +160,7 @@ if ( is_page('tienda') || (function_exists('is_shop') && is_shop()) ) {
             <span class="merci-ui__message-text"></span>
         </div>
         <button class="merci-ui__trigger" aria-controls="merci-message" aria-expanded="false">
-            <img class="merci-ui__avatar" src="/assets/images/Merci-en-la-nube.webp" alt="Interactuar con el asistente" width="80" height="80" fetchpriority="low" decoding="async">
+            <img class="merci-ui__avatar" src="/assets/images/tu_avatar.webp?v=1779989875" alt="Interactuar con el asistente" width="80" height="80" fetchpriority="low" decoding="async">
         </button>
     </aside>
 

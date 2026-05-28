@@ -88,7 +88,7 @@ class MerciController {
         } else if (path.includes('/biblioteca')) {
             return [
                 'Estás en la Biblioteca 📚',
-                'Aquí se guarda el conocimiento inmutable generado mientras se crea el proyecto tudominio.com',
+                'Aquí se guarda el conocimiento inmutable generado mientras se crea el proyecto tu_dominio.com',
                 'Recuerda que puedes descargar los artículos en PDF 📄'
             ];
         } else if (path.includes('/art-de-cote')) {

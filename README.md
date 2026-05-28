@@ -1,10 +1,16 @@
-# Merci Boilerplate v1.16.1
+# Merci Boilerplate v1.17.0
 
 Un ecosistema DevSecOps autónomo impulsado por Inteligencia Artificial Local (Shift-Left AI) y Desarrollo Guiado por Especificaciones (Spec-Driven Development). 
 
 Combina un orquestador local en Python puro (Sistema Merci) que automatiza la calidad del código, un núcleo estático ultrarrápido (HTML5, SASS, Vanilla JS, BEM) y un motor dinámico aislado opcional (WordPress Headless). Diseñado para alcanzar un rendimiento perfecto (Core Web Vitals 100/100) con 0 dependencias externas bloqueantes en el pipeline.
 
 > 🤖 **Inteligencia y Gobernanza:** El boilerplate incluye agentes de IA locales que auto-reparan código, auto-documentan el Roadmap y generan bases de conocimiento estáticas con coste cero y privacidad total. La justificación de las decisiones DevSecOps reside en la carpeta `/docs`.
+
+## 🚀 Novedades en la v1.17.0 (Clon Efímero, Gemelos Multimedia y Cache-Busting)
+
+- **Patrón Gemelo Multimedia:** Al inicializar un nuevo repositorio (`merci-init.py`), el orquestador ahora inyecta imágenes genéricas (`tu_logo.webp`, `tu_avatar.webp`) mediante reescritura directa de código fuente, erradicando los falsos positivos 404 en el primer análisis Lighthouse.
+- **Invalidación Dinámica de Caché (Zero-Stale):** `merci-init.py` inyecta automáticamente el Timestamp de época de Unix como query string (`?v=TIMESTAMP`) en todos los activos multimedia reemplazados. Esto burla la agresiva caché de 10 años de Nginx (`max-age=315360000`) garantizando que el Showcase siempre renderice los recursos frescos sin depender de scripts de backend.
+- **Purga de Identidad Agnóstica (DLP):** Refactorizado el destructor de instanciación para que extermine permanentemente todas las referencias y enlaces fijos al menú de *Art de Coté* y telemetría de la matriz, protegiendo al Boilerplate de la identidad de su creador.
 
 ## 🚀 Novedades en la v1.16.1 (Hotfix Documental)
 

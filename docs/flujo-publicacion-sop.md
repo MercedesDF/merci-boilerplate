@@ -63,6 +63,25 @@ Por diseño arquitectónico (Environment Segregation), el núcleo estático (Bib
 
 ---
 
+## FLUJO 4: Release y Showcase (Boilerplate)
+**Destino:** Repositorio público (`merci-boilerplate`) y Subdominio de demostración (`boilerplate.tu_dominio.com`).
+**Características:** Generación de clones efímeros aislados para distribución y demostración, purgando metadatos de identidad (DLP) y rompiendo cachés estáticas persistentes.
+
+### Paso a Paso (Showcase):
+1. **Despliegue Interactivo:** Ejecutar `merci showcase`.
+2. **Orquestación:** El script crea un Clon Efímero en memoria, purga toda la identidad corporativa mediante la inyección del Patrón Gemelo Multimedia (sustituye logotipos y avatares) y elimina el menú de Art de Coté.
+3. **Invalidación de Caché (Zero-Stale):** Para evitar que el servidor Nginx muestre imágenes fantasma (por su caché de 10 años), el orquestador inyecta un *Timestamp Unix* dinámico en los reemplazos multimedia.
+4. **Sincronización:** El código resultante (purificado y anónimo) se sincroniza vía SSH/rsync al servidor en el subdominio de demostración.
+
+### Paso a Paso (Release Público):
+1. **Empaquetado:** Ejecutar `merci release`.
+2. **Clon Efímero:** El script crea el clon y lo purga internamente, igual que el Showcase.
+3. **Sincronización Local:** En lugar de enviarlo a un servidor remoto, sincroniza el código resultante en la ruta del repositorio público hermano local (ej. `../merci-boilerplate`).
+4. **Validación:** Ejecuta un `merci total` completo en el repositorio destino para asegurar que el código no se ha roto.
+5. **Git Push:** Finalmente, empaqueta y hace un commit con la nueva versión detectada en el README, subiéndolo a GitHub.
+
+---
+
 ## ⚠️ Reglas de Oro (Hardening Operativo)
 
 - **Prevención de Posts Fantasma (Data Drift):** Nunca borrar un archivo `.md` dinámico del disco si ya ha sido sincronizado con WordPress. En caso de eliminación física, el script Headless lo ignorará y la base de datos jamás recibirá la orden de ocultarlo. Para despublicar, cambiar su YAML a `estado: "borrador"` y ejecutar `merci wp` (El script lo ocultará del CMS y lo expulsará físicamente al laboratorio). Solo entonces se debe eliminar del entorno local.

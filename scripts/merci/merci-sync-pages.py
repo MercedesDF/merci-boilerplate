@@ -66,7 +66,7 @@ def main():
     index_html = INDEX_PATH.read_text(encoding="utf-8")
     
     # 1. Patrones de extracción (Regex)
-    header_pattern = r'(<header class="header">.*?</header>)'
+    header_pattern = r'(<header class="header" id="top">.*?</header>)'
     footer_pattern = r'(<footer class="footer".*?</footer>)'
     aside_pattern = r'(<aside class="merci-ui".*?</aside>)'
     css_pattern = r'(<link rel="stylesheet" href="/css/main\.css\?v=\d+">)'

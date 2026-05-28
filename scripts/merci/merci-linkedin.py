@@ -223,6 +223,7 @@ def procesar_linkedin(modo_auto=False):
             
             estado_social = re.search(r'^estado_social:\s*["\']?([^"\'\n]+)["\']?', yaml_block, re.MULTILINE)
             fecha = re.search(r'^fecha:\s*["\']?([^"\'\n]+)["\']?', yaml_block, re.MULTILINE)
+            orden_social = re.search(r'^orden_social:\s*(\d+)', yaml_block, re.MULTILINE)
             
             if estado and estado.group(1) == "publicado" and estado_social and linkedin_text_match and not linkedin_id:
                 val_estado_social = estado_social.group(1)
@@ -235,20 +236,23 @@ def procesar_linkedin(modo_auto=False):
                     tema_match = re.search(r'^tema:\s*["\']?([^"\'\n]+)["\']?', yaml_block, re.MULTILINE)
                     tema_val = tema_match.group(1).lower() if tema_match else ""
                     if "blog" in tema_val:
-                        enlace = f"https://tudominio.com/blog/{archivo.stem}/"
+                        enlace = f"https://tu_dominio.com/blog/{archivo.stem}/"
                     else:
                         titulo_match = re.search(r'^titulo:\s*["\']?([^"\'\n]+)["\']?', yaml_block, re.MULTILINE)
                         titulo_val = titulo_match.group(1) if titulo_match else archivo.stem
                         slug = slugify(titulo_val)
                         base_path = "/art-de-cote/" if "art" in tema_val else "/biblioteca/"
-                        enlace = f"https://tudominio.com{base_path}{slug}.html"
+                        enlace = f"https://tu_dominio.com{base_path}{slug}.html"
                     texto_post_final = f"{texto_post_base}\n\n🔗 Lee el artículo completo aquí:\n{enlace}"
                 else:
                     texto_post_final = texto_post_base
 
+                val_orden = int(orden_social.group(1)) if orden_social else 999
+
                 datos_post = {
                     "archivo": archivo,
                     "fecha": fecha_val,
+                    "orden": val_orden,
                     "texto_post": texto_post_final,
                     "yaml_block": yaml_block,
                     "content": content
@@ -264,7 +268,7 @@ def procesar_linkedin(modo_auto=False):
             print("  🤷‍♀️ Ningún post 'aprobado' en la cola para emitir hoy.")
             return
             
-        aprobados.sort(key=lambda x: x["fecha"])
+        aprobados.sort(key=lambda x: (x["orden"], x["fecha"]))
         post_objetivo = aprobados[0]
         archivo = post_objetivo["archivo"]
         texto_post = post_objetivo["texto_post"]
@@ -283,7 +287,7 @@ def procesar_linkedin(modo_auto=False):
     else:
         
         aprobados_hoy = 0
-        en_cola.sort(key=lambda x: x["fecha"])
+        en_cola.sort(key=lambda x: (x["orden"], x["fecha"]))
         
         while True:
             if not en_cola:
@@ -318,7 +322,7 @@ def procesar_linkedin(modo_auto=False):
             print(f"\n  📝 Revisando: {archivo.name} ({post['fecha']})")
             print(f"  💬 Previsualización:\n{texto_post}\n")
             
-            confirmacion = input("  👉 ¿Aprobar este post y moverlo a la cola automática de emisión? (s/N): ").strip().lower()
+            confirmacion = input("  👉 ¿Acción para este post? [s=Aprobar / d=Descartar / N=Omitir]: ").strip().lower()
             if confirmacion == 's':
                 nuevo_yaml = re.sub(r'^estado_social:\s*["\']?en_cola["\']?', 'estado_social: "aprobado"', yaml_block, flags=re.MULTILINE)
                 nuevo_contenido = content.replace(yaml_block, nuevo_yaml)
@@ -327,11 +331,107 @@ def procesar_linkedin(modo_auto=False):
                 aprobados_hoy += 1
                 en_cola.pop(idx)
                 aprobados.append(post)
+            elif confirmacion == 'd':
+                seguro = input("  ⚠️ ¿Realmente quieres olvidar esta publicación permanentemente? (s/N): ").strip().lower()
+                if seguro == 's':
+                    nuevo_yaml = re.sub(r'^estado_social:\s*["\']?en_cola["\']?', 'estado_social: "ignorado"', yaml_block, flags=re.MULTILINE)
+                    nuevo_contenido = content.replace(yaml_block, nuevo_yaml)
+                    archivo.write_text(nuevo_contenido, encoding="utf-8")
+                    print(f"  🗑️ Post descartado permanentemente (estado_social: ignorado).")
+                    en_cola.pop(idx)
+                else:
+                    print("  ⏭️ Operación cancelada. Dejado en la cola.")
             else:
                 print("  ⏭️ Omitido. Dejado en la cola.")
                 
         if aprobados_hoy > 0:
             print(f"\n  🎉 Has aprobado {aprobados_hoy} post(s). Una tarea Cron los irá publicando poco a poco.")
+            
+        if aprobados:
+            while True:
+                print("\n  📅 Cola actual de posts 'aprobados' (saldrán en este orden):")
+                aprobados.sort(key=lambda x: (x["orden"], x["fecha"]))
+                for i, post in enumerate(aprobados, 1):
+                    marcador = f"⭐ [Puesto {post['orden']}]" if post["orden"] < 999 else "   Normal"
+                    print(f"    [{i}] {marcador} | {post['fecha']} — {post['archivo'].name}")
+                    
+                print("\n  ⚙️  Acciones de la cola:")
+                print("    [1] Asignar posición exacta a un post (1, 2, 3...)")
+                print("    [2] Devolver a revisión (Mover a en_cola)")
+                print("    [3] Descartar un post permanentemente (Mover a ignorado)")
+                print("    [0] Finalizar y salir")
+                
+                accion = input("\n  👉 Elige una acción (0-3): ").strip()
+                
+                if accion == '0' or not accion:
+                    break
+                elif accion == '1':
+                    opcion_pri = input("  👉 ¿Qué post quieres reordenar? (Elige número): ").strip()
+                    try:
+                        idx_pri = int(opcion_pri) - 1
+                        if 0 <= idx_pri < len(aprobados):
+                            post_pri = aprobados[idx_pri]
+                            nuevo_orden = int(input(f"  👉 ¿Qué posición le asignamos a '{post_pri['archivo'].name}'? (1, 2, 3...): ").strip())
+                            
+                            p_arch = post_pri["archivo"]
+                            p_content = p_arch.read_text(encoding="utf-8")
+                            
+                            if "orden_social:" in p_content:
+                                p_content = re.sub(r'^orden_social:\s*\d+', f'orden_social: {nuevo_orden}', p_content, flags=re.MULTILINE)
+                            else:
+                                p_content = re.sub(r'(^estado_social:\s*["\']?[^"\'\n]+["\']?)', rf'\1\norden_social: {nuevo_orden}', p_content, flags=re.MULTILINE)
+                            
+                            p_arch.write_text(p_content, encoding="utf-8")
+                            post_pri["orden"] = nuevo_orden
+                            print(f"  ⭐ ¡Hecho! '{p_arch.name}' movido a la posición {nuevo_orden}.")
+                        else:
+                            print("  ❌ Post no encontrado.")
+                    except ValueError:
+                        print("  ❌ Entrada inválida.")
+                elif accion == '2':
+                    opcion_des = input("  👉 ¿Qué post quieres devolver a revisión? (Elige número): ").strip()
+                    try:
+                        idx_des = int(opcion_des) - 1
+                        if 0 <= idx_des < len(aprobados):
+                            post_des = aprobados[idx_des]
+                            p_arch = post_des["archivo"]
+                            p_content = p_arch.read_text(encoding="utf-8")
+                            
+                            if "orden_social:" in p_content:
+                                p_content = re.sub(r'^orden_social:\s*\d+\r?\n?', '', p_content, flags=re.MULTILINE)
+                            p_content = re.sub(r'^estado_social:\s*["\']?aprobado["\']?', 'estado_social: "en_cola"', p_content, flags=re.MULTILINE)
+                            
+                            p_arch.write_text(p_content, encoding="utf-8")
+                            aprobados.pop(idx_des)
+                            print(f"  ⏪ ¡Hecho! '{p_arch.name}' ha sido devuelto a la cola de revisión.")
+                        else:
+                            print("  ❌ Post no encontrado.")
+                    except ValueError:
+                        print("  ❌ Entrada inválida.")
+                elif accion == '3':
+                    opcion_des = input("  👉 ¿Qué post quieres descartar permanentemente? (Elige número): ").strip()
+                    try:
+                        idx_des = int(opcion_des) - 1
+                        if 0 <= idx_des < len(aprobados):
+                            post_des = aprobados[idx_des]
+                            seguro = input(f"  ⚠️ ¿Realmente quieres olvidar la publicación '{post_des['archivo'].name}' permanentemente? (s/N): ").strip().lower()
+                            if seguro == 's':
+                                p_arch = post_des["archivo"]
+                                p_content = p_arch.read_text(encoding="utf-8")
+                                
+                                if "orden_social:" in p_content:
+                                    p_content = re.sub(r'^orden_social:\s*\d+\r?\n?', '', p_content, flags=re.MULTILINE)
+                                p_content = re.sub(r'^estado_social:\s*["\']?aprobado["\']?', 'estado_social: "ignorado"', p_content, flags=re.MULTILINE)
+                                
+                                p_arch.write_text(p_content, encoding="utf-8")
+                                aprobados.pop(idx_des)
+                                print(f"  🗑️ ¡Hecho! '{p_arch.name}' ha sido descartado permanentemente.")
+                            else:
+                                print("  ⏭️ Operación cancelada. El post se mantiene en la cola.")
+                        else:
+                            print("  ❌ Post no encontrado.")
+                    except ValueError:
+                        print("  ❌ Entrada inválida.")
 
 if __name__ == "__main__":
     modo_auto = "--auto" in sys.argv or "--cron" in sys.argv

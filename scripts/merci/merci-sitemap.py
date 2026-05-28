@@ -17,7 +17,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[2]
 PUBLIC_DIR = REPO_ROOT / "public"
 SITEMAP_PATH = PUBLIC_DIR / "sitemap.xml"
-DOMAIN = "https://tudominio.com"
+DOMAIN = "https://tu_dominio.com"
 
 def generar_sitemap():
     print("🗺️ [Merci Sitemap] Escaneando páginas webs estáticas...")

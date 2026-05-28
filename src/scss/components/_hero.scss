@@ -194,12 +194,15 @@
         border-radius: 4px;
         text-decoration: none;
         font-weight: bold;
+        background-color: transparent;
         color: $color-text-base;
-        border: 1px solid #cbd5e1;
+        border: 1px solid $color-border;
         transition: all 0.2s ease-in-out;
 
         &:hover {
-            background-color: #f1f5f9;
+            background-color: $color-text-base;
+            color: $color-bg-base;
+            border-color: $color-text-base;
         }
 
         &--primary {

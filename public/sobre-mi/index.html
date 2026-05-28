@@ -5,13 +5,13 @@
     <!-- QUÉ HACE: Meta descripción enfocada a reclutadores técnicos e indexación. -->
     <meta name="description" content="Perfil técnico y currículum semántico de Tu Empresa.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sobre Mí / CV — tudominio.com</title>
+    <title>Sobre Mí / CV — tu_dominio.com</title>
     
     <link rel="icon" href="/favicon.ico?v=3" type="image/x-icon">
-    <link rel="stylesheet" href="/css/main.css?v=1779834038">
-    <script src="/js/MerciController.js?v=1779834037" defer></script>
+    <link rel="stylesheet" href="/css/main.css?v=1779989875">
+    <script src="/js/MerciController.js?v=1779989875" defer></script>
     <script src="/js/main.js?v=1779435201" defer></script>
-    <link rel="canonical" href="https://tudominio.com/sobre-mi/">
+    <link rel="canonical" href="https://tu_dominio.com/sobre-mi/">
 
     <!-- QUÉ HACE: El núcleo del "CV Anti-ATS". Datos estructurados listos para ser consumidos por IAs y rastreadores corporativos. -->
     <!-- POR QUÉ: Los ATS leen código, no diseño. Entregarles un JSON-LD estándar elimina los errores de parseo de los PDFs. -->
@@ -21,7 +21,7 @@
       "@type": "Person",
       "name": "Tu Empresa",
       "jobTitle": "Tu Rol / Puesto",
-      "url": "https://tudominio.com/sobre-mi/",
+      "url": "https://tu_dominio.com/sobre-mi/",
       "sameAs": [
         "https://www.linkedin.com/in/tu-perfil/",
         "https://github.com/tu-usuario"
@@ -37,12 +37,12 @@
 </head>
 <body class="page" id="page-sobre-mi">
     <!-- Ancla invisible WAI-ARIA -->
-    <div id="top" tabindex="-1" style="position: absolute; top: 0; left: 0;"></div>
+
     
     <!-- El header y footer serán gestionados automáticamente por merci-sync-pages.py en la próxima compilación -->
-    <header class="header">
+    <header class="header" id="top">
         <a href="/" class="header__brand">
-            <img src="/assets/images/logo.webp?v=2" alt="tuempresa" class="header__logo" width="263" height="65" fetchpriority="low" decoding="async">
+            <img src="/assets/images/tu_logo.webp?v=1779989875" alt="tuempresa" class="header__logo" width="263" height="65" fetchpriority="low" decoding="async">
         </a>
         <button class="header__toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false">
             <span class="header__toggle-icon"></span>
@@ -56,7 +56,6 @@
             <!-- QUÉ HACE: Diferencia este enlace del autogenerado por WordPress en las tarjetas. -->
             <!-- POR QUÉ: Evita el error WAI-ARIA de "Enlaces idénticos con distinto destino". -->
             <a href="/blog/" class="nav__link" aria-label="Ir a la portada del Blog">Blog</a>
-            <a href="/art-de-cote/" class="nav__link">Art de Coté</a>
             <a href="/blog/tienda/" class="nav__link">Tienda</a>
             <a href="/contacto/" class="nav__link">Contacto</a>
         </nav>
@@ -99,7 +98,7 @@
         </div>
         <!-- QUÉ HACE: Usa un botón nativo (<button>) para atrapar el foco del tabulador (Accesibilidad) -->
         <button class="merci-ui__trigger" aria-controls="merci-message" aria-expanded="false">
-            <img class="merci-ui__avatar" src="/assets/images/Merci-en-la-nube.webp" alt="Interactuar con el asistente" width="80" height="80" fetchpriority="low" decoding="async">
+            <img class="merci-ui__avatar" src="/assets/images/tu_avatar.webp?v=1779989875" alt="Interactuar con el asistente" width="80" height="80" fetchpriority="low" decoding="async">
         </button>
     </aside>
 </body>
