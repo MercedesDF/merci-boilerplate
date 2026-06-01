@@ -2,44 +2,58 @@
 
 .library-nav {
     margin-bottom: 4rem;
-    background: #f8fafc;
-    padding: 2rem;
+    background: $color-surface;
+    padding: 1.5rem;
     border-radius: 8px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid $color-border;
 
     &__title {
         margin-top: 0;
         font-size: 1.2rem;
-        margin-bottom: 1rem;
-        color: #334155;
+        margin-bottom: 0.75rem;
+        color: $color-text-base;
     }
 
     &__list {
         list-style: none;
         padding: 0;
         display: grid;
-        // QUÉ HACE: Crea columnas de ancho flexible pero con un mínimo de 300px.
+        // QUÉ HACE: Crea columnas de ancho flexible pero con un mínimo de 250px.
         // POR QUÉ: Permite un diseño de rejilla responsivo sin media queries.
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 1.5rem;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.25rem;
         margin: 0;
     }
 
     &__theme-title {
         display: inline-block;
-        margin-bottom: 0.8rem;
+        margin-bottom: 0.5rem;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.05em;
-        font-size: 0.9rem;
-        color: #9a3412; /* Naranja accesible WCAG */
-        border-bottom: 2px solid rgba(154, 52, 18, 0.3);
+        font-size: 0.85rem;
+        color: $color-regular; /* Naranja accesible WCAG */
+        border-bottom: 2px solid rgba($color-regular, 0.3);
         padding-bottom: 0.2rem;
         text-decoration: none;
+        transition: all 0.2s ease;
     
         &:visited {
             color: $color-visited;
         }
+
+        &:hover {
+            color: $color-primary;
+            border-bottom-color: $color-primary;
+        }
+    }
+
+    &__sub-theme {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: $color-text-muted;
+        margin-top: 0.75rem;
+        padding-left: 0.25rem;
     }
 
     &__article-list {
@@ -48,24 +62,29 @@
         margin: 0;
         display: flex;
         flex-direction: column;
-        gap: 0.5rem;
+        gap: 0.25rem;
     }
 
     &__article-item {
-        padding-left: 1rem;
-        border-left: 2px solid #e2e8f0;
-        transition: border-color 0.2s ease;
+        padding-left: 0.75rem;
+        border-left: 2px solid $color-border;
+        transition: all 0.2s ease;
 
         &:hover {
-            border-color: #cbd5e1;
+            border-left-color: $color-primary;
+            background-color: rgba($color-primary, 0.02);
+            transform: translateX(4px);
+            border-radius: 0 4px 4px 0;
         }
     }
 
     &__article-link {
-        font-size: 0.95rem;
-        color: #475569; /* Gris pizarra original */
+        font-size: 0.875rem;
+        color: $color-text-muted;
         text-decoration: none;
         display: block;
+        padding: 0.15rem 0;
+        transition: color 0.2s ease;
         
         &:visited {
             color: $color-visited;
@@ -74,6 +93,15 @@
             color: $color-primary;
         }
     }
+}
+
+.library-subsection__title {
+    font-size: 1.25rem;
+    color: $color-text-base;
+    margin-top: 3rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid $color-border;
 }
 
 .library-section {
@@ -103,9 +131,14 @@
     &__back-link {
         font-size: 0.9rem;
         font-weight: 600;
-        color: #64748b;
+        color: $color-text-muted;
         text-decoration: underline;
         white-space: nowrap;
         margin-left: 1rem;
+        transition: color 0.2s ease;
+
+        &:hover {
+            color: $color-primary;
+        }
     }
 }

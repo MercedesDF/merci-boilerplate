@@ -35,8 +35,9 @@ if ( is_page('tienda') || (function_exists('is_shop') && is_shop()) ) {
     <div id="top" tabindex="-1" style="position: absolute; top: 0; left: 0;"></div>
     <header class="header">
         <a href="/" class="header__brand">
-            <img src="/assets/images/tu_logo.webp?v=1779989875" alt="tuempresa" class="header__logo" width="263" height="65" fetchpriority="low" decoding="async">
+            <img src="/assets/images/tu_logo.webp?v=1780300672" alt="tuempresa" class="header__logo" width="263" height="65" fetchpriority="low" decoding="async">
         </a>
+        
         <button class="header__toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false">
             <span class="header__toggle-icon"></span>
         </button>
@@ -55,20 +56,18 @@ if ( is_page('tienda') || (function_exists('is_shop') && is_shop()) ) {
         // 1. Inyección de Cabeceras Estilo "Boilerplate" para Vistas Dinámicas
         $header_title = '';
         $header_desc = '';
-        $hero_modifier = '';
 
         if ( is_page('tienda') || (function_exists('is_shop') && is_shop()) ) {
-            $header_title = 'Tienda';
-            $header_desc = 'Catálogo de recursos, herramientas y merchandising oficial del entorno Merci Boilerplate.';
+            $header_title = "Merci'<span class=\"hero__highlight\">Shop</span>";
+            $header_desc = '<strong><em>la tienda no tienda</em></strong><br>merchandising oficial del ecosistema Mercí';
         } elseif ( is_home() || is_archive() ) {
-            $header_title = 'Blog';
+            $header_title = 'b<span class="hero__highlight">log</span>';
             $header_desc = 'Bitácora cronológica, diario de desarrollo y artículos de marketing.';
-            $hero_modifier = ' hero--compact';
         }
 
         if ( $header_title ) : 
         ?>
-            <section class="hero<?php echo $hero_modifier; ?>">
+            <section class="hero">
                 <h1 class="hero__title"><?php echo $header_title; ?></h1>
                 <p class="hero__subtitle"><?php echo $header_desc; ?></p>
             </section>
@@ -160,7 +159,7 @@ if ( is_page('tienda') || (function_exists('is_shop') && is_shop()) ) {
             <span class="merci-ui__message-text"></span>
         </div>
         <button class="merci-ui__trigger" aria-controls="merci-message" aria-expanded="false">
-            <img class="merci-ui__avatar" src="/assets/images/tu_avatar.webp?v=1779989875" alt="Interactuar con el asistente" width="80" height="80" fetchpriority="low" decoding="async">
+            <img class="merci-ui__avatar" src="/assets/images/tu_avatar.webp?v=1780300672" alt="Interactuar con el asistente" width="80" height="80" fetchpriority="low" decoding="async">
         </button>
     </aside>
 

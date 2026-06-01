@@ -17,3 +17,4 @@
 [2026-05-26 19:17:43] 260526_instant_bdef8c9c6aa648abbc696484dcb07e1d-mercedev-tienda-mobile-4g-81.json | TTFB: 941ms, Latency: 170ms | Posible penalización por red, no por CPU.
 [2026-05-28 18:47:35] merci-boilerplate.template.json | TTFB: 773ms, Latency: 170ms | Posible penalización por red, no por CPU.
 [2026-05-28 19:32:03] 2026-05-27-no-100-merci-boilerplate.template.json | TTFB: 764ms, Latency: 170ms | Posible penalización por red, no por CPU.
+[2026-05-28 20:05:17] 260528_instant_78f1d95370a24dfdab6a4ec101a809e4-mercedev-mobile-4g.json | TTFB: 769ms, Latency: 170ms | Posible penalización por red, no por CPU.

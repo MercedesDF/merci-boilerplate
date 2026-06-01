@@ -1,10 +1,16 @@
-# Merci Boilerplate v1.17.0
+# Merci Boilerplate v1.18.0
 
 Un ecosistema DevSecOps autónomo impulsado por Inteligencia Artificial Local (Shift-Left AI) y Desarrollo Guiado por Especificaciones (Spec-Driven Development). 
 
 Combina un orquestador local en Python puro (Sistema Merci) que automatiza la calidad del código, un núcleo estático ultrarrápido (HTML5, SASS, Vanilla JS, BEM) y un motor dinámico aislado opcional (WordPress Headless). Diseñado para alcanzar un rendimiento perfecto (Core Web Vitals 100/100) con 0 dependencias externas bloqueantes en el pipeline.
 
 > 🤖 **Inteligencia y Gobernanza:** El boilerplate incluye agentes de IA locales que auto-reparan código, auto-documentan el Roadmap y generan bases de conocimiento estáticas con coste cero y privacidad total. La justificación de las decisiones DevSecOps reside en la carpeta `/docs`.
+
+## 🚀 Novedades en la v1.18.0 (Refinamiento UI/UX, Accesibilidad y Animaciones)
+
+- **Accesibilidad y Contraste WCAG:** Ajuste quirúrgico de la paleta de colores y estados *hover* en botones para garantizar el cumplimiento estricto de WCAG AA/AAA sin sacrificar la identidad visual del proyecto.
+- **Refinamiento de E-commerce Híbrido:** Mejoras de experiencia de usuario (UX) en la maquetación del catálogo y carrito de WooCommerce, priorizando el diseño Mobile-First y la claridad de los espaciados.
+- **Microinteracciones Zero-JS:** Integración de animaciones fluidas y enriquecimiento visual delegado íntegramente a variables y transiciones nativas de SASS/CSS. Se preserva el hilo principal libre (0ms TBT) al no depender de librerías de terceros.
 
 ## 🚀 Novedades en la v1.17.0 (Clon Efímero, Gemelos Multimedia y Cache-Busting)
 

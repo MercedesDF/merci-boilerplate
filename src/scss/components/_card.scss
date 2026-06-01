@@ -19,7 +19,7 @@
 
     // Al hacer hover sobre cualquier parte de la tarjeta, el título se ilumina
     .card__title a {
-      color: $color-primary;
+      color: $color-homage; // Homenaje: Malva vibrante
     }
   }
 
@@ -88,8 +88,16 @@
   }
 
   &__meta {
-    font-size: 0.875rem;
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
     color: $color-text-muted;
+    background-color: rgba($color-text-muted, 0.1);
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
 
   // Modificador BEM para Cuadernillos (Blog cronológico)
@@ -99,7 +107,7 @@
 
   // Modificador BEM para Libros (Biblioteca técnica temática)
   &--book {
-    border-top: 3px solid #10b981; // Acento verde (técnico/validado)
+    border-top: 3px solid $color-homage; // Acento malva (Homenaje / técnico consolidado)
   }
 }
 

@@ -324,77 +324,67 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
 
 def generar_indice(publicaciones, out_path, title, meta_desc, hero_subtitle, canonical_url, header_html, footer_html, css_v: int, js_c_v: int, js_m_v: int):
     print(f"📖 Generando índice temático para {title}...")
-    title_html = html.escape(title)
+    
+    if title == "La Biblioteca":
+        title_html = 'la biblio<span class="hero__highlight">teca</span>'
+    elif title == "Art de Coté":
+        title_html = 'art de <span class="hero__highlight">coté</span>'
+    else:
+        title_html = html.escape(title)
+        
     meta_desc_html = html.escape(meta_desc)
+    hero_subtitle_html = html.escape(hero_subtitle)
     
     # Agrupar publicaciones por tema (Estanterías)
     estanterias = {}
     for pub in publicaciones:
-        tema_original = pub["tema"]
-        tema = tema_original.casefold()  # normalización robusta: evita que una may. convierta el tema en dos diferentes.
-        if tema not in estanterias:
-            estanterias[tema] = []
+        # QUÉ HACE: Implementa agrupación jerárquica (Tema / Subtema).
+        # POR QUÉ: Permite una arquitectura de la información más limpia y escalable.
+        tema_raw = pub.get("tema") or "General"
+        tema_completo = str(tema_raw).split('/')
+        tema_principal = tema_completo[0].strip().casefold()
+        sub_tema = tema_completo[1].strip().casefold() if len(tema_completo) > 1 else "General"
 
-        estanterias[tema].append(pub)
+        if tema_principal not in estanterias:
+            estanterias[tema_principal] = {}
+        
+        if sub_tema not in estanterias[tema_principal]:
+            estanterias[tema_principal][sub_tema] = []
+            
+        estanterias[tema_principal][sub_tema].append(pub)
         
     secciones_html = ""
     enlaces_indice_html = ""
     
     # Ordenar temas alfabéticamente y procesar sus publicaciones
-    for tema in sorted(estanterias.keys()):
+    for tema_principal in sorted(estanterias.keys()):
         # QUÉ HACE: Genera un ID válido para el ancla (ej. 'devsecops-y-gobernanza')
-        tema_slug = slugify(tema)
+        tema_slug = slugify(tema_principal)
         # QUÉ HACE: Sanitiza el nombre de la estantería (tema) antes de inyectarlo en el HTML.
         # POR QUÉ: Protege el DOM del índice contra caracteres conflictivos.
-        tema_html = html.escape(tema)
-        
-        # QUÉ HACE: Ordena los artículos: Primero los "Compendios" (True), luego por fecha del más nuevo al más antiguo.
-        # POR QUÉ: Otorga un trato preferente (arriba de la lista) a los documentos de alto nivel 
-        # para que el usuario encuentre la visión global antes de descender a los cuadernillos tácticos.
-        pubs_tema = sorted(estanterias[tema], key=lambda x: (x["tipo"].lower() == "compendio", x["fecha"]), reverse=True)
+        tema_html = html.escape(tema_principal)
         
         # Construimos el contenedor principal de la estantería (con diseño de columnas responsivo)
         enlaces_indice_html += f'                <li class="library-nav__item">\n'
         # QUÉ HACE: Delega el color a la clase SASS .indice__tema para permitir pseudo-clases interactivas (:visited).
         enlaces_indice_html += f'                    <a href="#{tema_slug}" class="library-nav__theme-title" aria-label="Explorar estantería: {tema_html}">{tema_html}</a>\n'
         enlaces_indice_html += f'                    <ul class="library-nav__article-list">\n'
-        
-        cards_html = ""
-        for pub in pubs_tema:
-            # QUÉ HACE: Genera un ID válido para la tarjeta del artículo.
-            pub_slug = pub.get("slug", slugify(pub["titulo"]))
-            # QUÉ HACE: Escapa los títulos y descripciones antes de inyectarlos en las tarjetas.
-            # POR QUÉ: Impide que etiquetas literales en las descripciones rompan la interfaz visual.
-            pub_titulo_html = html.escape(pub["titulo"])
-            pub_desc_html = html.escape(pub["descripcion"])
+
+        sub_temas_ordenados = sorted(estanterias[tema_principal].keys())
+        for sub_tema in sub_temas_ordenados:
+            sub_tema_html = html.escape(sub_tema)
+            enlaces_indice_html += f'                        <li class="library-nav__sub-theme">{sub_tema_html}</li>\n'
             
-            # QUÉ HACE: Escapa campos secundarios del Frontmatter para la etiqueta meta de la tarjeta.
-            # POR QUÉ: Cierra cualquier vía de inyección secundaria hacia el bloque estático.
-            pub_fecha_html = html.escape(str(pub["fecha"]))
-            badge_html = html.escape(str(pub["tipo"])).capitalize()
-            fase_badge_html = f" &middot; Fase {html.escape(str(pub['fase']))}" if pub.get("fase") else ""
-            
-            # QUÉ HACE: Inyecta cada artículo como un ancla interna apuntando a su tarjeta resumen.
-            # POR QUÉ: Retiene al usuario en la página índice para que pueda leer la descripción antes de entrar.
-            enlaces_indice_html += f'                        <li class="library-nav__article-item">\n'
-            # QUÉ HACE: Diferencia el texto accesible (aria-label) añadiendo la fecha para evitar penalización por enlaces con mismo texto y distinto destino.
-            enlaces_indice_html += f'                            <a href="#{pub_slug}" class="library-nav__article-link" aria-label="Ir al resumen de: {pub_titulo_html} ({pub_fecha_html})">{pub_titulo_html}</a>\n'
-            enlaces_indice_html += f'                        </li>\n'
-            
-            clase_css = "card--booklet" if pub["tipo"].lower() == "cuadernillo" else "card--book"
-            
-            cards_html += f"""
-                <article class="card {clase_css}" id="{pub_slug}">
-                    <header>
-                        <span class="card__meta">{pub_fecha_html} — {badge_html}{fase_badge_html}</span>
-                        <h2 class="card__title"><a href="{pub["url"]}" aria-label="Leer artículo completo: {pub_titulo_html} ({pub_fecha_html})">{pub_titulo_html}</a></h2>
-                    </header>
-                    <div class="card__content">
-                        <p>{pub_desc_html}</p>
-                    </div>
-                </article>"""
+            pubs_sub_tema = sorted(estanterias[tema_principal][sub_tema], key=lambda x: (x["tipo"].lower() == "compendio", x["fecha"]), reverse=True)
+            for pub in pubs_sub_tema:
+                pub_slug = pub.get("slug", slugify(pub["titulo"]))
+                pub_titulo_html = html.escape(pub["titulo"])
+                pub_fecha_html = html.escape(str(pub["fecha"]))
                 
-        # Cerramos la lista de artículos y el elemento principal de la estantería
+                enlaces_indice_html += f'                        <li class="library-nav__article-item">\n'
+                enlaces_indice_html += f'                            <a href="#{pub_slug}" class="library-nav__article-link" aria-label="Ir al resumen de: {pub_titulo_html} ({pub_fecha_html})">{pub_titulo_html}</a>\n'
+                enlaces_indice_html += f'                        </li>\n'
+
         enlaces_indice_html += f'                    </ul>\n                </li>\n'
                 
         # QUÉ HACE: Inyecta el ID para el ancla, 'scroll-margin-top' y un contenedor flex para alinear el botón "Volver arriba" a la derecha.
@@ -404,11 +394,38 @@ def generar_indice(publicaciones, out_path, title, meta_desc, hero_subtitle, can
             <div class="library-section__header">
                 <h2 class="library-section__title home-card__title--highlight"><a href="#{tema_slug}" aria-label="Ver sección: {tema_html}">{tema_html}</a></h2>
                 <a href="#top" class="library-section__back-link">↑ Volver arriba</a>
-            </div>
-            <div class="home-grid">
-                {cards_html}
-            </div>
-        </section>"""
+            </div>"""
+
+        for sub_tema in sub_temas_ordenados:
+            sub_tema_html = html.escape(sub_tema)
+            secciones_html += f'\n            <h3 class="library-subsection__title">{sub_tema_html}</h3>'
+            secciones_html += '\n            <div class="home-grid">'
+            
+            pubs_sub_tema = sorted(estanterias[tema_principal][sub_tema], key=lambda x: (x["tipo"].lower() == "compendio", x["fecha"]), reverse=True)
+            cards_html = ""
+            for pub in pubs_sub_tema:
+                pub_slug = pub.get("slug", slugify(pub["titulo"]))
+                pub_titulo_html = html.escape(pub["titulo"])
+                pub_desc_html = html.escape(pub["descripcion"])
+                pub_fecha_html = html.escape(str(pub["fecha"]))
+                badge_html = html.escape(str(pub["tipo"])).capitalize()
+                fase_badge_html = f" &middot; Fase {html.escape(str(pub['fase']))}" if pub.get("fase") else ""
+                clase_css = "card--booklet" if pub["tipo"].lower() == "cuadernillo" else "card--book"
+                
+                cards_html += f"""
+                <article class="card {clase_css}" id="{pub_slug}">
+                    <header>
+                        <span class="card__meta">{pub_fecha_html} — {badge_html}{fase_badge_html}</span>
+                        <h2 class="card__title"><a href="{pub["url"]}" aria-label="Leer artículo completo: {pub_titulo_html} ({pub_fecha_html})">{pub_titulo_html}</a></h2>
+                    </header>
+                    <div class="card__content">
+                        <p>{pub_desc_html}</p>
+                    </div>
+                </article>"""
+            secciones_html += cards_html
+            secciones_html += '\n            </div>'
+
+        secciones_html += '\n        </section>'
                 
     # QUÉ HACE: Inyecta el "Announcement Badge" dinámicamente en las portadas
     badge_html = ""
@@ -432,9 +449,9 @@ def generar_indice(publicaciones, out_path, title, meta_desc, hero_subtitle, can
         </a>"""
         
     # QUÉ HACE: Trunca metadatos para el índice
-    titulo_seo = f"{title_html} — tu_dominio.com"
+    titulo_seo = f"{title} — tu_dominio.com"
     if len(titulo_seo) > 65:
-        titulo_seo = f"{title_html[:60]}..." if len(title_html) > 60 else title_html
+        titulo_seo = f"{title[:60]}..." if len(title) > 60 else title
         
     desc_seo = meta_desc_html
     if len(desc_seo) > 150:
@@ -468,7 +485,7 @@ def generar_indice(publicaciones, out_path, title, meta_desc, hero_subtitle, can
         <!-- QUÉ HACE: Sección Hero unificada con el resto del ecosistema -->
         <section class="hero">
             <h1 class="hero__title">{title_html}</h1>
-            <p class="hero__subtitle">{meta_desc_html}</p>
+            <p class="hero__subtitle">{hero_subtitle_html}</p>
             {badge_html}
         </section>
         
@@ -555,7 +572,7 @@ def main(): # type: ignore
                 
     if publicaciones_bib:
         PUBLIC_BIBLIOTECA.mkdir(parents=True, exist_ok=True)
-        generar_indice(publicaciones_bib, PUBLIC_BIBLIOTECA / "index.html", "La Biblioteca", "Índice de publicaciones técnicas y proyectos de la Biblioteca.", "Documentación técnica, proyectos DevSecOps y arquitectura de software. El activo de conocimiento central del ecosistema.", "https://tu_dominio.com/biblioteca/", header_html, footer_html, css_version, js_controller_version, js_main_version)
+        generar_indice(publicaciones_bib, PUBLIC_BIBLIOTECA / "index.html", "La Biblioteca", "Archivo técnico y documentación oficial. Compendios de arquitectura DevSecOps, automatización Python y metodologías Zero-Bloat.", "El conocimiento inmutable del ecosistema. Documentación técnica, metodología Spec as Source y cuadernillos de ingeniería DevSecOps. Todo lo que el sistema construye, la biblioteca lo preserva.", "https://tu_dominio.com/biblioteca/", header_html, footer_html, css_version, js_controller_version, js_main_version)
         
     if publicaciones_art:
         PUBLIC_ART_DE_COTE.mkdir(parents=True, exist_ok=True)

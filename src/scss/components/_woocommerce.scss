@@ -185,15 +185,41 @@
       transform: translateY(-2px);
     }
   }
+
+  /* QUÉ HACE: Ajusta la caja de cantidad para que sea compacta y legible en todas las vistas */
+  .quantity {
+    input.qty {
+      width: 80px;
+      text-align: center;
+      font-size: 1.25rem;
+      font-weight: 700;
+      padding: 0.5rem;
+      border: 1px solid $color-border;
+      border-radius: 4px;
+      background-color: $color-surface;
+    }
+  }
+
+  /* QUÉ HACE: Estilo global de la moneda gráfica */
+  .merci-coin-icon {
+    display: inline-block;
+    vertical-align: middle;
+    transform: translateY(-2px);
+    margin-left: 4px;
+    width: 1.3em !important; /* QUÉ HACE: Escala con el texto y anula el width: 100% de .product img */
+    height: 1.3em !important;
+    margin-bottom: 0 !important;
+    box-shadow: none !important;
+  }
   
   .woocommerce-notices-wrapper {
     margin-bottom: 2rem;
     
     .woocommerce-message, .woocommerce-error, .woocommerce-info {
-      background-color: rgba(16, 185, 129, 0.1);
-      color: #065f46;
+      background-color: rgba($color-homage, 0.1); /* Homenaje: Malva suave */
+      color: $color-homage-dark; /* Contraste WCAG > 8:1 */
       padding: 1rem;
-      border-left: 4px solid #10b981;
+      border-left: 4px solid $color-homage;
       border-radius: 4px;
       display: flex;
       flex-wrap: wrap;
@@ -202,11 +228,20 @@
       gap: 1rem;
       
       a.button {
-        background-color: #065f46;
+        background-color: $color-homage-dark;
         padding: 0.4rem 0.8rem;
         font-size: 0.9rem;
         margin-top: 0;
       }
+    }
+    
+    .woocommerce-info--store-notice {
+      display: block; /* QUÉ HACE: Anula el display: flex base para que los saltos de línea (<br>) fluyan correctamente */
+      margin-top: 0;
+      justify-content: center;
+      text-align: center;
+      font-size: 1.1rem;
+      line-height: 1.6;
     }
     
     .woocommerce-error {
@@ -221,28 +256,190 @@
     border-collapse: collapse;
     margin-bottom: 2rem;
     
-    th, td {
+    /* QUÉ HACE: Destruye el diseño tabular en móvil para apilar los productos como tarjetas */
+    display: block;
+    
+    thead, tbody, tr, th, td {
+      display: block;
+    }
+    
+    thead {
+      display: none; /* Ocultamos la cabecera nativa en móvil */
+    }
+    
+    tr {
+      border: 1px solid $color-border;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
       padding: 1rem;
-      border-bottom: 1px solid rgba(15, 23, 42, 0.1);
-      text-align: left;
+      background-color: $color-surface;
+      box-shadow: $shadow-sm;
+    }
+    
+    td {
+      border-bottom: 1px solid rgba($color-text-base, 0.05);
+      padding: 0.8rem 0;
+      text-align: right;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      
+      &:last-child {
+        border-bottom: none;
+      }
+      
+      /* QUÉ HACE: Inyecta el título de la columna leyendo el atributo nativo de WC */
+      &::before {
+        content: attr(data-title) ": ";
+        font-weight: 700;
+        color: $color-text-muted;
+      }
+      
+      /* QUÉ HACE: Excepciones en móvil para que foto y título se vean centrados y grandes */
+      &.product-remove {
+        display: block;
+        text-align: right;
+        border-bottom: none;
+        padding: 0;
+        &::before { display: none; }
+      }
+      
+      &.product-thumbnail {
+        display: block;
+        text-align: center;
+        border-bottom: none;
+        padding: 0 0 1rem 0;
+        &::before { display: none; }
+        img {
+          max-width: 100%;
+          max-height: 250px;
+          margin: 0 auto;
+        }
+      }
+      
+      &.product-name {
+        display: block;
+        text-align: center;
+        font-size: 1.25rem;
+        padding-bottom: 1.5rem;
+        &::before { display: none; }
+      }
     }
     
     img {
       max-width: 60px;
+      height: auto; /* QUÉ HACE: Evita que WooCommerce aplaste la imagen con su height="300" nativo */
       border-radius: 4px;
     }
     
-    .actions {
-      text-align: right;
-      padding-top: 1rem;
+    td.actions {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 1rem;
+      
+      .coupon {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        width: 100%;
+        input { 
+          width: 100%;
+          padding: 0.8rem;
+          font-size: 1rem;
+          border: 1px solid $color-border;
+          border-radius: 4px;
+          background-color: $color-surface;
+        }
+      }
+      
+      button { width: 100%; }
+    }
+
+    /* Desktop: Restaurar la tabla original */
+    @media (min-width: 768px) {
+      display: table;
+      
+      thead { display: table-header-group; }
+      tbody { display: table-row-group; }
+      
+      tr {
+        display: table-row;
+        border: none;
+        background-color: transparent;
+        box-shadow: none;
+        margin-bottom: 0;
+        padding: 0;
+      }
+      
+      td, th {
+        display: table-cell;
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 1px solid $color-border;
+        
+        /* QUÉ HACE: Contrarresta la especificidad de las excepciones móviles para restaurar la celda nativa */
+        &.product-remove,
+        &.product-thumbnail,
+        &.product-name {
+          display: table-cell;
+          text-align: left;
+          padding: 1rem;
+          border-bottom: 1px solid $color-border;
+        }
+        
+        /* Garantiza que la columna del nombre tenga espacio para respirar en escritorio */
+        &.product-name {
+          width: 40%;
+        }
+
+        /* Restauramos tamaño icono en PC */
+        &.product-thumbnail img {
+          max-width: 60px;
+          height: auto;
+        }
+        
+        &::before { display: none; }
+      }
+      
+      td.actions {
+        text-align: right;
+        
+        .coupon {
+          display: inline-block;
+          width: auto;
+          input { width: auto; margin-right: 0.5rem; }
+        }
+        
+        button { width: auto; }
+      }
     }
   }
 
   .cart-collaterals, .woocommerce-checkout-payment {
-    background-color: hsl(0, 0%, 98%);
+    background-color: $color-surface;
     padding: 2rem;
     border-radius: 8px;
-    border: 1px solid rgba(15, 23, 42, 0.1);
+    border: 1px solid $color-border;
+    box-shadow: $shadow-sm;
+  }
+
+  /* QUÉ HACE: Estiliza la tabla de totales (Subtotal, Envío, Total) */
+  .cart-collaterals .cart_totals {
+    h2 {
+      margin-top: 0;
+      color: $color-primary;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      tr {
+        border-bottom: 1px solid rgba($color-text-base, 0.05);
+        th, td { padding: 1rem 0; }
+        th { text-align: left; color: $color-text-muted; }
+        td { text-align: right; font-weight: bold; }
+      }
+      tr:last-child { border-bottom: none; }
+    }
   }
 
   form.checkout {
@@ -284,5 +481,53 @@
   .header .nav__link[href="/blog/tienda/"] {
     color: #c2410c;
     font-weight: 600;
+  }
+
+    /* QUÉ HACE: Anula el efecto de elevación (:hover) del contenedor principal para evitar que la página salte */
+    article.card:hover {
+      transform: none;
+      box-shadow: none;
+      border-color: $color-border;
+    }
+}
+
+/* ========================================================
+   Acceso Rápido al Carrito (Mobile-First)
+   ======================================================== */
+.header__cart-mobile {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  text-decoration: none;
+  font-size: 1.8rem;
+  margin-left: auto;
+  margin-right: 1rem;
+  transition: transform 0.2s ease;
+  
+  &:hover {
+    transform: scale(1.1);
+  }
+  
+  .header__cart-count {
+    position: absolute;
+    top: -5px;
+    right: -8px;
+    background-color: $color-primary;
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    height: 20px;
+    min-width: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    padding: 0 0.3rem;
+    box-shadow: $shadow-sm;
+  }
+
+  /* QUÉ HACE: Oculta la nubecilla en PC porque ya existe en la navegación principal */
+  @media (min-width: 768px) {
+    display: none;
   }
 }

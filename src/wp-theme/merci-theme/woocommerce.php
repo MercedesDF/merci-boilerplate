@@ -20,8 +20,19 @@ $js_main_v = time();
     <div id="top" tabindex="-1" style="position: absolute; top: 0; left: 0;"></div>
     <header class="header">
         <a href="/" class="header__brand">
-            <img src="/assets/images/tu_logo.webp?v=1779989875" alt="tuempresa" class="header__logo" width="263" height="65" fetchpriority="low" decoding="async">
+            <img src="/assets/images/tu_logo.webp?v=1780300672" alt="tuempresa" class="header__logo" width="263" height="65" fetchpriority="low" decoding="async">
         </a>
+        
+        <?php 
+        $cart_count = ( class_exists('WooCommerce') && !is_null(WC()->cart) ) ? WC()->cart->get_cart_contents_count() : 0;
+        ?>
+        <a href="<?php echo function_exists('wc_get_cart_url') ? esc_url(wc_get_cart_url()) : '/blog/carrito/'; ?>" class="header__cart-mobile" aria-label="Ver carrito">
+            ☁️
+            <?php if ( $cart_count > 0 ) : ?>
+                <span class="header__cart-count"><?php echo $cart_count; ?></span>
+            <?php endif; ?>
+        </a>
+        
         <button class="header__toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false">
             <span class="header__toggle-icon"></span>
         </button>
@@ -38,8 +49,19 @@ $js_main_v = time();
 
     <main class="main" id="main">
         <section class="hero">
-            <h1 class="hero__title">Tienda</h1>
-            <p class="hero__subtitle">Catálogo de recursos, herramientas y merchandising oficial.</p>
+            <h1 class="hero__title">Merci'<span class="hero__highlight">Shop</span></h1>
+            <p class="hero__subtitle"><strong><em>la tienda no tienda</em></strong><br>merchandising oficial del ecosistema Mercí</p>
+            <?php if ( function_exists('is_shop') && is_shop() ) : ?>
+                <div class="woocommerce">
+                    <div class="woocommerce-notices-wrapper">
+                        <div class="woocommerce-info woocommerce-info--store-notice">
+                            ℹ️ <strong>Economía Simulada:</strong> <br>Este catálogo es una demostración técnica (E-commerce Zero-JS).<br>
+                            Los precios están en <em>Merci-coins</em> <img src="/favicon.ico" alt="Llama" width="16" height="16" class="merci-coin-icon"><br>
+                            ¡Añade al carrito sin miedo!
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
         </section>
         <section class="section">
             <?php if ( is_product() ) : ?>
@@ -64,7 +86,7 @@ $js_main_v = time();
     </footer>
     <aside class="merci-ui" id="merci-ui" aria-label="Asistente virtual Merci">
         <div class="merci-ui__message-box" id="merci-message" aria-live="polite" aria-hidden="true"><span class="merci-ui__message-text"></span></div>
-        <button class="merci-ui__trigger" aria-controls="merci-message" aria-expanded="false"><img class="merci-ui__avatar" src="/assets/images/tu_avatar.webp?v=1779989875" alt="Interactuar con el asistente" width="80" height="80" fetchpriority="low" decoding="async"></button>
+        <button class="merci-ui__trigger" aria-controls="merci-message" aria-expanded="false"><img class="merci-ui__avatar" src="/assets/images/tu_avatar.webp?v=1780300672" alt="Interactuar con el asistente" width="80" height="80" fetchpriority="low" decoding="async"></button>
     </aside>
     <?php wp_footer(); ?>
 </body>

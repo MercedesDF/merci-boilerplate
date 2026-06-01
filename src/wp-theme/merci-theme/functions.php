@@ -366,7 +366,7 @@ function merci_add_custom_currency($currencies) {
 add_filter('woocommerce_currency_symbol', 'merci_add_custom_currency_symbol', 10, 2);
 function merci_add_custom_currency_symbol($currency_symbol, $currency) {
     if ($currency === 'MC') {
-        $currency_symbol = 'MC 🪙';
+        $currency_symbol = '<img src="/favicon.ico" alt="Llama" width="16" height="16" class="merci-coin-icon">';
     }
     return $currency_symbol;
 }

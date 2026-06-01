@@ -191,18 +191,20 @@
     &__btn {
         display: inline-block;
         padding: 0.8rem 1.5rem;
-        border-radius: 4px;
+        border-radius: 50px;
         text-decoration: none;
         font-weight: bold;
-        background-color: transparent;
+        background-color: rgba($color-text-base, 0.02);
         color: $color-text-base;
-        border: 1px solid $color-border;
-        transition: all 0.2s ease-in-out;
+        border: 2px solid $color-border;
+        transition: all 0.2s ease;
 
         &:hover {
-            background-color: $color-text-base;
-            color: $color-bg-base;
-            border-color: $color-text-base;
+            transform: translateY(-2px);
+            border-color: $color-primary;
+            background-color: rgba($color-primary, 0.05);
+            color: $color-primary;
+            box-shadow: $shadow-sm;
         }
 
         &--primary {
@@ -215,5 +217,20 @@
                 color: #ffffff;
             }
         }
+    }
+
+    &__explica {
+        max-width: 65ch;
+        margin: 2.5rem auto 0;
+        padding: 1rem 1.5rem;
+        background-color: rgba($color-homage, 0.1);
+        border-left: 4px solid $color-homage;
+        border-radius: 4px;
+        color: $color-homage-dark;
+        font-size: 1.05rem;
+        text-align: left;
+        line-height: 1.6;
+        
+        strong { color: $color-homage-dark; }
     }
 }
