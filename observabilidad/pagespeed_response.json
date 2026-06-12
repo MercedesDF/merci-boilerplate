@@ -282,7 +282,7 @@
               "priority": "Low",
               "entity": "tuempresa.es",
               "resourceType": "Image",
-              "url": "https://tuempresa.es/assets/images/tu_logo.webp?v=1781254921",
+              "url": "https://tuempresa.es/assets/images/tu_logo.webp?v=1781255265",
               "mimeType": "image/webp",
               "experimentalFromMainFrame": true,
               "networkRequestTime": 138.17799997329712
@@ -292,7 +292,7 @@
               "entity": "tuempresa.es",
               "experimentalFromMainFrame": true,
               "mimeType": "image/webp",
-              "url": "https://tuempresa.es/assets/images/tu_avatar.webp?v=1781254921",
+              "url": "https://tuempresa.es/assets/images/tu_avatar.webp?v=1781255265",
               "networkRequestTime": 138.41299986839294,
               "statusCode": 200,
               "sessionTargetType": "page",
@@ -627,7 +627,7 @@
             {
               "wastedBytes": 14242,
               "totalBytes": 17080,
-              "url": "https://tuempresa.es/assets/images/tu_logo.webp?v=1781254921",
+              "url": "https://tuempresa.es/assets/images/tu_logo.webp?v=1781255265",
               "subItems": {
                 "items": [
                   {
@@ -646,7 +646,7 @@
                 "lhId": "page-1-IMG",
                 "selector": "body#page-home \u003e header#top \u003e a.header__brand \u003e img.header__logo",
                 "nodeLabel": "tuempresa",
-                "snippet": "\u003cimg src=\"/assets/images/tu_logo.webp?v=1781254921\" alt=\"tuempresa\" class=\"header__logo\" width=\"263\" height=\"65\" fetchpriority=\"low\" decoding=\"async\"\u003e",
+                "snippet": "\u003cimg src=\"/assets/images/tu_logo.webp?v=1781255265\" alt=\"tuempresa\" class=\"header__logo\" width=\"263\" height=\"65\" fetchpriority=\"low\" decoding=\"async\"\u003e",
                 "boundingRect": {
                   "bottom": 53,
                   "top": 16,
@@ -840,7 +840,7 @@
           ],
           "items": [
             {
-              "url": "https://tuempresa.es/assets/images/tu_logo.webp?v=1781254921",
+              "url": "https://tuempresa.es/assets/images/tu_logo.webp?v=1781255265",
               "totalBytes": 17445
             },
             {
@@ -857,7 +857,7 @@
             },
             {
               "totalBytes": 4780,
-              "url": "https://tuempresa.es/assets/images/tu_avatar.webp?v=1781254921"
+              "url": "https://tuempresa.es/assets/images/tu_avatar.webp?v=1781255265"
             },
             {
               "totalBytes": 3286,
