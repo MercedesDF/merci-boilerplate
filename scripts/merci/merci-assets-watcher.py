@@ -23,7 +23,10 @@ def get_assets_state() -> dict[Path, float]:
     if not ASSETS_RAW_DIR.exists():
         return {}
     
-    valid_extensions = {".png", ".jpg", ".jpeg", ".gif", ".bmp", ".tiff"}
+    valid_extensions = {
+        ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".tiff",  # Formatos de imagen
+        ".mp4", ".mov", ".avi", ".webm"                     # Formatos de vídeo
+    }
     return {
         path: path.stat().st_mtime
         for path in ASSETS_RAW_DIR.rglob("*")

@@ -9,11 +9,11 @@ optimización y auditoría del proyecto. Excluye scripts interactivos
 (merci-commit) o de vigilancia continua (merci-watch).
 """
 
-import subprocess
-import time
 import json
-import sys
 import os
+import subprocess
+import sys
+import time
 from pathlib import Path
 
 # Definimos la ruta base donde residen los scripts
@@ -57,7 +57,12 @@ PIPELINE = [
     "merci-linkcheck.py"
 ]
 
-def main():
+def main() -> None:
+    """
+    QUÉ HACE: Orquesta la ejecución secuencial de todos los scripts del pipeline.
+    POR QUÉ: Centraliza la automatización de construcción y aseguramiento de calidad (QA),
+            garantizando el patrón Fail-Fast ante cualquier fallo intermedio.
+    """
     start_time = time.time()
     print("🚀 [Merci Total] Iniciando orquestación del pipeline DevSecOps...\n")
     
@@ -82,6 +87,9 @@ def main():
         except subprocess.CalledProcessError as e:
             print(f"\n❌ [Merci Total] Pipeline detenido. El proceso '{script}' reportó errores y bloqueó la ejecución.")
             sys.exit(e.returncode)
+        except Exception as e:
+            print(f"\n❌ [Merci Total] Pipeline detenido. Error inesperado al lanzar '{script}': {e}")
+            sys.exit(1)
             
     end_time = time.time()
     duration = end_time - start_time

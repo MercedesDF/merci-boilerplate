@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-merci-audit.py — Auditoría local del proyecto tu_dominio.com (Fase 1).
+merci-audit.py — Auditoría local del proyecto tuempresa.es (Fase 1).
 
 ¿Qué problema resuelve?
     Evitar que secretos o errores básicos lleguen al repositorio, y adelantar
@@ -592,7 +592,7 @@ def audit_external_assets(state: AuditState, path: Path, text: str) -> None:
     script_pattern = re.compile(r'<script[^>]*\bsrc\s*=\s*["\'](https?://[^"\']+)["\']', re.IGNORECASE)
     for match in script_pattern.finditer(text):
         url = match.group(1)
-        if "tu_dominio.com" not in url and "localhost" not in url:
+        if "tuempresa.es" not in url and "localhost" not in url:
             line_number = text.count('\n', 0, match.start()) + 1
             state.add(Finding(path, line_number, "error", "UI_EXTERNAL_ASSET", f"Script externo detectado: {url[:30]}..."))
             
@@ -601,7 +601,7 @@ def audit_external_assets(state: AuditState, path: Path, text: str) -> None:
     for match in link_pattern.finditer(text):
         full_tag = match.group(0).lower()
         url = match.group(1)
-        if "stylesheet" in full_tag and "tu_dominio.com" not in url and "localhost" not in url:
+        if "stylesheet" in full_tag and "tuempresa.es" not in url and "localhost" not in url:
             line_number = text.count('\n', 0, match.start()) + 1
             state.add(Finding(path, line_number, "error", "UI_EXTERNAL_ASSET", f"CSS externo detectado: {url[:30]}..."))
                 
@@ -609,7 +609,7 @@ def audit_external_assets(state: AuditState, path: Path, text: str) -> None:
     img_pattern = re.compile(r'<img[^>]*\bsrc\s*=\s*["\'](https?://[^"\']+)["\']', re.IGNORECASE)
     for match in img_pattern.finditer(text):
         url = match.group(1)
-        if "tu_dominio.com" not in url and "localhost" not in url:
+        if "tuempresa.es" not in url and "localhost" not in url:
             line_number = text.count('\n', 0, match.start()) + 1
             state.add(Finding(path, line_number, "error", "UI_EXTERNAL_ASSET", f"Imagen externa detectada: {url[:30]}..."))
             
@@ -617,7 +617,7 @@ def audit_external_assets(state: AuditState, path: Path, text: str) -> None:
     meta_pattern = re.compile(r'<meta[^>]*\bcontent\s*=\s*["\'](https?://[^"\']+)["\']', re.IGNORECASE)
     for match in meta_pattern.finditer(text):
         url = match.group(1)
-        if "tu_dominio.com" not in url and "localhost" not in url:
+        if "tuempresa.es" not in url and "localhost" not in url:
             line_number = text.count('\n', 0, match.start()) + 1
             state.add(Finding(path, line_number, "error", "UI_EXTERNAL_ASSET", f"Meta URL externa detectada: {url[:30]}..."))
             
@@ -668,6 +668,7 @@ class SeoHTMLParser(HTMLParser):
         self.json_ld_scripts = 0
         self.has_noindex = False
         self.noindex_content = ""
+        self.img_without_alt: list[int] = []
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, Optional[str]]]) -> None:
         # Normalizamos nombres de atributos a minúsculas para comparar sin sorpresas.
@@ -700,6 +701,9 @@ class SeoHTMLParser(HTMLParser):
 
             if "charset" in attributes:
                 self.charset = (attributes.get("charset") or "").strip()
+            
+        if tag_lower == "img" and "alt" not in attributes:
+            self.img_without_alt.append(self.getpos()[0])
 
         if tag_lower == "link" and attributes.get("rel", "").lower() == "canonical":
             href = attributes.get("href", "").strip()
@@ -812,6 +816,17 @@ def audit_html_seo(state: AuditState, path: Path, text: str, strict_json_ld: boo
                 "Falta meta viewport (mobile-first / Core Web Vitals).",
             )
         )
+        
+    for lineno in parser.img_without_alt:
+        state.add(
+            Finding(
+                path,
+                lineno,
+                "error",
+                "SEO_IMG_ALT",
+                "Imagen sin atributo 'alt'. Penaliza accesibilidad (WAI-ARIA) y Google PageSpeed.",
+            )
+        )
 
     if not parser.canonical:
         state.add(
@@ -868,7 +883,7 @@ def audit_json(state: AuditState, path: Path, text: str) -> None:
         )
 
 
-def run_on_files(paths: Iterable[Path], strict_json_ld: bool, verbose: bool = False) -> AuditState:
+def run_on_files(paths: Iterable[Path], strict_json_ld: bool, verbose: bool = False, is_external: bool = False) -> AuditState:
     """Orquesta todas las comprobaciones, archivo por archivo."""
     state = AuditState()
     
@@ -930,10 +945,13 @@ def run_on_files(paths: Iterable[Path], strict_json_ld: bool, verbose: bool = Fa
         audit_html_seo(state, path, text, strict_json_ld)
         audit_md_acronyms(state, path, text)
         audit_php_smells(state, path, text)
-        audit_inline_styles(state, path, text)
-        audit_inline_scripts(state, path, text)
-        audit_external_assets(state, path, text)
-        audit_shop_yaml(state, path, text)
+        
+        # Reglas exclusivas del ecosistema Merci (se omiten en auditorías externas)
+        if not is_external:
+            audit_inline_styles(state, path, text)
+            audit_inline_scripts(state, path, text)
+            audit_external_assets(state, path, text)
+            audit_shop_yaml(state, path, text)
         
         # Solo cacheamos el archivo si está inmaculado (0 errores, 0 advertencias)
         if len(state.errors) == errores_previos and len(state.warns) == warns_previos:
@@ -954,8 +972,10 @@ def run_on_files(paths: Iterable[Path], strict_json_ld: bool, verbose: bool = Fa
     return state
 
 
-def audit_banned_tracked_files(root: Path, state: AuditState, staged_only: bool) -> None:
+def audit_banned_tracked_files(root: Path, state: AuditState, staged_only: bool, is_external: bool = False) -> None:
     """Verifica que no haya material pesado rastreado por Git (o en stage)."""
+    if is_external:
+        return
     cmd = ["git", "-C", str(root), "diff", "--cached", "--name-only", "--diff-filter=ACM"] if staged_only else ["git", "-C", str(root), "ls-files"]
     try:
         completed = subprocess.run(cmd, check=True, capture_output=True, text=True)
@@ -1057,8 +1077,8 @@ def main(argv: Optional[list[str]] = None) -> int:
     parser.add_argument(
         "--root",
         type=Path,
-        default=REPO_ROOT,
-        help="Raíz del repositorio (por defecto: raíz del proyecto).",
+            default=Path(os.getcwd()).resolve(),
+            help="Raíz del repositorio a auditar (por defecto: directorio actual).",
     )
     parser.add_argument(
         "--git-staged",
@@ -1092,6 +1112,8 @@ def main(argv: Optional[list[str]] = None) -> int:
         print(f"Raíz inválida (no es carpeta): {root}", file=sys.stderr)
         return 2
 
+    is_external = root.resolve() != REPO_ROOT.resolve()
+
     try:
         if args.git_staged:
             files = git_staged_paths(root)
@@ -1099,10 +1121,10 @@ def main(argv: Optional[list[str]] = None) -> int:
             files = list(iter_repo_files(root))
             
         if args.verbose:
-            print(f"🔍 [Merci Audit] Iniciando auditoría sobre {len(files)} archivos...")
+            print(f"🔍 [Merci Audit] Iniciando auditoría sobre {len(files)} archivos{' (Modo Auditoría Externa)' if is_external else ''}...")
             
-        state = run_on_files(files, args.strict_json_ld, args.verbose)
-        audit_banned_tracked_files(root, state, args.git_staged)
+        state = run_on_files(files, args.strict_json_ld, args.verbose, is_external)
+        audit_banned_tracked_files(root, state, args.git_staged, is_external)
     except SystemExit:
         raise
     except Exception as exc:
@@ -1111,14 +1133,15 @@ def main(argv: Optional[list[str]] = None) -> int:
 
     print_report(state)
 
-    # Exportar métricas para Grafana (Agente SRE)
-    try:
-        obs_dir = REPO_ROOT / "observabilidad"
-        obs_dir.mkdir(exist_ok=True)
-        report_data = {"errors": len(state.errors), "warnings": len(state.warns)}
-        (obs_dir / ".audit_report.json").write_text(json.dumps(report_data), encoding="utf-8")
-    except Exception:
-        pass
+    # Exportar métricas SRE solo si estamos auditando el propio Boilerplate
+    if not is_external:
+        try:
+            obs_dir = REPO_ROOT / "observabilidad"
+            obs_dir.mkdir(exist_ok=True)
+            report_data = {"errors": len(state.errors), "warnings": len(state.warns)}
+            (obs_dir / ".audit_report.json").write_text(json.dumps(report_data), encoding="utf-8")
+        except Exception:
+            pass
 
     if state.warns:
         print(

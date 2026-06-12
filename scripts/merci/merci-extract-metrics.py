@@ -18,7 +18,14 @@ import urllib.error
 from datetime import datetime
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
+# QUÉ HACE: Permite que un orquestador externo (como merci-showcase) defina
+# una raíz de proyecto distinta, aislando la ejecución del script.
+# POR QUÉ: Garantiza que el Showcase opere sobre su clon efímero y no contamine
+# ni lea los datos del proyecto matriz.
+if 'MERCI_PROJECT_ROOT' in os.environ:
+    REPO_ROOT = Path(os.environ['MERCI_PROJECT_ROOT']).resolve()
+else:
+    REPO_ROOT = Path(__file__).resolve().parents[2]
 
 INDEX_HTML = REPO_ROOT / "public" / "index.html"
 OBSERVABILIDAD_DIR = REPO_ROOT / "observabilidad"
@@ -26,7 +33,7 @@ CACHE_FILE = OBSERVABILIDAD_DIR / ".metrics_cache"
 PAGESPEED_CACHE_JSON = OBSERVABILIDAD_DIR / "pagespeed_response.json"
 
 # Configuración de la API Autónoma
-TARGET_URL = "https://tu_dominio.com/"
+TARGET_URL = "https://tuempresa.es/"
 STRATEGY = "mobile"
 CACHE_TTL_SECONDS = 86400  # 24 horas de caché para no estrangular el pipeline CI/CD local
 

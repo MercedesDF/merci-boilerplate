@@ -7,18 +7,19 @@ Escanea el repositorio recién clonado, purga los datos de origen (mercedev)
 e inyecta el nuevo nombre y dominio del proyecto.
 """
 
-import os
-import sys
-import shutil
-import re
 import argparse
+import os
 from pathlib import Path
+import re
+import shutil
+import sys
+import time
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 TARGET_EXTENSIONS = {'.html', '.php', '.md', '.py', '.js', '.scss', '.yaml', '.yml', '.json', '.txt', '.xml'}
 
-def replace_in_files(old_str: str, new_str: str):
+def replace_in_files(old_str: str, new_str: str) -> None:
     """
     QUÉ HACE: Recorre recursivamente el repositorio buscando y reemplazando cadenas.
     POR QUÉ: Automatiza la personalización del boilerplate, evitando buscar
@@ -48,7 +49,7 @@ def replace_in_files(old_str: str, new_str: str):
                     print(f"    ⚠️ No se pudo procesar {file_path.name}: {e}")
     print(f"    ✅ Modificados {count} archivos.")
 
-def resetear_roadmap(nuevo_nombre: str):
+def resetear_roadmap(nuevo_nombre: str) -> None:
     """
     QUÉ HACE: Vacía el ROADMAP.md personal de la autora y lo sustituye por una plantilla base.
     POR QUÉ: Prevención de Fuga de Datos (DLP). El roadmap actual contiene todas las Épicas privadas de la autora.
@@ -69,7 +70,7 @@ def resetear_roadmap(nuevo_nombre: str):
 """
         roadmap_path.write_text(clean_content, encoding="utf-8")
 
-def purge_directory(dir_path: Path, exclude: list = None):
+def purge_directory(dir_path: Path, exclude: list[str] | None = None) -> None:
     """
     QUÉ HACE: Elimina todo el contenido de una carpeta excepto .gitkeep y los archivos excluidos.
     POR QUÉ: Limpia la biblioteca y el laboratorio, pero permite salvar archivos base como la bitácora agnóstica.
@@ -89,7 +90,7 @@ def purge_directory(dir_path: Path, exclude: list = None):
         elif item.is_dir():
             shutil.rmtree(item)
 
-def anonimizar_portada(nuevo_dominio: str):
+def anonimizar_portada(nuevo_dominio: str) -> None:
     """
     QUÉ HACE: Limpia el logotipo y reemplaza el texto de presentación por un mensaje de bienvenida (estilo Vite).
     POR QUÉ: Mejora la Developer Experience (DX) entregando una landing limpia y lista para personalizar.
@@ -124,9 +125,20 @@ def anonimizar_portada(nuevo_dominio: str):
         </article>"""
         
         content = re.sub(r'<article class="prose">.*?</article>', nuevo_prose, content, flags=re.DOTALL | re.IGNORECASE)
+
+        # QUÉ HACE: Purga los textos personales del Hero y los bloques "Merci Explica" de la matriz.
+        # POR QUÉ: Prevención de Fuga de Datos (DLP). Evita que la identidad, el copy de marketing
+        # o explicaciones de la autora matriz se filtren en la demo pública del Showcase/Boilerplate.
+        content = re.sub(r'<h2 class="hero__statement">.*?</h2>', '<h2 class="hero__statement">proyecto instanciado<br>infraestructura lista</h2>', content, flags=re.DOTALL | re.IGNORECASE)
+        content = re.sub(r'<p class="hero__subtitle">.*?</p>', '<p class="hero__subtitle">El ecosistema DevSecOps ha sido inicializado con éxito. El código base, los orquestadores y la infraestructura están listos para recibir tu proyecto.</p>', content, flags=re.DOTALL | re.IGNORECASE)
+        content = content.replace('¿quieres conocerme?', 'Ver perfil')
+
+        explica_pattern = re.compile(r'<(div|aside) class="hero__explica">.*?</\1>', re.DOTALL | re.IGNORECASE)
+        content = explica_pattern.sub('', content)
+
         index_path.write_text(content, encoding="utf-8")
 
-def anonimizar_paginas_secundarias(nuevo_nombre: str, nuevo_dominio: str):
+def anonimizar_paginas_secundarias(nuevo_nombre: str, nuevo_dominio: str) -> None:
     """
     QUÉ HACE: Arrasa con el contenido de Sobre Mí y Contacto, inyectando plantillas en blanco (estilo Vite).
     POR QUÉ: Data Leak Prevention (DLP) matemático. No depende de buscar textos exactos. Vacía el <main> por completo.
@@ -199,7 +211,7 @@ def anonimizar_paginas_secundarias(nuevo_nombre: str, nuevo_dominio: str):
         content = re.sub(r'<main[^>]*>.*?</main>', nuevo_main_contacto, content, flags=re.DOTALL | re.IGNORECASE)
         contacto_path.write_text(content, encoding="utf-8")
 
-def anonimizar_enlaces_y_textos(preserve_socials=False):
+def anonimizar_enlaces_y_textos(preserve_socials: bool = False) -> None:
     """
     QUÉ HACE: Limpia enlaces sociales del footer y frases hardcodeadas del asistente.
     POR QUÉ: Garantiza un "Marca Blanca" total sin depender del reemplazo de identidad global.
@@ -216,7 +228,7 @@ def anonimizar_enlaces_y_textos(preserve_socials=False):
     replace_in_files("habla con Mercedes-mercedev, el cerebro de la web", "habla con el administrador de la web")
     replace_in_files("La tienda no tienda de merchandising conmigo de como protagonista", "Catálogo oficial de demostración")
 
-def generar_placeholders_directorios(nuevo_dominio: str):
+def generar_placeholders_directorios(nuevo_dominio: str) -> None:
     """
     QUÉ HACE: Genera archivos index.html en carpetas estructurales vacías.
     POR QUÉ: Al vaciar estas carpetas por DLP, Nginx devuelve 403 Forbidden. 
@@ -296,7 +308,7 @@ def generar_placeholders_directorios(nuevo_dominio: str):
 </html>"""
         (dir_path / "index.html").write_text(html_content, encoding="utf-8")
 
-def resetear_telemetria_html():
+def resetear_telemetria_html() -> None:
     """
     QUÉ HACE: Resetea los contadores del dashboard inyectados por merci-telemetry.py.
     POR QUÉ: Previene la fuga de datos (DLP) de las métricas de la autora hacia el nuevo proyecto.
@@ -317,8 +329,11 @@ def resetear_telemetria_html():
             html = re.sub(pattern2, r'\g<1>N/D\g<2>', html, flags=re.IGNORECASE)
         path.write_text(html, encoding="utf-8")
 
-def configure_ai_module(include_ai: bool):
-    """Configura la Marca Blanca del asistente o ejecuta su amputación quirúrgica."""
+def configure_ai_module(include_ai: bool) -> None:
+    """
+    QUÉ HACE: Configura la Marca Blanca del asistente de IA o ejecuta su amputación quirúrgica.
+    POR QUÉ: Permite decidir si conservar la IA de forma despersonalizada o eliminarla por completo de la UI y los scripts del pipeline.
+    """
     if include_ai:
         print("  🧠 Configurando módulo de Inteligencia Artificial (Marca Blanca)...")
         replace_in_files("Eres Merci, la asistente virtual", "Eres un asistente virtual técnico")
@@ -379,7 +394,12 @@ def configure_ai_module(include_ai: bool):
             content = content.replace(', js_controller_version', '').replace(', js_c_v: int', '')
             publish_py.write_text(content, encoding="utf-8")
 
-def main():
+def main() -> None:
+    """
+    QUÉ HACE: Orquesta la instanciación completa del Boilerplate para un nuevo proyecto.
+    POR QUÉ: Automatiza la purga de datos personales, marcas comerciales y configuraciones locales
+            para generar un repositorio limpio y agnóstico de marca blanca.
+    """
     parser = argparse.ArgumentParser(description="Inicializa un nuevo Boilerplate DevSecOps a partir del repositorio.")
     parser.add_argument('--force', action='store_true', help="Ignora la advertencia destructiva")
     parser.add_argument('--dominio', type=str, help="Nuevo dominio sin protocolo (ej. mi-proyecto.com)")
@@ -507,7 +527,6 @@ def main():
     
     # Aplicar patrón Gemelos Multimedia
     print("  🖼️  Aplicando patrón Gemelos Multimedia (reemplazando recursos de matriz en el código)...")
-    import time
     v_buste = int(time.time())
     replace_in_files("/assets/images/logo.webp?v=2", f"/assets/images/tu_logo.webp?v={v_buste}")
     replace_in_files("/assets/images/logo.webp", f"/assets/images/tu_logo.webp?v={v_buste}")
@@ -577,3 +596,6 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print("\n🛑 [Merci Init] Inicialización cancelada. El repositorio base no ha sido modificado.")
         sys.exit(130)
+    except Exception as e:
+        print(f"\n❌ [Merci Init] Error fatal durante la inicialización: {e}")
+        sys.exit(1)

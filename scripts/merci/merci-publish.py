@@ -104,7 +104,7 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
     
     # QUÉ HACE: Trunca metadatos para SEO técnico (Shift-Left SEO)
     # POR QUÉ: Evita advertencias del linter y truncamientos en buscadores (SERPs).
-    titulo_seo = f"{titulo_html} — tu_dominio.com"
+    titulo_seo = f"{titulo_html} — tuempresa.es"
     if len(titulo_seo) > 65:
         titulo_seo = f"{titulo_html[:60]}..." if len(titulo_html) > 60 else titulo_html
         
@@ -150,7 +150,7 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
         print(f"  ❌ Error: Falta el atributo 'alt_portada' obligatorio en {filepath.name}")
         return False
     
-    canonical_url = f"https://tu_dominio.com{base_url_path}{out_filename}"
+    canonical_url = f"https://tuempresa.es{base_url_path}{out_filename}"
 
     # QUÉ HACE: Pre-procesador de multimedia. Busca sintaxis de imagen que apunte a un vídeo.
     # POR QUÉ: Markdown nativo no soporta la etiqueta <video>. Usamos expresiones regulares para transformar 
@@ -223,7 +223,7 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
     <div class="portada">
         <h1>{titulo_html}</h1>
         <p>{tipo_html} | Vol. {volumen_html}</p>
-        <p><strong>tu_dominio.com</strong> — {fecha_html}{fase_pdf_text}</p>
+        <p><strong>tuempresa.es</strong> — {fecha_html}{fase_pdf_text}</p>
     </div>
     <div class="contenido">
         {html_content}
@@ -449,7 +449,7 @@ def generar_indice(publicaciones, out_path, title, meta_desc, hero_subtitle, can
         </a>"""
         
     # QUÉ HACE: Trunca metadatos para el índice
-    titulo_seo = f"{title} — tu_dominio.com"
+    titulo_seo = f"{title} — tuempresa.es"
     if len(titulo_seo) > 65:
         titulo_seo = f"{title[:60]}..." if len(title) > 60 else title
         
@@ -472,7 +472,7 @@ def generar_indice(publicaciones, out_path, title, meta_desc, hero_subtitle, can
     {{
       "@context": "https://schema.org",
       "@type": "CollectionPage",
-      "name": {json.dumps(title + " - tu_dominio.com")},
+      "name": {json.dumps(title + " - tuempresa.es")},
       "description": {json.dumps(meta_desc)},
       "url": {json.dumps(canonical_url)}
     }}
@@ -572,11 +572,11 @@ def main(): # type: ignore
                 
     if publicaciones_bib:
         PUBLIC_BIBLIOTECA.mkdir(parents=True, exist_ok=True)
-        generar_indice(publicaciones_bib, PUBLIC_BIBLIOTECA / "index.html", "La Biblioteca", "Archivo técnico y documentación oficial. Compendios de arquitectura DevSecOps, automatización Python y metodologías Zero-Bloat.", "El conocimiento inmutable del ecosistema. Documentación técnica, metodología Spec as Source y cuadernillos de ingeniería DevSecOps. Todo lo que el sistema construye, la biblioteca lo preserva.", "https://tu_dominio.com/biblioteca/", header_html, footer_html, css_version, js_controller_version, js_main_version)
+        generar_indice(publicaciones_bib, PUBLIC_BIBLIOTECA / "index.html", "La Biblioteca", "Archivo técnico y documentación oficial. Compendios de arquitectura DevSecOps, automatización Python y metodologías Zero-Bloat.", "El conocimiento inmutable del ecosistema. Documentación técnica, metodología Spec as Source y cuadernillos de ingeniería DevSecOps. Todo lo que el sistema construye, la biblioteca lo preserva.", "https://tuempresa.es/biblioteca/", header_html, footer_html, css_version, js_controller_version, js_main_version)
         
     if publicaciones_art:
         PUBLIC_ART_DE_COTE.mkdir(parents=True, exist_ok=True)
-        generar_indice(publicaciones_art, PUBLIC_ART_DE_COTE / "index.html", "Art de Coté", "Índice de scripts experimentales, andamiajes y código colateral.", "Scripts, flujos de automatización y código experimental preservado bajo la filosofía Zero Waste (Cero Desperdicio).", "https://tu_dominio.com/art-de-cote/", header_html, footer_html, css_version, js_controller_version, js_main_version)
+        generar_indice(publicaciones_art, PUBLIC_ART_DE_COTE / "index.html", "Art de Coté", "Índice de scripts experimentales, andamiajes y código colateral.", "Scripts, flujos de automatización y código experimental preservado bajo la filosofía Zero Waste (Cero Desperdicio).", "https://tuempresa.es/art-de-cote/", header_html, footer_html, css_version, js_controller_version, js_main_version)
             
     total_pubs = len(publicaciones_bib) + len(publicaciones_art)
     limpiar_archivos_zombis(archivos_validos)

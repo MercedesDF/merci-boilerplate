@@ -36,3 +36,6 @@ docs/*.pdf
 
 # Scripts privados de la matriz
 scripts/matriz/
+
+# Archivos de intercambio de datos
+contexto-matriz.md

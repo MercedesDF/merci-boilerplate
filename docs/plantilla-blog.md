@@ -11,7 +11,7 @@ fase: ""
 <!-- linkedin:
 Escribe aquí tu anuncio para LinkedIn.
 Acepta saltos de línea sin problemas.
-https://tu_dominio.com/blog/tu-url
+https://tuempresa.es/blog/tu-url
 -->
 
 Escribe aquí el contenido de tu artículo. 

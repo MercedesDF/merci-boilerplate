@@ -1,5 +1,5 @@
-# robots.txt para tu_dominio.com
+# robots.txt para tuempresa.es
 User-agent: *
 Allow: /
 
-Sitemap: https://tu_dominio.com/sitemap.xml
+Sitemap: https://tuempresa.es/sitemap.xml

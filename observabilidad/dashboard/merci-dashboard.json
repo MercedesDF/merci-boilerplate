@@ -42,7 +42,7 @@
       }
     ],
     "cursorSync": "Off",
-    "description": "métricas de tu_dominio.com en local",
+    "description": "métricas de tuempresa.es en local",
     "editable": true,
     "elements": {
       "panel-1": {
@@ -975,7 +975,7 @@
       "hideTimepicker": false,
       "fiscalYearStartMonth": 0
     },
-    "title": "tu_dominio.com",
+    "title": "tuempresa.es",
     "variables": [],
     "preferences": {
       "layout": {

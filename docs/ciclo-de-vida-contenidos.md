@@ -20,8 +20,8 @@ Este documento explica cómo el *YAML Frontmatter* actúa como el "volante" del 
     *   `"borrador"`: Listo para ser promovido.
     *   `"publicado"`: Live en la web.
 *   `estado_social`: La válvula del Buffer de LinkedIn. 
-    *   `"en_cola"`: Pendiente de tu revisión humana.
-    *   `"aprobado"`: Listo para que el robot (cronjob) lo dispare.
+    *   `"en_cola"`: Pendiente de revisión humana.
+    *   `"aprobado"`: Listo para la activación automática (cronjob).
     *   `"publicado_linkedin"`: Ya emitido en la red.
 *   `alt_portada`: El escudo WAI-ARIA. Si está vacío en la capa estática, el auditor bloquea la compilación para mantener el 100/100 de accesibilidad.
 
@@ -31,17 +31,17 @@ Este documento explica cómo el *YAML Frontmatter* actúa como el "volante" del 
 
 ### A. El Flujo Estático (Biblioteca / Art de Coté)
 1. **Nacimiento:** Echas una idea cruda en `laboratorio/notas_rapidas`. La IA (`merci librarian`) redacta el documento, le pone `estado: "incubacion"` y lo deja en `laboratorio/incubacion/`.
-2. **Maduración:** Lo revisas. Si te gusta, cambias a `estado: "borrador"`.
-3. **Curación:** Ejecutas `merci promote`. El script lee el YAML, ve que el *tema* es "DevSecOps" y mueve físicamente el archivo a `/biblioteca/`. Lo sella como `publicado`.
+2. **Maduración:** Revisión manual. Si es de conformidad, se cambia a `estado: "borrador"`.
+3. **Curación:** Ejecución de `merci promote`. El script lee el YAML, verifica que el *tema* es "DevSecOps" y mueve físicamente el archivo a `/biblioteca/`, sellándolo como `publicado`.
 4. **Compilación:** Ejecutas `merci total`. Python convierte el Markdown a HTML, genera el PDF, inyecta el SEO, crea la estantería y lo sube.
 
 ### B. El Flujo Dinámico (Blog en WordPress)
-1. **Marketing:** La IA (`merci blogger`) crea el artículo de marketing en `incubacion/` con tema "Blog" a partir de otro post técnico. Lo pasas a `borrador`.
+1. **Marketing:** La IA (`merci blogger`) crea el artículo de marketing en `incubacion/` con tema "Blog" a partir de otro post técnico. Se pasa a `borrador`.
 2. **Curación Ligera:** Ejecutas `merci promote`. El script lo mueve a la carpeta `/blog/` en la raíz local.
 3. **Sincronización API:** Ejecutas `merci wp` (o `merci total`). Python dialoga con WordPress vía API REST, resuelve dinámicamente si el post ya existe (por slug) y lo crea o actualiza sin duplicarlo. La caché incremental (`observabilidad/.wp_sync.json`) evita llamadas de red sobre artículos no modificados.
 
 ### C. El Flujo Social (LinkedIn)
-1. **Aprobación (Humano):** Ejecutas `merci linkedin`. El script te muestra una lista interactiva numerada con los posts `en_cola`. Eliges cuál revisar y, si lo confirmas, cambia a `aprobado`.
+1. **Aprobación (Humano):** Ejecución de `merci linkedin`. El script muestra una lista interactiva numerada con los posts `en_cola` para seleccionar cuál revisar, y tras la confirmación, cambia a `aprobado`.
 2. **Disparo (Robot):** Una tarea automática de Ubuntu (`cron`) ejecuta `merci linkedin --auto` cada varios días. Coge un post `aprobado`, lo publica en LinkedIn, y lo sella como `publicado_linkedin`.
 
 ---
