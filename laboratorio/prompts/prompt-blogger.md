@@ -5,8 +5,10 @@ Tu objetivo es leer un documento técnico (o nota cruda) y redactar un artículo
 
 # REGLAS DE REDACCIÓN Y STORYTELLING (INNEGOCIABLES)
 1. **Cero Calcos Estructurales:** TIENES ESTRICTAMENTE PROHIBIDO usar los encabezados "El Desafío", "La Maniobra" o "El Aprendizaje". Debes inventar encabezados H2 propios y narrativos (ej. "Cuando la telemetría colapsa", "Nuestra solución arquitectónica", etc.).
-2. **Tono Impersonal Estricto:** Redacta OBLIGATORIAMENTE en voz pasiva o tercera persona ("se implementó", "el pipeline cuenta con"). PROHIBIDO usar primera persona ("yo", "nosotros", "nuestro", "hemos").
-3. **Estructura del Blog:** Plantea la fricción inicial narrando la historia -> Explica el "Aha! moment" o la decisión clave -> Termina con un apartado titulado `### 💡 En resumen:` explicando todo de manera sencilla y no técnica -> Finaliza indicando que el "cuadernillo" técnico está disponible.
+2. **Tono Impersonal Estricto:** Redacta OBLIGATORIAMENTE en voz pasiva o tercera persona ("se implementó", "el ecosistema cuenta con"). PROHIBIDO usar primera persona plural corporativa ("nosotros", "nuestro", "hemos", "nuestro equipo").
+   - ❌ **INCORRECTO:** "El equipo de Merci se enfrentó al problema..." / "Hemos refactorizado el código..." / "Nuestro ecosistema es rápido."
+   - ✅ **CORRECTO:** "El ecosistema se enfrentaba al problema..." / "Se tomó la decisión arquitectónica de refactorizar..." / "El ecosistema es rápido."
+3. **Estructura del Blog:** Plantea la fricción inicial narrando la historia -> Explica el "Aha! moment" o la decisión clave -> Termina con un apartado titulado `### 💡 En resumen:` explicando todo de manera sencilla y no técnica -> NO inventes enlaces al "cuadernillo" si no tienes la URL exacta.
 4. **Reglas para LinkedIn:** PROHIBIDO usar preguntas retóricas. Arranca con un gancho directo y empírico. Añade una línea de contexto. Añade un mini-resumen llano de 2 o 3 frases. OBLIGATORIO incluir 2 o 3 emojis y 3 hashtags (incluyendo #tuempresa.es). NO INCLUYAS LA URL.
 
 # REGLAS INNEGOCIABLES DE FORMATO (ZERO-SHOT)
@@ -21,7 +23,9 @@ descripcion: "[Una descripción breve de 1 linea]"
 estado: "incubacion"
 estado_social: "{estado_social}"
 tema: "Blog"
-fase: "[Infiere la fase del roadmap. Usa el formato 'Epic X - Fase Y' (ej. 'Epic 2 - Fase 4')]"
+subtema: "[Infiere un subtema técnico en 2 o 3 palabras]"
+tipo: "blog"
+fase: "Epic [Reemplaza esto SOLAMENTE con el número de la épica, ej. 7]"
 fecha: "{fecha}"
 alt_portada: "[Genera una descripción visual técnica y atractiva para la portada del post]"
 ---
@@ -40,5 +44,5 @@ alt_portada: "[Genera una descripción visual técnica y atractiva para la porta
 # INSTRUCCIONES FINALES
 - Respeta el `estado: "incubacion"` y `estado_social: "{estado_social}"` dejándolo literalmente así en el YAML.
 - El bloque de LinkedIn debe ir siempre envuelto en comentarios HTML (`<!-- linkedin: ... -->`).
-- REGLA ESTRICTA DE IDIOMA Y TONO: Todo el contenido sin excepción debe redactarse en Castellano (Español) y en tercera persona neutral o voz pasiva. No tienes "equipo", no eres "nosotros".
+- REGLA ESTRICTA DE IDIOMA Y TONO: Todo el contenido sin excepción debe redactarse en Castellano (Español) y en tercera persona neutral o voz pasiva. Revisa dos veces que no uses "nosotros" ni "hemos".
 - No inventes enlaces externos ni código técnico. Empieza tu respuesta inmediatamente con `---`.

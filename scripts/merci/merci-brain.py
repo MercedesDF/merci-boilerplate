@@ -10,14 +10,14 @@ generar respuestas estáticas inteligentes, protegiendo el rendimiento (100/100)
 y operando de forma 100% offline y gratuita.
 """
 
-import sys
 import json
 import re
+import sys
 import unicodedata
-import urllib.request
 import urllib.error
-from pathlib import Path
+import urllib.request
 import warnings
+from pathlib import Path
 
 # Silenciamos advertencias de deprecación de librerías de terceros (ej. google.generativeai) para mantener la consola limpia
 warnings.filterwarnings("ignore", category=FutureWarning)
@@ -28,17 +28,21 @@ PUBLIC_JS_DIR = REPO_ROOT / "public" / "js"
 PROMPT_PATH = REPO_ROOT / "laboratorio" / "prompts" / "prompt-brain.md"
 
 def slugify(texto: str) -> str:
-    """Convierte un texto en una cadena segura para URLs (slug)."""
+    """
+    QUÉ HACE: Convierte un texto en una cadena segura para URLs (slug).
+    POR QUÉ: Normaliza y estandariza los nombres de archivo y URLs eliminando tildes y caracteres especiales.
+    """
     texto = str(texto)
     texto = re.sub(r'[—–]', '-', texto)
     texto = unicodedata.normalize('NFKD', texto).encode('ascii', 'ignore').decode('ascii')
     texto = re.sub(r'[^\w\s-]', '', texto.lower())
     return re.sub(r'[-\s]+', '-', texto).strip('-_')
 
-def consultar_ia_local(prompt):
-    """Realiza una petición POST nativa a la API local de Ollama (qwen2.5-coder)."""
-    # QUÉ HACE: Envía el prompt de generación de texto al endpoint de la API local de Ollama.
-    # POR QUÉ: Aísla el proceso de la nube, garantizando cero latencia de red y privacidad total.
+def consultar_ia_local(prompt: str) -> str:
+    """
+    QUÉ HACE: Realiza una petición POST nativa a la API local de Ollama (qwen2.5-coder).
+    POR QUÉ: Aísla el proceso de la nube, garantizando cero latencia de red y privacidad total.
+    """
     try:
         local_url = "http://localhost:11434/api/generate"
         local_payload = {
@@ -55,11 +59,11 @@ def consultar_ia_local(prompt):
     except Exception as e_local:
         return f"Error HTTP Local: {e_local}"
 
-def generar_cerebro_estatico(force_clean=False):
+def generar_cerebro_estatico(force_clean: bool = False) -> None:
     """
     QUÉ HACE: Escanea la biblioteca, pide saludos contextuales a Ollama local y los guarda en un JSON.
     POR QUÉ: Permite a Merci tener respuestas inteligentes en cada artículo sin consumir
-    tiempo de red (0 ms latencia) ni depender de servicios externos de terceros.
+            tiempo de red (0 ms latencia) ni depender de servicios externos de terceros.
     """
     print("\n📚 [Merci Brain] Iniciando escaneo de la Biblioteca...")
     biblioteca_dir = REPO_ROOT / "biblioteca"
@@ -136,7 +140,10 @@ def generar_cerebro_estatico(force_clean=False):
         print(f"  ℹ️  Info: Quedan {fallbacks_count} artículos pendientes de IA por fallo de conexión local. Verifica Ollama.")
 
 if __name__ == "__main__":
-    print("🧠 [Merci Brain] Despertando lóbulo frontal (Motor 100% Local)...")
-    force_clean = "--clean" in sys.argv
-    
-    generar_cerebro_estatico(force_clean)
+    try:
+        print("🧠 [Merci Brain] Despertando lóbulo frontal (Motor 100% Local)...")
+        force_clean = "--clean" in sys.argv
+        generar_cerebro_estatico(force_clean)
+    except Exception as e:
+        print(f"❌ [Merci Brain] Error fatal en la ejecución: {e}")
+        sys.exit(1)

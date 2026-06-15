@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <!-- QUÉ HACE: Actualiza la meta descripción para alinearla con el perfil de Performance y Spec as Source. -->
     <!-- POR QUÉ: Refleja el valor real, demostrable y altamente demandado del ecosistema actual. -->
-    <meta name="description" content="Laboratorio DevSecOps e Ingeniería de Rendimiento. Ecosistema de 25+ agentes IA, Desarrollo Guiado por Especificaciones y 100/100 Core Web Vitals.">
+    <meta name="description"
+        content="Laboratorio DevSecOps e Ingeniería de Rendimiento. Ecosistema de 25+ agentes IA, Desarrollo Guiado por Especificaciones y 100/100 Core Web Vitals.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+
     <!-- QUÉ HACE: Explicita las directrices de indexación para los motores de búsqueda -->
     <!-- POR QUÉ: Limpia el bloque comentado obsoleto y asegura que el rastreador siga los enlaces del índice. -->
     <meta name="robots" content="index, follow">
@@ -15,22 +17,23 @@
     <!-- QUÉ HACE: Implementa el protocolo Open Graph para metadatos sociales (Social Cards) -->
     <!-- POR QUÉ: Al automatizar LinkedIn con merci-linkedin.py, es vital controlar cómo se renderiza la URL matriz al ser compartida. -->
     <meta property="og:title" content="tuempresa — Ingeniería de Rendimiento & DevSecOps">
-    <meta property="og:description" content="Laboratorio DevSecOps gobernado por 25+ agentes IA y metodología Spec as Source.">
+    <meta property="og:description"
+        content="Laboratorio DevSecOps gobernado por 25+ agentes IA y metodología Spec as Source.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://tuempresa.es/">
-    <meta property="og:image" content="https://tuempresa.es/assets/images/tu_logo.webp?v=1781255265">
+    <meta property="og:image" content="https://tuempresa.es/assets/images/tu_logo.webp?v=1781515055">
 
     <title>tuempresa — Ingeniería de Rendimiento & DevSecOps</title>
-    
+
     <!-- Favicon y Mercí-->
     <link rel="icon" href="/favicon.ico?v=2" type="image/x-icon">
     <!-- QUÉ HACE: Cache Busting dinámico incrementado a v14 -->
     <!-- POR QUÉ: Obliga a Varnish y a navegadores móviles a purgar la caché y descargar la nueva rejilla de 5 columnas. -->
-    <link rel="stylesheet" href="/css/main.css?v=1781255265">
-    <script src="/js/MerciController.js?v=1781255265" defer></script>
+    <link rel="stylesheet" href="/css/main.css?v=1781515056">
+    <script src="/js/MerciController.js?v=1781503814" defer></script>
     <script src="/js/main.js?v=1779435201" defer></script>
     <link rel="canonical" href="https://tuempresa.es">
-    
+
     <!-- JSON-LD Mínimo Fase 2 -->
     <script type="application/ld+json">
     {
@@ -41,12 +44,14 @@
     }
     </script>
 </head>
+
 <body class="page" id="page-home">
     <!-- QUÉ HACE: Centraliza el foco de "Volver arriba" semánticamente en el header -->
     <!-- POR QUÉ: Elimina el anti-patrón de accesibilidad de usar divs invisibles con tabindex="-1" -->
     <header class="header" id="top">
         <a href="/" class="header__brand">
-            <img src="/assets/images/tu_logo.webp?v=1781255265" alt="tuempresa" class="header__logo" width="263" height="65" fetchpriority="low" decoding="async">
+            <img src="/assets/images/tu_logo.webp?v=1781515055" alt="tuempresa" class="header__logo" width="263" height="65"
+                fetchpriority="low" decoding="async">
         </a>
         <button class="header__toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false">
             <span class="header__toggle-icon"></span>
@@ -60,6 +65,7 @@
             <!-- QUÉ HACE: Diferencia este enlace del autogenerado por WordPress en las tarjetas. -->
             <!-- POR QUÉ: Evita el error WAI-ARIA de "Enlaces idénticos con distinto destino". -->
             <a href="/blog/" class="nav__link" aria-label="Ir a la portada del Blog">Blog</a>
+            <a href="/proyectos/" class="nav__link">Proyectos</a>
             <a href="/blog/tienda/" class="nav__link">Tienda</a>
             <a href="/contacto/" class="nav__link">Contacto</a>
         </nav>
@@ -73,7 +79,7 @@
             <h1 class="hero__title">tuempr<span class="hero__highlight">esa</span>.es</h1>
             <h2 class="hero__statement">proyecto instanciado<br>infraestructura lista</h2>
             <p class="hero__subtitle">El ecosistema DevSecOps ha sido inicializado con éxito. El código base, los orquestadores y la infraestructura están listos para recibir tu proyecto.</p>
-            
+
             <ul class="hero__highlights">
                 <li>100/100 Core Web Vitals</li>
                 <li>0 Dependencias Externas</li>
@@ -82,7 +88,9 @@
 
             <div class="hero__cta">
                 <a href="/sobre-mi/" class="hero__btn">Ver perfil</a>
-                <a href="https://github.com/MercedesDF/merci-boilerplate" target="_blank" rel="noopener noreferrer" class="hero__btn">Ver el código fuente</a>
+                <a href="https://github.com/MercedesDF/merci-boilerplate" target="_blank" rel="noopener noreferrer"
+                    class="hero__btn">Ver el código fuente</a>
+                <a href="/proyectos/" class="hero__btn">Otros proyectos</a>
             </div>
 
             
@@ -93,7 +101,8 @@
         <!-- ===================== -->
         <section class="section">
             <h2 class="home-section__title">Última auditoría independiente — móvil, red 4G simulada</h2>
-            <div class="hero__dashboard hero__dashboard--standalone" role="group" aria-label="Métricas de rendimiento — Auditoría Mobile (PageSpeed Insights)">
+            <div class="hero__dashboard hero__dashboard--standalone" role="group"
+                aria-label="Métricas de rendimiento — Auditoría Mobile (PageSpeed Insights)">
                 <div class="hero__metric">
                     <span class="hero__metric-label">FCP</span>
                     <span class="hero__metric-value">0.8 s</span>
@@ -104,7 +113,8 @@
                 </div>
                 <div class="hero__metric">
                     <span class="hero__metric-label">INP</span>
-                    <span class="hero__metric-value"><100ms</span>
+                    <span class="hero__metric-value">
+                        <100ms< /span>
                 </div>
                 <div class="hero__metric">
                     <span class="hero__metric-label">CLS</span>
@@ -128,14 +138,14 @@
                 </div>
                 <div class="hero__metric">
                     <span class="hero__metric-label">Agentes</span>
-                    <span class="hero__metric-value">25+ CLI</span>
+                    <span class="hero__metric-value">N/D</span>
                 </div>
                 <div class="hero__metric">
                     <span class="hero__metric-label">Arquitectura</span>
                     <span class="hero__metric-value">3-layer</span>
                 </div>
             </div>
-            
+
             <!-- QUÉ HACE: Expone las puntuaciones de Lighthouse (CWV) y diagnostica problemas de red. -->
             <div id="lighthouse-scores" class="hero__scores-summary">
                 100 en Rendimiento | 100 en Accesibilidad | 100 en Mejores Prácticas | 100 en SEO
@@ -144,7 +154,7 @@
             <!-- ===================== -->
             <!-- PROSE (EDITORIAL)     -->
             <!-- ===================== -->
-           <article class="prose">
+            <article class="prose">
             <div class="prose__content">
                 <h2>¡Bienvenido a tu Boilerplate DevSecOps!</h2>
                 <p>Esta plataforma ha sido instanciada con éxito y el código base está listo para ti.</p>
@@ -155,11 +165,15 @@
         </section>
 
     </main>
+    <a href="#top" class="floating-back-to-top" aria-label="Volver arriba">↑</a>
     <footer class="footer">
         <div class="footer__links">
-            <a href="https://linkedin.com/in/tu-perfil/" target="_blank" rel="noopener noreferrer" class="footer__link">LinkedIn</a>
-            <a href="https://github.com/tu-usuario" target="_blank" rel="noopener noreferrer" class="footer__link">GitHub</a>
-            <a href="https://github.com/MercedesDF/merci-boilerplate" target="_blank" rel="noopener noreferrer" class="footer__link">Merci Boilerplate</a>
+            <a href="https://linkedin.com/in/tu-perfil/" target="_blank" rel="noopener noreferrer"
+                class="footer__link">LinkedIn</a>
+            <a href="https://github.com/tu-usuario" target="_blank" rel="noopener noreferrer"
+                class="footer__link">GitHub</a>
+            <a href="https://github.com/MercedesDF/merci-boilerplate" target="_blank" rel="noopener noreferrer"
+                class="footer__link">Merci Boilerplate</a>
         </div>
         <div class="footer__text">
             <a href="#top">↑ Volver arriba</a><br>
@@ -175,8 +189,10 @@
         </div>
         <!-- QUÉ HACE: Usa un botón nativo (<button>) para atrapar el foco del tabulador (Accesibilidad) -->
         <button class="merci-ui__trigger" aria-controls="merci-message" aria-expanded="false">
-            <img class="merci-ui__avatar" src="/assets/images/tu_avatar.webp?v=1781255265" alt="Interactuar con el asistente" width="80" height="80" fetchpriority="low" decoding="async">
+            <img class="merci-ui__avatar" src="/assets/images/tu_avatar.webp?v=1781515055" alt="Interactuar con el asistente"
+                width="80" height="80" fetchpriority="low" decoding="async">
         </button>
     </aside>
 </body>
+
 </html>

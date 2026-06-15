@@ -9,6 +9,8 @@ tipo: "cuadernillo"
 estado: "incubacion"
 estado_social: "en_cola"
 tema: "Art de Coté"
+subtema: "General"
+destacado: "false"
 fase: ""
 ---
 

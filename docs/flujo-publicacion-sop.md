@@ -22,6 +22,10 @@ Por diseño arquitectónico (Environment Segregation), el núcleo estático (Bib
    ```bash
    merci total
    ```
+   *Nota:* Detrás de escena, se ejecuta el script `merci-publish.py` para transformar los documentos Markdown de la biblioteca en páginas HTML estáticas y maquetar los PDFs correspondientes. De ser necesario, se puede ejecutar la compilación de forma directa con:
+   ```bash
+   python3 scripts/merci/merci-publish.py
+   ```
 4. **Sello y Empaquetado:** Sellar la publicación añadiendo los archivos a Git (`merci commit`).
 
 ---
@@ -84,6 +88,7 @@ Por diseño arquitectónico (Environment Segregation), el núcleo estático (Bib
 
 ## ⚠️ Reglas de Oro (Hardening Operativo)
 
+- **Integridad Pre-Commit (Regla de la IA y Humana):** Tienes TERMINANTEMENTE PROHIBIDO realizar un `merci-commit.py` sin antes haber ejecutado obligatoriamente la suite de validación completa (`merci total`). Todo el ecosistema debe compilarse y auditarse en verde antes de sellar el historial en Git.
 - **Prevención de Posts Fantasma (Data Drift):** Nunca borrar un archivo `.md` dinámico del disco si ya ha sido sincronizado con WordPress. En caso de eliminación física, el script Headless lo ignorará y la base de datos jamás recibirá la orden de ocultarlo. Para despublicar, cambiar su YAML a `estado: "borrador"` y ejecutar `merci wp` (El script lo ocultará del CMS y lo expulsará físicamente al laboratorio). Solo entonces se debe eliminar del entorno local.
 - **Actualización de Contenidos y Fechas (El control del tiempo):** Para editar un documento ya publicado, modifica el `.md` en su carpeta de producción y ejecuta su orquestador (`merci wp` o `merci total`). El sistema lo actualizará sin duplicarlo. **Sobre la fecha:** Si se mantiene el campo `fecha` original intacto, se realizará una *"actualización silenciosa"* (ideal para corregir erratas sin alterar el orden cronológico). Si se desea indicar que el contenido ha sido profundamente revisado o se requiere que vuelva a subir al principio del blog, se cambia manualmente el campo `fecha: "YYYY-MM-DD"` en el YAML Frontmatter a la fecha de hoy antes de sincronizar.
 - **Prohibición de cruce:** Nunca ejecutar `merci-promote.py` sobre un archivo que ya reside en las carpetas de producción de la raíz. En caso afirmativo, el script lo enviará a la `biblioteca/` estática provocando una colisión de arquitecturas.

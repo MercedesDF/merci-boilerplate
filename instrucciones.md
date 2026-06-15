@@ -56,7 +56,7 @@ El ecosistema cuenta con un flujo estático (SSG) y otro dinámico (Headless WP)
 
 **Para la Biblioteca (Núcleo Estático):**
 1. **Sincronización:** `git pull` para evitar conflictos con el servidor remoto.
-2. **Incubación:** Crear un `.md` en `laboratorio/incubacion/` con `estado: "incubacion"`. Una vez revisado, cambiar a `estado: "borrador"`.
+2. **Incubación:** Crear un `.md` en `laboratorio/incubacion/` con `estado: "incubacion"` y un `tema` estrictamente asignado a una de las 4 macro-categorías ("Desarrollo y Arquitectura", "DevSecOps e Infraestructura", "Inteligencia Artificial y Agentes", "Productividad y Gobernanza"). Una vez revisado, cambiar a `estado: "borrador"`.
 3. **Curación:** Ejecutar `python3 scripts/merci/merci-promote.py` para curarlo y moverlo a la `biblioteca/`.
 4. **QA y Compilación:** Ejecutar `python3 scripts/merci/merci-total.py` (compila SSG, sincroniza páginas y audita el código resultante).
 

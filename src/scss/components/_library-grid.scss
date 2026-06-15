@@ -1,0 +1,24 @@
+@use '../abstracts' as *;
+
+// Layout de alta densidad para la Biblioteca
+// Enfoque Mobile-First: apila por defecto si el ancho es menor a 280px
+
+.library-grid {
+  display: grid;
+  // gap más compacto para condensar el scroll vertical
+  gap: 1rem;
+  
+  // Utiliza auto-fill con minmax para llenar todo el espacio con columnas de al menos 280px
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+// Separador de subtema que ocupa todo el ancho de la cuadrícula
+.library-subsection__title {
+  grid-column: 1 / -1;
+  font-size: 1.25rem;
+  color: $color-primary;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid rgba($color-text-base, 0.1);
+  padding-bottom: 0.5rem;
+}

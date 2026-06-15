@@ -3,24 +3,25 @@
 
 """
 merci-extract-metrics.py — Agente Extractor Data-Driven Autónomo (PageSpeed API).
+
 Interroga la API de Google PageSpeed Insights, cachea la respuesta para proteger
 el rendimiento del pipeline, extrae las métricas de Core Web Vitals, inyecta
 diagnósticos SRE de red y actualiza la portada.
 """
 
 import json
+import os
 import re
 import sys
-import os
 import time
-import urllib.request
 import urllib.error
+import urllib.request
 from datetime import datetime
 from pathlib import Path
 
-# QUÉ HACE: Permite que un orquestador externo (como merci-showcase) defina
+# Permite que un orquestador externo (como merci-showcase) defina
 # una raíz de proyecto distinta, aislando la ejecución del script.
-# POR QUÉ: Garantiza que el Showcase opere sobre su clon efímero y no contamine
+# Garantiza que el Showcase opere sobre su clon efímero y no contamine
 # ni lea los datos del proyecto matriz.
 if 'MERCI_PROJECT_ROOT' in os.environ:
     REPO_ROOT = Path(os.environ['MERCI_PROJECT_ROOT']).resolve()
@@ -37,7 +38,12 @@ TARGET_URL = "https://tuempresa.es/"
 STRATEGY = "mobile"
 CACHE_TTL_SECONDS = 86400  # 24 horas de caché para no estrangular el pipeline CI/CD local
 
-def load_api_key():
+
+def load_api_key() -> str | None:
+    """
+    QUÉ HACE: Lee el archivo .env seguro y busca la clave PAGESPEED_API_KEY.
+    POR QUÉ: Permite autenticarse ante la API de Google PageSpeed Insights para no agotar la cuota de llamadas anónimas.
+    """
     env_file = REPO_ROOT / ".env"
     if not env_file.exists():
         return None
@@ -53,7 +59,12 @@ def load_api_key():
             return key
     return None
 
-def fetch_pagespeed_data(api_key):
+
+def fetch_pagespeed_data(api_key: str | None) -> dict | None:
+    """
+    QUÉ HACE: Realiza una petición HTTP GET a la API de Google PageSpeed Insights para la URL y estrategia configuradas.
+    POR QUÉ: Obtiene el reporte Lighthouse en formato JSON de forma automatizada.
+    """
     print(f"🌍 Interrogando a Google PageSpeed Insights API ({STRATEGY})...")
     url = f"https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url={TARGET_URL}&strategy={STRATEGY}"
     if api_key:
@@ -72,7 +83,12 @@ def fetch_pagespeed_data(api_key):
         print(f"  ❌ Error inesperado de la API: {e}")
         return None
 
-def extract_metrics_from_data(data: dict):
+
+def extract_metrics_from_data(data: dict) -> dict[str, str]:
+    """
+    QUÉ HACE: Parsea la respuesta JSON de PageSpeed para extraer métricas de rendimiento y Core Web Vitals (LCP, TBT, CLS, etc.).
+    POR QUÉ: Permite analizar cuantitativamente el estado del frontend e inyectar avisos de red.
+    """
     print("📄 Parseando árbol .lighthouseResult...")
     metrics = {"FCP": "N/D", "LCP": "N/D", "INP": "N/D", "CLS": "N/D", "TBT": "N/D", "SI": "N/D"}
     
@@ -154,7 +170,12 @@ def extract_metrics_from_data(data: dict):
         
     return metrics
 
-def update_index_html(metrics: dict):
+
+def update_index_html(metrics: dict[str, str]) -> None:
+    """
+    QUÉ HACE: Modifica la portada estática (public/index.html) para inyectar los valores de las métricas en su respectivo bloque HTML.
+    POR QUÉ: Proporciona a los usuarios visitantes un panel visual en tiempo real con las métricas del sitio.
+    """
     if not INDEX_HTML.exists():
         print(f"❌ No se encontró el archivo: {INDEX_HTML}")
         return
@@ -168,7 +189,7 @@ def update_index_html(metrics: dict):
         if value == "N/D":
             continue
             
-        # QUÉ HACE: Busca exactamente la métrica en el HTML basándose en su clase BEM
+        # Busca exactamente la métrica en el HTML basándose en su clase BEM
         # y reemplaza el contenido del span de valor, preservando la estructura del HTML.
         pattern = rf'(<span class="hero__metric-label">{key}</span>\s*<span class="hero__metric-value">)[^<]+(</span>)'
         html = re.sub(pattern, rf'\g<1>{value}\g<2>', html)
@@ -182,7 +203,12 @@ def update_index_html(metrics: dict):
     INDEX_HTML.write_text(html, encoding="utf-8")
     print("✨ Portada actualizada con éxito.")
 
-def main():
+
+def main() -> None:
+    """
+    QUÉ HACE: Orquesta el flujo de extracción de métricas, aplicando caché de 24 horas y llamando a la inyección en la portada.
+    POR QUÉ: Protege el rendimiento del pipeline de build local contra cuotas de red y llamadas repetitivas lentas.
+    """
     print("🚀 Iniciando extracción de métricas DevSecOps (PageSpeed API Autónoma)...")
     OBSERVABILIDAD_DIR.mkdir(exist_ok=True)
     
@@ -225,6 +251,7 @@ def main():
     
     # Guardamos en caché el nombre del archivo recién procesado
     CACHE_FILE.write_text(cache_id, encoding="utf-8")
+
 
 if __name__ == "__main__":
     try:

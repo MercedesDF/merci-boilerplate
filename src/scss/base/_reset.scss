@@ -28,10 +28,31 @@ picture,
 video {
     display: block;
     max-width: 100%;
+    height: auto;
 }
 
 /* QUÉ HACE: Compensa el header fijo en todos los saltos de enlaces ancla. */
 /* POR QUÉ: Evita que el contenido destino quede oculto bajo la navegación superior. */
 [id] {
     scroll-margin-top: 120px;
+}
+
+/* QUÉ HACE: Oculta visualmente el texto destinado a lectores de pantalla (clase estándar WP). */
+/* POR QUÉ: Al eliminar los estilos nativos de WP, esta clase se perdía, haciendo visible texto de accesibilidad redundante (ej. en WooCommerce). */
+.screen-reader-text {
+    border: 0;
+    clip: rect(1px, 1px, 1px, 1px);
+    clip-path: inset(50%);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute !important;
+    width: 1px;
+    word-wrap: normal !important;
+}
+
+/* Utilidades Globales de Renderizado */
+.aspect-square {
+    aspect-ratio: 1 / 1;
 }

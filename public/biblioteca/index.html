@@ -6,8 +6,8 @@
     <title>La Biblioteca — tuempresa.es</title>
     <meta name="description" content="Archivo técnico y documentación oficial. Compendios de arquitectura DevSecOps, automatización Python y metodologías Zero-Bloat.">
     <link rel="canonical" href="https://tuempresa.es/biblioteca/">
-    <link rel="stylesheet" href="/css/main.css?v=1781255265">
-    <script src="/js/MerciController.js?v=1781255265" defer></script>
+    <link rel="stylesheet" href="/css/main.css?v=1781515056">
+    <script src="/js/MerciController.js?v=1781503814" defer></script>
     <script src="/js/main.js?v=1779435201" defer></script>
     <script type="application/ld+json">
     {
@@ -23,7 +23,8 @@
     <div id="top" tabindex="-1" style="position: absolute; top: 0; left: 0;"></div>
     <header class="header" id="top">
         <a href="/" class="header__brand">
-            <img src="/assets/images/tu_logo.webp?v=1781255265" alt="tuempresa" class="header__logo" width="263" height="65" fetchpriority="low" decoding="async">
+            <img src="/assets/images/tu_logo.webp?v=1781515055" alt="tuempresa" class="header__logo" width="263" height="65"
+                fetchpriority="low" decoding="async">
         </a>
         <button class="header__toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false">
             <span class="header__toggle-icon"></span>
@@ -37,6 +38,7 @@
             <!-- QUÉ HACE: Diferencia este enlace del autogenerado por WordPress en las tarjetas. -->
             <!-- POR QUÉ: Evita el error WAI-ARIA de "Enlaces idénticos con distinto destino". -->
             <a href="/blog/" class="nav__link" aria-label="Ir a la portada del Blog">Blog</a>
+            <a href="/proyectos/" class="nav__link">Proyectos</a>
             <a href="/blog/tienda/" class="nav__link">Tienda</a>
             <a href="/contacto/" class="nav__link">Contacto</a>
         </nav>
@@ -57,30 +59,27 @@
         <nav class="library-nav" aria-label="Índice de estanterías">
             <h2 class="library-nav__title">Estanterías Temáticas</h2>
             <ul class="library-nav__list">
-                <li class="library-nav__item">
-                    <a href="#devsecops-y-gobernanza" class="library-nav__theme-title" aria-label="Explorar estantería: devsecops y gobernanza">devsecops y gobernanza</a>
+                <li class="library-nav__item theme--devsecops-e-infraestructura">
+                    <a href="#devsecops-e-infraestructura" class="library-nav__theme-title" aria-label="Explorar estantería: DevSecOps e Infraestructura">DevSecOps e Infraestructura</a>
                     <ul class="library-nav__article-list">
-                        <li class="library-nav__sub-theme">General</li>
-                        <li class="library-nav__article-item">
-                            <a href="#glosario-tecnico" class="library-nav__article-link" aria-label="Ir al resumen de: Glosario Técnico (2026-06-12)">Glosario Técnico</a>
-                        </li>
+                        <li class="library-nav__sub-theme"><a href="#devsecops-e-infraestructura-general" class="library-nav__theme-title library-nav__theme-title--sub" aria-label="General (1) en DevSecOps e Infraestructura">General (1)</a></li>
                     </ul>
                 </li>
             </ul>
         </nav>
         
         
-        <section class="library-section" id="devsecops-y-gobernanza">
+        <section class="library-section theme--devsecops-e-infraestructura" id="devsecops-e-infraestructura">
             <div class="library-section__header">
-                <h2 class="library-section__title home-card__title--highlight"><a href="#devsecops-y-gobernanza" aria-label="Ver sección: devsecops y gobernanza">devsecops y gobernanza</a></h2>
-                <a href="#top" class="library-section__back-link">↑ Volver arriba</a>
+                <h2 class="library-section__title home-card__title--highlight"><a href="#devsecops-e-infraestructura" aria-label="Ver sección: DevSecOps e Infraestructura">DevSecOps e Infraestructura</a></h2>
+                
             </div>
-            <h3 class="library-subsection__title">General</h3>
-            <div class="home-grid">
+            <div class="library-grid">
+                <h3 class="library-subsection__title" id="devsecops-e-infraestructura-general">General</h3>
                 <article class="card card--book" id="glosario-tecnico">
                     <header>
-                        <span class="card__meta">2026-06-12 — Proyecto</span>
-                        <h2 class="card__title"><a href="/biblioteca/glosario-tecnico.html" aria-label="Leer artículo completo: Glosario Técnico (2026-06-12)">Glosario Técnico</a></h2>
+                        <span class="card__meta">2026-06-15 — Proyecto</span>
+                        <h2 class="card__title"><a href="/biblioteca/glosario-tecnico.html" aria-label="Leer artículo completo: Glosario Técnico (2026-06-15)">Glosario Técnico</a></h2>
                     </header>
                     <div class="card__content">
                         <p>Diccionario Data-Driven compilado automáticamente por el Agente Glosario.</p>
@@ -89,11 +88,15 @@
             </div>
         </section>
     </main>
+    <a href="#top" class="floating-back-to-top" aria-label="Volver arriba">↑</a>
     <footer class="footer">
         <div class="footer__links">
-            <a href="https://linkedin.com/in/tu-perfil/" target="_blank" rel="noopener noreferrer" class="footer__link">LinkedIn</a>
-            <a href="https://github.com/tu-usuario" target="_blank" rel="noopener noreferrer" class="footer__link">GitHub</a>
-            <a href="https://github.com/MercedesDF/merci-boilerplate" target="_blank" rel="noopener noreferrer" class="footer__link">Merci Boilerplate</a>
+            <a href="https://linkedin.com/in/tu-perfil/" target="_blank" rel="noopener noreferrer"
+                class="footer__link">LinkedIn</a>
+            <a href="https://github.com/tu-usuario" target="_blank" rel="noopener noreferrer"
+                class="footer__link">GitHub</a>
+            <a href="https://github.com/MercedesDF/merci-boilerplate" target="_blank" rel="noopener noreferrer"
+                class="footer__link">Merci Boilerplate</a>
         </div>
         <div class="footer__text">
             <a href="#top">↑ Volver arriba</a><br>
@@ -109,7 +112,8 @@
         </div>
         <!-- QUÉ HACE: Usa un botón nativo (<button>) para atrapar el foco del tabulador (Accesibilidad) -->
         <button class="merci-ui__trigger" aria-controls="merci-message" aria-expanded="false">
-            <img class="merci-ui__avatar" src="/assets/images/tu_avatar.webp?v=1781255265" alt="Interactuar con el asistente" width="80" height="80" fetchpriority="low" decoding="async">
+            <img class="merci-ui__avatar" src="/assets/images/tu_avatar.webp?v=1781515055" alt="Interactuar con el asistente"
+                width="80" height="80" fetchpriority="low" decoding="async">
         </button>
     </aside>
 </body>

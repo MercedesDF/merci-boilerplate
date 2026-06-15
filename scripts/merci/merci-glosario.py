@@ -9,14 +9,14 @@ delega a un modelo local (Ollama) su definición en formato JSON estructurado,
 mantiene un registro maestro (JSON SSOT) y compila un Markdown estático ordenado.
 """
 
-import os
-import sys
-import re
 import json
-import urllib.request
+import os
+import re
+import sys
 import urllib.error
-from pathlib import Path
+import urllib.request
 from datetime import datetime
+from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 GLOSSARY_JSON = REPO_ROOT / 'laboratorio' / 'biblioteca' / 'glosario-tecnico.json'
@@ -27,8 +27,11 @@ BITACORA_DIR = REPO_ROOT / 'laboratorio'
 MODEL = 'qwen2.5-coder'
 MAX_TERMS_PER_RUN = 3
 
-def load_glossary_state():
-    """Carga el estado maestro del glosario desde el JSON."""
+def load_glossary_state() -> dict:
+    """
+    QUÉ HACE: Carga el estado maestro del glosario desde el JSON.
+    POR QUÉ: Centraliza la fuente de verdad (SSOT) del diccionario para auditorías y compilación.
+    """
     if GLOSSARY_JSON.exists():
         with open(GLOSSARY_JSON, 'r', encoding='utf-8') as f:
             try:
@@ -39,12 +42,19 @@ def load_glossary_state():
                 sys.exit(1)
     return {"terminos": {}, "ignorados": []}
 
-def save_glossary_state(data):
-    """Guarda el estado maestro modificado en el JSON."""
+def save_glossary_state(data: dict) -> None:
+    """
+    QUÉ HACE: Guarda el estado maestro modificado en el JSON.
+    POR QUÉ: Persiste los nuevos términos y sus metadatos de forma atómica en disco.
+    """
     with open(GLOSSARY_JSON, 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
-def is_valid_term(term):
+def is_valid_term(term: str) -> bool:
+    """
+    QUÉ HACE: Valida si un término encontrado en el escaneo califica para el glosario.
+    POR QUÉ: Filtra cadenas vacías, fechas, y falsos positivos recurrentes del analizador.
+    """
     if len(set(term.replace('-', ''))) == 1:
         return False
     date_markers = ['YYYY', 'AAAA', 'MM', 'DD', 'YYYY-MM', 'AAAA-MM', 'AAAA-MM-DD']
@@ -52,8 +62,11 @@ def is_valid_term(term):
         return False
     return True
 
-def extract_terms_from_bitacoras():
-    """Retorna terms_dict y context_dict con la frase donde apareció para ayudar al usuario."""
+def extract_terms_from_bitacoras() -> tuple[dict[str, dict[str, list[str]]], dict[str, str]]:
+    """
+    QUÉ HACE: Retorna terms_dict y context_dict con la frase donde apareció para ayudar al usuario.
+    POR QUÉ: Escanea las bitácoras y manuales del laboratorio para extraer acrónimos o términos técnicos candidatos.
+    """
     terms_dict = {}
     context_dict = {}
     
@@ -109,8 +122,11 @@ def extract_terms_from_bitacoras():
                             terms_dict[m][fname] = [f"L{i}"]
     return terms_dict, context_dict
 
-def generate_with_ollama(system_prompt, user_prompt):
-    """Llama a la API de Ollama exigiendo estricto formato JSON."""
+def generate_with_ollama(system_prompt: str, user_prompt: str) -> dict:
+    """
+    QUÉ HACE: Llama a la API de Ollama exigiendo estricto formato JSON.
+    POR QUÉ: Permite obtener respuestas estructuradas sin necesidad de validadores de formato manuales complejos.
+    """
     url = "http://localhost:11434/api/generate"
     payload = {
         "model": MODEL,
@@ -131,13 +147,16 @@ def generate_with_ollama(system_prompt, user_prompt):
     except Exception as e:
         raise Exception(f"Error procesando Ollama (JSON): {e}")
 
-def compile_markdown(state_data):
-    """Compila el JSON maestro hacia un archivo Markdown (Artefacto Build-Time)."""
+def compile_markdown(state_data: dict) -> None:
+    """
+    QUÉ HACE: Compila el JSON maestro hacia un archivo Markdown (Artefacto Build-Time).
+    POR QUÉ: Transforma el diccionario de datos consolidado en la documentación pública accesible de la Biblioteca.
+    """
     fecha_hoy = datetime.now().strftime("%Y-%m-%d")
     md = "---\n"
     md += "titulo: \"Glosario Técnico\"\n"
     md += "descripcion: \"Diccionario Data-Driven compilado automáticamente por el Agente Glosario.\"\n"
-    md += "tema: \"DevSecOps y Gobernanza\"\n"
+    md += "tema: \"DevSecOps e Infraestructura\"\n"
     md += "estado: \"publicado\"\n"
     md += f"alt_portada: \"Diccionario técnico automatizado {fecha_hoy}\"\n"
     md += f"fecha: \"{fecha_hoy}\"\n"
@@ -181,7 +200,11 @@ def compile_markdown(state_data):
     with open(GLOSSARY_MD, 'w', encoding='utf-8') as f:
         f.write(md)
 
-def main():
+def main() -> None:
+    """
+    QUÉ HACE: Orquesta el escaneo de términos y la consulta de definiciones al modelo local.
+    POR QUÉ: Gestiona el flujo interactivo de triage de términos nuevos para alimentar y compilar el glosario.
+    """
     use_ai = "--ai" in sys.argv
     state = load_glossary_state()
     
@@ -366,3 +389,6 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print("\n🛑 [Merci Glosario] Operación cancelada abruptamente. Saliendo limpiamente.")
         sys.exit(130)
+    except Exception as e:
+        print(f"❌ [Merci Glosario] Error fatal en la ejecución: {e}")
+        sys.exit(1)

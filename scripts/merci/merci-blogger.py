@@ -7,13 +7,13 @@ Transforma notas crudas en artículos atractivos para el blog y
 redacta el anuncio para LinkedIn, dejándolo "en_cola" para la difusión asíncrona.
 """
 
-import sys
+import logging
+import os
 import re
+import sys
+import unicodedata
 from datetime import datetime
 from pathlib import Path
-import os
-import logging
-import unicodedata
 
 try:
     os.environ["LITELLM_LOCAL_MODEL_COST_MAP"] = "True"
@@ -32,13 +32,21 @@ NOTAS_DIR = REPO_ROOT / "laboratorio" / "notas_rapidas"
 INCUBACION_DIR = REPO_ROOT / "laboratorio" / "incubacion"
 
 def slugify(texto: str) -> str:
+    """
+    QUÉ HACE: Convierte un texto en una cadena segura para URLs (slug).
+    POR QUÉ: Normaliza nombres de archivo y de rutas de blog eliminando acentos y caracteres especiales.
+    """
     texto = str(texto)
     texto = re.sub(r'[—–]', '-', texto)
     texto = unicodedata.normalize('NFKD', texto).encode('ascii', 'ignore').decode('ascii')
     texto = re.sub(r'[^\w\s-]', '', texto.lower())
     return re.sub(r'[-\s]+', '-', texto).strip('-_')
 
-def main():
+def main() -> None:
+    """
+    QUÉ HACE: Lee un borrador o nota cruda, lo estructura como artículo del blog y lo encola para redes sociales.
+    POR QUÉ: Automatiza la generación de marketing de contenidos técnicos (DevRel) usando el modelo de lenguaje local.
+    """
     print("✍️  [Merci Blogger] Iniciando Agente Redactor de Marketing...")
     
     if not PROMPT_PATH.exists():
@@ -222,3 +230,7 @@ if __name__ == "__main__":
         main()
     except KeyboardInterrupt:
         print("\n  🛑 Cancelado por el usuario.")
+        sys.exit(130)
+    except Exception as e:
+        print(f"❌ [Merci Blogger] Error fatal inesperado: {e}")
+        sys.exit(1)

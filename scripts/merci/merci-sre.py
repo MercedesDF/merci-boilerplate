@@ -3,12 +3,14 @@
 
 """
 merci-sre.py — Agente de Observabilidad y Métricas (Fase 4).
+
 Expone el estado del ecosistema DevSecOps en el puerto 8001 para Prometheus.
 """
 
-import time
-import re
 import json
+import re
+import sys
+import time
 from pathlib import Path
 from prometheus_client import start_http_server, Gauge
 
@@ -24,6 +26,7 @@ DOCS_BLOG = Gauge('merci_documentos_blog_total', 'Documentos publicados en blog'
 LINKEDIN_QUEUE = Gauge('merci_linkedin_queue_total', 'Publicaciones en cola para LinkedIn')
 DOCUMENT_DRIFT = Gauge('merci_document_drift_total', 'Archivos con deriva documental')
 PIPELINE_DURATION = Gauge('merci_pipeline_duration_seconds', 'Tiempo de ejecución de merci-total.py')
+COMPLETO_DURATION = Gauge('merci_completo_duration_seconds', 'Tiempo de ejecución de merci-completo.py')
 PIPELINE_SCRIPT_DURATION = Gauge('merci_pipeline_script_duration_seconds', 'Tiempo de ejecución por script', ['script'])
 GLOSARIO_TERMS = Gauge('merci_glosario_terminos_total', 'Número total de términos definidos en el glosario JSON')
 CHAOS_EVENTS = Gauge('merci_chaos_events_total', 'Resultados de los simulacros del Chaos Monkey', ['resultado'])
@@ -42,8 +45,12 @@ CWV_TBT = Gauge('merci_cwv_tbt_ms', 'Total Blocking Time en ms')
 CWV_LCP = Gauge('merci_cwv_lcp_ms', 'Largest Contentful Paint en ms')
 CWV_CLS = Gauge('merci_cwv_cls', 'Cumulative Layout Shift')
 
-def actualizar_metricas_pipeline():
-    """Lectura de JSON (Deriva y Duración). Se refrescan periódicamente (cada 10s)."""
+
+def actualizar_metricas_pipeline() -> None:
+    """
+    QUÉ HACE: Lee los archivos JSON de duración de pipeline y deriva documental, y actualiza sus Gauges.
+    POR QUÉ: Permite visualizar en Grafana si hay derivas semánticas o cambios lentos en el pipeline DevSecOps.
+    """
     drift_path = REPO_ROOT / "observabilidad" / ".drift_report.json"
     if drift_path.exists():
         try:
@@ -66,8 +73,20 @@ def actualizar_metricas_pipeline():
         except Exception:
             pass
 
-def actualizar_metricas_chaos():
-    """Lectura del log privado de resiliencia (Chaos Engineering)."""
+    completo_path = REPO_ROOT / "observabilidad" / ".completo_duration.json"
+    if completo_path.exists():
+        try:
+            data = json.loads(completo_path.read_text(encoding="utf-8"))
+            COMPLETO_DURATION.set(data.get("duration_seconds", 0.0))
+        except Exception:
+            pass
+
+
+def actualizar_metricas_chaos() -> None:
+    """
+    QUÉ HACE: Lee el log privado de resiliencia del Chaos Monkey y calcula eventos exitosos vs fallidos.
+    POR QUÉ: Expone métricas de fiabilidad y autoreparación en el Dashboard de Grafana.
+    """
     chaos_path = REPO_ROOT / ".privado" / "chaos-audit.json"
     if chaos_path.exists():
         try:
@@ -79,8 +98,12 @@ def actualizar_metricas_chaos():
         except Exception:
             pass
 
-def actualizar_metricas_ia_y_auditoria():
-    """Lectura de fallbacks del Lóbulo Frontal y reportes del Auditor."""
+
+def actualizar_metricas_ia_y_auditoria() -> None:
+    """
+    QUÉ HACE: Escanea los fallbacks del lóbulo frontal (IA) y el reporte de auditoría para actualizar sus gauges.
+    POR QUÉ: Permite observar la tasa de contingencias de IA y los errores/alertas del linter.
+    """
     brain_path = REPO_ROOT / "public" / "js" / "brain_data.json"
     if brain_path.exists():
         try:
@@ -99,8 +122,12 @@ def actualizar_metricas_ia_y_auditoria():
         except Exception:
             pass
 
-def actualizar_metricas_lighthouse():
-    """Lectura del payload SRE generado por el extractor de métricas."""
+
+def actualizar_metricas_lighthouse() -> None:
+    """
+    QUÉ HACE: Lee el payload SRE generado por el extractor de PageSpeed para actualizar métricas de Core Web Vitals y Lighthouse.
+    POR QUÉ: Sirve para monitorizar la velocidad, accesibilidad, buenas prácticas y SEO en tiempo real.
+    """
     sre_path = REPO_ROOT / "observabilidad" / ".lighthouse_sre.json"
     if sre_path.exists():
         try:
@@ -117,8 +144,12 @@ def actualizar_metricas_lighthouse():
         except Exception:
             pass
 
-def actualizar_estado_documental():
-    """Lectura de Markdown y YAML Frontmatter. Se refresca cada segundo para feedback instantáneo."""
+
+def actualizar_estado_documental() -> None:
+    """
+    QUÉ HACE: Analiza el Roadmap, Glosario, y el YAML Frontmatter de la incubadora y estanterías de producción.
+    POR QUÉ: Proporciona métricas rápidas de los activos del repositorio y del estado de publicación.
+    """
     # 0. Glosario JSON
     glosario_json_path = REPO_ROOT / "laboratorio" / "biblioteca" / "glosario-tecnico.json"
     if glosario_json_path.exists():
@@ -191,13 +222,18 @@ def actualizar_estado_documental():
                     pass
     LINKEDIN_QUEUE.set(en_cola_social)
 
-def main():
+
+def main() -> None:
+    """
+    QUÉ HACE: Inicia el servidor HTTP de Prometheus y ejecuta el bucle de muestreo continuo.
+    POR QUÉ: Mantiene expuesto el puerto 8001 para que Prometheus pueda raspar las métricas actualizadas cada segundo.
+    """
     puerto = 8001
     print(f"👁️  [Merci SRE] Iniciando Agente de Observabilidad en el puerto {puerto}...")
     start_http_server(puerto, addr="0.0.0.0")
     
     while True:
-        # QUÉ HACE: Muestreo continuo "hiper-rápido" (1s) para todas las métricas.
+        # Muestreo continuo "hiper-rápido" (1s) para todas las métricas.
         actualizar_estado_documental()
         actualizar_metricas_pipeline()
         actualizar_metricas_chaos()
@@ -205,8 +241,10 @@ def main():
         actualizar_metricas_lighthouse()
         time.sleep(1)
 
+
 if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
         print("\n👁️  [Merci SRE] Agente de Observabilidad detenido por el usuario. ¡Hasta la vista!")
+        sys.exit(130)

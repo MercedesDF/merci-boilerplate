@@ -178,6 +178,20 @@ add_filter( 'woocommerce_order_attribution_tracking_enabled', '__return_false' )
 add_filter( 'pre_option_woocommerce_order_attribution_tracking_enabled', function() { return 'no'; } );
 
 // =========================================================================
+// 3.6 REFINAMIENTOS DE UX / ACCESIBILIDAD PARA WOOCOMMERCE
+// =========================================================================
+
+// QUÉ HACE: Limpia la etiqueta de accesibilidad (aria-label / screen-reader-text) de los inputs de cantidad.
+// POR QUÉ: WooCommerce inyecta el título completo del producto ('Nombre del producto cantidad'), lo cual es redundante y excesivamente verboso para lectores de pantalla o interfaces densas, ya que el input siempre está dentro del contexto visual del producto.
+function merci_limpiar_etiqueta_cantidad($args, $product) {
+    // Al vaciar el product_name, el sprint_f nativo de WooCommerce ('%s quantity') se reduce a ' quantity' o ' cantidad', 
+    // pero para mayor control, podemos simplemente sobrescribir el texto completo genérico.
+    $args['product_name'] = '';
+    return $args;
+}
+add_filter('woocommerce_quantity_input_args', 'merci_limpiar_etiqueta_cantidad', 10, 2);
+
+// =========================================================================
 // 4. HARDENING Y SEGURIDAD (Fase 5.2)
 // =========================================================================
 

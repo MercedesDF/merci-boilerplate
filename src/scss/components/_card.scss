@@ -100,6 +100,43 @@
     letter-spacing: 0.05em;
   }
 
+  // Modificadores de alta densidad para la Biblioteca
+  &--booklet, &--book {
+    padding: 1.25rem;
+    gap: 0.5rem;
+    
+    @media (max-width: 767px) {
+      padding: 1rem;
+    }
+
+    .card__title {
+      font-size: 1.15rem;
+      line-height: 1.3;
+      margin-bottom: 0.5rem;
+    }
+    
+    .card__meta {
+      font-size: 0.65rem;
+      padding: 0.2rem 0.6rem;
+      margin-bottom: 0.5rem;
+    }
+  }
+
+  // Restringimos el truncamiento y la letra pequeña SOLO a la cuadrícula
+  .library-grid & {
+    .card__content p {
+      font-size: 0.875rem;
+      line-height: 1.5;
+      margin-bottom: 0;
+      
+      // Truncar descripción a 2 líneas para primar densidad
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+  }
+
   // Modificador BEM para Cuadernillos (Blog cronológico)
   &--booklet {
     border-top: 3px solid $color-primary; // Acento naranja
@@ -112,25 +149,51 @@
 }
 
 .card__content {
-    /* Espaciado para el texto generado desde Markdown */
+    /* Estilos globales para la lectura del artículo (Prosa técnica) */
+    font-size: 1.125rem; /* 18px para máxima legibilidad en párrafos continuos */
+    line-height: 1.8;
+    color: $color-text-base;
+    
     h2 {
-        margin-top: 2.5rem;
-        margin-bottom: 1rem;
-        color: $color-primary; /* Un toque visual opcional para los capítulos */
+        font-size: 1.75rem;
+        margin-top: 3rem;
+        margin-bottom: 1.25rem;
+        color: $color-primary;
+        border-bottom: 1px solid $color-border;
+        padding-bottom: 0.5rem;
     }
     
     h3 {
+        font-size: 1.35rem;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        color: $color-text-base;
+    }
+    
+    h4 {
+        font-size: 1.15rem;
         margin-top: 1.5rem;
         margin-bottom: 0.75rem;
     }
     
     p, ul, ol, pre {
-        margin-bottom: 1.25rem;
-        line-height: 1.7;
+        margin-bottom: 1.5rem;
     }
     
     li {
         margin-bottom: 0.5rem;
+    }
+    
+    a {
+        color: $color-primary;
+        text-decoration: underline;
+        text-decoration-color: rgba($color-primary, 0.3);
+        text-underline-offset: 3px;
+        transition: all 0.2s ease;
+        &:hover {
+            color: $color-regular;
+            text-decoration-color: $color-regular;
+        }
     }
 
     /* Clases inyectadas por el orquestador para contenido multimedia */
@@ -138,10 +201,9 @@
         border-radius: 8px;
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         width: 100%;
-        margin-bottom: 1.25rem;
+        margin-bottom: 1.5rem;
     }
     
     .video-fallback {
         display: none; /* Oculto en web, visible solo en los PDF generados por WeasyPrint */
-    }
-} // <-- AÑADIDO: Cerramos .card__content aquí
+    }} // <-- AÑADIDO: Cerramos .card__content aquí

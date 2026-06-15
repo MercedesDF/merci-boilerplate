@@ -57,3 +57,29 @@ a {
         color: color.scale($color-primary, $lightness: 20%);
     }
 }
+
+// Bloques de código: Prevención de desbordamiento horizontal (Viewport y PDF)
+pre, code {
+    white-space: pre-wrap;       /* Permite el salto de línea en texto preformateado (Crucial para WeasyPrint/PDF) */
+    word-break: break-word;      /* Rompe palabras largas si no caben */
+    word-wrap: break-word;       /* Alias para compatibilidad */
+}
+
+pre {
+    overflow-x: auto;            /* Añade scroll horizontal en móviles si aún así algo desborda */
+    max-width: 100%;             /* Respeta el límite del contenedor padre */
+    background-color: #f1f5f9;   /* Fondo suave (Slate 100) para contraste */
+    padding: $spacing-md;        /* Espaciado interno */
+    border-radius: 4px;          /* Bordes redondeados */
+    font-family: monospace;      /* Tipografía de código */
+    font-size: 0.9em;            /* Tamaño ajustado */
+    border: 1px solid $color-border;
+}
+
+code {
+    font-family: monospace;
+    background-color: #f1f5f9;
+    padding: 0.1em 0.3em;
+    border-radius: 3px;
+    font-size: 0.9em;
+}

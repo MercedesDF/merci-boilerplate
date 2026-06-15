@@ -3,25 +3,27 @@
 
 """
 merci-chaos.py — Agente de Chaos Engineering (Epic 2 Fase 4).
+
 Objetivo: Simular una mutación o sabotaje en el código fuente utilizando IA,
 ejecutar la auditoría para verificar que el sistema lo detecta, y finalmente 
 auto-restaurar el entorno (Rollback).
 """
 
-import os
-import sys
-import subprocess
-import random
-from datetime import datetime
-import re
 import json
-from pathlib import Path
 import logging
+import os
+import random
+import re
+import subprocess
+import sys
+from datetime import datetime
+from pathlib import Path
+
 try:
     os.environ["LITELLM_LOCAL_MODEL_COST_MAP"] = "True"
     logging.getLogger('LiteLLM').setLevel(logging.ERROR)
-    from litellm import completion
     import litellm
+    from litellm import completion
     litellm.telemetry = False
     litellm.suppress_debug_info = True
 except ImportError:
@@ -33,7 +35,12 @@ PROMPT_PATH = REPO_ROOT / "laboratorio" / "prompts" / "prompt-chaos.md"
 PRIVADO_DIR = REPO_ROOT / ".privado"
 CHAOS_LOG_PATH = PRIVADO_DIR / "chaos-audit.json"
 
+
 def extract_json_array(text: str) -> list:
+    """
+    QUÉ HACE: Busca y extrae un array JSON de un bloque de texto dado.
+    POR QUÉ: Resuelve la deserialización cuando el LLM devuelve texto adicional alrededor del JSON.
+    """
     match = re.search(r'\[.*?\]', text, re.DOTALL)
     if match:
         json_str = match.group(0)
@@ -45,7 +52,13 @@ def extract_json_array(text: str) -> list:
             pass
     return []
 
-def main():
+
+def main() -> None:
+    """
+    QUÉ HACE: Orquesta un experimento de Chaos Engineering inyectando vulnerabilidades aleatorias en el código,
+              verificando si el escudo linter las detecta, y aplicando un rollback seguro.
+    POR QUÉ: Garantiza de forma empírica la resiliencia del sistema de integración y la fiabilidad de las auditorías.
+    """
     print("\n🐒 [Merci Chaos] Iniciando experimento de Chaos Engineering...")
     
     status = subprocess.run(["git", "status", "--porcelain"], cwd=REPO_ROOT, capture_output=True, text=True)
@@ -74,7 +87,8 @@ def main():
         respuesta = completion(model="ollama/qwen2.5-coder", api_base="http://localhost:11434", messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": prompt}], temperature=0.7, timeout=120)
         sabotajes = extract_json_array(respuesta.choices[0].message.content)
     except Exception as e_local:
-        print(f"  ❌ [Merci Error] Falló el motor local: {e_local}"); sys.exit(1)
+        print(f"  ❌ [Merci Error] Falló el motor local: {e_local}")
+        sys.exit(1)
 
     if not sabotajes or not sabotajes[0].get("buscar") or sabotajes[0].get("buscar") not in original_content:
         print("  ℹ️ [Merci Info] La IA falló en apuntar al código exacto. Abortando.")
@@ -84,7 +98,7 @@ def main():
             print(f"     [Debug] Respuesta cruda de la IA:\n{respuesta.choices[0].message.content}")
         sys.exit(0)
 
-    print(f"  😈 Mutando el archivo (Inyectando vulnerabilidad)...")
+    print("  😈 Mutando el archivo (Inyectando vulnerabilidad)...")
     print(f"     [Táctica] Reemplazó: {sabotajes[0]['buscar']}")
     print(f"     [Táctica] Por:       {sabotajes[0]['reemplazar']}")
     target_file.write_text(original_content.replace(sabotajes[0]["buscar"], sabotajes[0]["reemplazar"], 1), encoding="utf-8")
@@ -127,4 +141,10 @@ def main():
         subprocess.run(["git", "restore", str(target_file)], cwd=REPO_ROOT)
         print(f"  ✨ {target_file.name} restaurado. Tu proyecto está a salvo.")
 
-if __name__ == "__main__": main()
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\n🛑 [Merci Chaos] Experimento cancelado por la usuaria.")
+        sys.exit(130)

@@ -314,7 +314,7 @@ def resetear_telemetria_html() -> None:
     POR QUÉ: Previene la fuga de datos (DLP) de las métricas de la autora hacia el nuevo proyecto.
     """
     print("  📊 Reseteando métricas de telemetría en dashboards (DLP)...")
-    targets = [REPO_ROOT / "public" / "sobre-mi" / "index.html"]
+    targets = [REPO_ROOT / "public" / "index.html", REPO_ROOT / "public" / "sobre-mi" / "index.html"]
     keys = ["Commit", "Agente", "Línea", "Release", "Versión", "Día"]
     
     for path in targets:
@@ -327,6 +327,10 @@ def resetear_telemetria_html() -> None:
             # Formato 2: Etiqueta antes que valor (ej. index.html de la portada)
             pattern2 = rf'(<span class="hero__metric-label">[^<]*?{key}[^<]*?</span>\s*<span class="hero__metric-value">)[^<]+(</span>)'
             html = re.sub(pattern2, r'\g<1>N/D\g<2>', html, flags=re.IGNORECASE)
+            
+        # Purgar también el tiempo E2E (Data-Driven Copywriting SRE)
+        html = re.sub(r'(<span class="sre-deploy-time">)[^<]+(</span>)', r'\g<1>N/D\g<2>', html, flags=re.IGNORECASE)
+        
         path.write_text(html, encoding="utf-8")
 
 def configure_ai_module(include_ai: bool) -> None:

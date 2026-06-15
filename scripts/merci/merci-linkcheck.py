@@ -9,12 +9,25 @@ ruta devuelve error 404, validando la integración real de Nginx y WordPress.
 """
 
 import sys
+import urllib.error
 import urllib.request
-from urllib.parse import urljoin, urlparse
 from html.parser import HTMLParser
+from urllib.parse import urljoin, urlparse
+
 
 class LinkParser(HTMLParser):
-    def __init__(self):
+    links: list[str]
+    a_tags: list[tuple[str, str]]
+    in_a_tag: bool
+    current_href: str
+    current_aria_label: str
+    current_text: list[str]
+
+    def __init__(self) -> None:
+        """
+        QUÉ HACE: Inicializa el parser de enlaces con listas vacías y banderas de estado.
+        POR QUÉ: Prepara la acumulación de rutas y textos descriptivos durante el procesamiento HTML.
+        """
         super().__init__()
         self.links = []
         self.a_tags = []
@@ -23,40 +36,58 @@ class LinkParser(HTMLParser):
         self.current_aria_label = ""
         self.current_text = []
 
-    def handle_starttag(self, tag, attrs):
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        """
+        QUÉ HACE: Intercepta las etiquetas HTML a, link e img para capturar sus respectivos atributos href o src.
+        POR QUÉ: Permite extraer de forma sistemática todas las dependencias y enlaces internos/externos de la página.
+        """
         attrs_dict = dict(attrs)
         # Extraer URLs de anclas, estilos e imágenes
         if tag == "a":
             self.in_a_tag = True
-            self.current_href = attrs_dict.get("href", "")
-            self.current_aria_label = attrs_dict.get("aria-label", "")
+            self.current_href = attrs_dict.get("href", "") or ""
+            self.current_aria_label = attrs_dict.get("aria-label", "") or ""
             self.current_text = []
             if self.current_href:
                 self.links.append(self.current_href)
         elif tag == "link":
             href = attrs_dict.get("href")
-            if href: self.links.append(href)
+            if href:
+                self.links.append(href)
         elif tag == "img":
             src = attrs_dict.get("src")
-            if src: self.links.append(src)
+            if src:
+                self.links.append(src)
             
-    def handle_data(self, data):
-        # QUÉ HACE: Acumula el texto visible que está dentro del enlace.
+    def handle_data(self, data: str) -> None:
+        """
+        QUÉ HACE: Acumula el texto visible que está dentro del enlace.
+        POR QUÉ: Ayuda a calcular el nombre accesible del enlace para cumplir con el estándar WCAG.
+        """
         if self.in_a_tag:
             self.current_text.append(data)
             
-    def handle_endtag(self, tag):
+    def handle_endtag(self, tag: str) -> None:
+        """
+        QUÉ HACE: Al cerrar la etiqueta de ancla, calcula el Nombre Accesible del enlace y lo añade a la lista.
+        POR QUÉ: Simula el comportamiento de lectores de pantalla (WAI-ARIA). Si no hay un aria-label explícito, se utiliza el texto visible.
+        """
         if tag == "a" and self.in_a_tag:
             self.in_a_tag = False
-            # QUÉ HACE: Calcula el "Nombre Accesible" real del enlace.
-            # POR QUÉ: Simula el comportamiento de un lector de pantalla (WAI-ARIA). 
+            # Calcula el "Nombre Accesible" real del enlace.
+            # Simula el comportamiento de un lector de pantalla (WAI-ARIA). 
             # Si no hay un aria-label explícito, se utiliza el texto visible.
             accessible_name = self.current_aria_label.strip() or "".join(self.current_text).strip()
             
             if accessible_name and self.current_href:
                 self.a_tags.append((accessible_name, self.current_href))
 
-def main():
+
+def main() -> None:
+    """
+    QUÉ HACE: Escanea de forma recursiva (vía HTTP) todas las páginas internas a partir del localhost o URL indicada.
+    POR QUÉ: Valida mecánicamente que no existan enlaces rotos (404) ni violaciones de accesibilidad WCAG (enlaces idénticos apuntando a destinos diferentes).
+    """
     # Por defecto, probamos el entorno de integración local
     base_url = "http://localhost"
     
@@ -93,11 +124,12 @@ def main():
                     parser = LinkParser()
                     parser.feed(html)
                     
-                    # QUÉ HACE: Mapea los Nombres Accesibles contra sus URLs de destino.
-                    # POR QUÉ: Detecta mecánicamente el antipatrón WCAG "Identical links have the same purpose".
+                    # Mapea los Nombres Accesibles contra sus URLs de destino.
+                    # Detecta mecánicamente el antipatrón WCAG "Identical links have the same purpose".
                     name_to_hrefs = {}
                     for name, href in parser.a_tags:
-                        if not name: continue
+                        if not name:
+                            continue
                         # Resolvemos la URL absoluta para que comparar "#seccion" y "/ruta#seccion" sea exacto
                         full_href = urljoin(clean_url, href)
                         if name not in name_to_hrefs:
@@ -141,5 +173,10 @@ def main():
         print("✅ Estado: Perfecto. Arquitectura unificada sin enlaces rotos.")
         sys.exit(0)
 
+
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\n🛑 [Merci LinkCheck] Rastreo interrumpido por el usuario.")
+        sys.exit(130)

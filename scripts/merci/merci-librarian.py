@@ -9,15 +9,15 @@ editorial a través del modelo de IA local (Ollama) y genera cuadernillos
 Markdown estructurados en el directorio de incubación (`laboratorio/`).
 """
 
-import os
-import sys
-from datetime import datetime
 import json
-import urllib.request
-from pathlib import Path
-import warnings
+import os
 import re
 import subprocess
+import sys
+import urllib.request
+import warnings
+from datetime import datetime
+from pathlib import Path
 
 # Silenciamos advertencias de deprecación de librerías de terceros (ej. google.generativeai) para mantener la consola limpia
 warnings.filterwarnings("ignore", category=FutureWarning)
@@ -29,10 +29,11 @@ LAB_DIR = REPO_ROOT / "laboratorio"
 PROMPT_PATH = REPO_ROOT / "laboratorio" / "prompts" / "prompt-bibliotecario.md"
 ENV_PATH = REPO_ROOT / ".env"
 
-def consultar_ia_local(prompt, system_prompt):
-    """Realiza una petición POST nativa a la API local de Ollama."""
-    # QUÉ HACE: Envía el prompt y el molde mental (system) al endpoint de la API local de Ollama sin librerías externas.
-    # POR QUÉ: Erradica la dependencia de LiteLLM y la nube, consolidando la arquitectura 100% local.
+def consultar_ia_local(prompt: str, system_prompt: str) -> str:
+    """
+    QUÉ HACE: Realiza una petición POST nativa a la API local de Ollama.
+    POR QUÉ: Erradica la dependencia de LiteLLM y la nube, consolidando la arquitectura 100% local.
+    """
     try:
         local_url = "http://localhost:11434/api/generate"
         local_payload = {
@@ -54,7 +55,10 @@ def consultar_ia_local(prompt, system_prompt):
         return f"Error HTTP Local: {e_local}"
 
 def get_bitacora_context(nota_cruda: str) -> str:
-    """Extrae palabras clave de la nota y filtra entradas relevantes de la bitácora (RAG Optimizado)."""
+    """
+    QUÉ HACE: Extrae palabras clave de la nota y filtra entradas relevantes de la bitácora (RAG Optimizado).
+    POR QUÉ: Proporciona contexto histórico a la IA para evitar alucinaciones y mantener la trazabilidad.
+    """
     bitacoras = [LAB_DIR / "bitacora-tuempresa-orquestacion-ia.md", LAB_DIR / "bitacora-tuempresa.md"]
     contexto = ""
     palabras_clave = [p.lower() for p in re.findall(r'\b[a-zA-Z]{5,}\b', nota_cruda)]
@@ -74,7 +78,10 @@ def get_bitacora_context(nota_cruda: str) -> str:
     return contexto[:3000] # Límite estricto de seguridad para modelos locales
 
 def get_system_prompt() -> str:
-    """Extrae el rol innegociable y las reglas editoriales del Agente."""
+    """
+    QUÉ HACE: Extrae el rol innegociable y las reglas editoriales del Agente.
+    POR QUÉ: Carga la directiva del sistema desde el archivo de prompt para desacoplar el comportamiento del código.
+    """
     if PROMPT_PATH.exists():
         return PROMPT_PATH.read_text(encoding="utf-8", errors="replace")
     print("❌ [Merci Error] Falta el archivo rector: prompt-bibliotecario.md")
@@ -97,7 +104,11 @@ def clean_markdown(text: str) -> str:
         
     return text
 
-def process_note(note_path: Path):
+def process_note(note_path: Path) -> None:
+    """
+    QUÉ HACE: Analiza una nota cruda, pregunta por el tipo de documento y llama a la IA para darle formato.
+    POR QUÉ: Automatiza la ingesta de borradores en la bandeja de entrada del laboratorio de forma interactiva.
+    """
     print(f"\n🤖 [Merci Librarian] Analizando nota cruda: {note_path.name}")
     
     print("  ¿Qué tipo de conocimiento contiene esta nota?")
@@ -171,14 +182,18 @@ def process_note(note_path: Path):
         print(f"  ❌ [Merci Error] Fallo procesando la respuesta de la IA: {e}")
 
 if __name__ == "__main__":
-    # Creamos los directorios si es la primera ejecución
-    NOTES_DIR.mkdir(parents=True, exist_ok=True)
-    PROCESADAS_DIR.mkdir(parents=True, exist_ok=True)
-    
-    notas = [p for p in NOTES_DIR.glob("*") if p.is_file() and p.suffix in {".txt", ".md"}]
-    if not notas:
-        print("ℹ️ [Merci Librarian] Estantería vacía. No hay notas nuevas en /notas_rapidas/")
-        sys.exit(0)
+    try:
+        # Creamos los directorios si es la primera ejecución
+        NOTES_DIR.mkdir(parents=True, exist_ok=True)
+        PROCESADAS_DIR.mkdir(parents=True, exist_ok=True)
         
-    for nota in notas:
-        process_note(nota)
+        notas = [p for p in NOTES_DIR.glob("*") if p.is_file() and p.suffix in {".txt", ".md"}]
+        if not notas:
+            print("ℹ️ [Merci Librarian] Estantería vacía. No hay notas nuevas en /notas_rapidas/")
+            sys.exit(0)
+            
+        for nota in notas:
+            process_note(nota)
+    except Exception as e:
+        print(f"❌ [Merci Librarian] Error fatal inesperado: {e}")
+        sys.exit(1)

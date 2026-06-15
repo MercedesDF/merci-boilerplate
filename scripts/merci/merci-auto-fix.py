@@ -9,12 +9,12 @@ reportado por `merci-audit.py` y solicitar a la API de contingencia en la
 nube (Gemini Flash) que genere un parche directo sobre el código fuente.
 """
 
-import os
-import sys
-import subprocess
-import re
-from pathlib import Path
 import logging
+import os
+import re
+import subprocess
+import sys
+from pathlib import Path
 
 try:
     os.environ["LITELLM_LOCAL_MODEL_COST_MAP"] = "True"
@@ -29,7 +29,10 @@ except ImportError:
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 def obtener_error_linter() -> dict | None:
-    """Ejecuta el auditor maestro e intercepta el primer error encontrado."""
+    """
+    QUÉ HACE: Ejecuta el auditor maestro e intercepta el primer error encontrado.
+    POR QUÉ: Captura la traza del error de seguridad o calidad para alimentar al agente auto-reparador.
+    """
     audit_script = REPO_ROOT / "scripts" / "merci" / "merci-audit.py"
     resultado = subprocess.run([sys.executable, str(audit_script)], capture_output=True, text=True)
     
@@ -45,7 +48,10 @@ def obtener_error_linter() -> dict | None:
     return None
 
 def aplicar_parche_ia(error: dict) -> bool:
-    """Delega la reparación al modelo de contingencia (Hybrid Stack)."""
+    """
+    QUÉ HACE: Delega la reparación al modelo de contingencia en la nube (Gemini 1.5 Flash).
+    POR QUÉ: Aplica parches correctores directamente en el código fuente de forma desatendida.
+    """
     file_path = REPO_ROOT / error["file"]
     if not file_path.exists():
         return False
@@ -67,7 +73,7 @@ NO uses bloques de markdown (ni ```python ni similares). Solo devuelve el códig
             messages=[{"role": "user", "content": prompt}],
             api_key=os.environ.get("GEMINI_API_KEY")
         )
-        nuevo_contenido = respuesta.choices.message.content.strip()
+        nuevo_contenido = respuesta.choices[0].message.content.strip()
         
         # QUÉ HACE: Limpieza defensiva en caso de que la IA ignore la regla e inyecte Markdown.
         if nuevo_contenido.startswith("```"):
@@ -81,14 +87,18 @@ NO uses bloques de markdown (ni ```python ni similares). Solo devuelve el códig
         return False
 
 if __name__ == "__main__":
-    if not os.environ.get("GEMINI_API_KEY"):
-        print("❌ [Merci AI] GEMINI_API_KEY no detectada. Cancelando Auto-Fix.")
+    try:
+        if not os.environ.get("GEMINI_API_KEY"):
+            print("❌ [Merci AI] GEMINI_API_KEY no detectada. Cancelando Auto-Fix.")
+            sys.exit(1)
+            
+        error_detectado = obtener_error_linter()
+        if error_detectado:
+            exito = aplicar_parche_ia(error_detectado)
+            sys.exit(0 if exito else 1)
+        else:
+            print("✅ [Merci AI] Ningún error interceptado. Ecosistema limpio.")
+            sys.exit(0)
+    except Exception as e:
+        print(f"❌ [Merci Auto-Fix] Error fatal inesperado: {e}")
         sys.exit(1)
-        
-    error_detectado = obtener_error_linter()
-    if error_detectado:
-        exito = aplicar_parche_ia(error_detectado)
-        sys.exit(0 if exito else 1)
-    else:
-        print("✅ [Merci AI] Ningún error interceptado. Ecosistema limpio.")
-        sys.exit(0)

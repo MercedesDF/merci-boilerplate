@@ -57,5 +57,18 @@ Este documento define el proceso estandarizado para desplegar la arquitectura h�
 2. Realizar auditoría de Core Web Vitals (Google PageSpeed Insights) para certificar el rendimiento.
 3. Comprobar accesos y bloqueos de seguridad en el panel de administración del CMS (Content Management System - Sistema de Gestión de Contenidos).
 
+## Despliegue Continuo Automatizado (Merci Deploy)
+
+Para automatizar la subida de cambios y la sincronización con el servidor de producción, se dispone del script `merci-deploy.py`. Este realiza las siguientes acciones de forma automática:
+1. Sube los cambios locales al repositorio remoto (`git push origin main`).
+2. Conecta por SSH al servidor VPS de producción y realiza la actualización del código (`git pull origin main`).
+3. Si están configuradas las credenciales de producción (`WP_PROD_URL`, `WP_PROD_USER`, `WP_PROD_APP_PASSWORD`), ejecuta la sincronización de contenidos (`merci-wp.py` y `merci-shop.py`).
+4. Realiza la purga de la caché de Varnish de la portada y del blog usando peticiones HTTP PURGE locales.
+
+Para ejecutar este despliegue automatizado, se utiliza el comando:
+```bash
+python3 scripts/merci/merci-deploy.py
+```
+
 ---
 *Nota: Las futuras actualizaciones de código se realizarán ejecutando `git pull` dentro de la carpeta clonada en el servidor.*

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Showcase: Inyección Multimedia — tuempresa.es</title>
+    <meta name="description" content="Prueba de renderizado nativo de imágenes responsivas y vídeos HTML5 en la arquitectura estática.">
+    <link rel="canonical" href="https://tuempresa.es/proyectos/showcase-inyeccion-multimedia.html">
+    <link rel="stylesheet" href="/css/main.css?v=1781515056">
+    <script src="/js/MerciController.js?v=1781503814" defer></script>
+    <script src="/js/main.js?v=1779435201" defer></script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Showcase: Inyecci\u00f3n Multimedia",
+      "description": "Prueba de renderizado nativo de im\u00e1genes responsivas y v\u00eddeos HTML5 en la arquitectura est\u00e1tica.",
+      "url": "https://tuempresa.es/proyectos/showcase-inyeccion-multimedia.html"
+    }
+    </script>
+</head>
+<body class="page" id="page-proyectos">
+    <div id="top" tabindex="-1" style="position: absolute; top: 0; left: 0;"></div>
+    <header class="header" id="top">
+        <a href="/" class="header__brand">
+            <img src="/assets/images/tu_logo.webp?v=1781515055" alt="tuempresa" class="header__logo" width="263" height="65"
+                fetchpriority="low" decoding="async">
+        </a>
+        <button class="header__toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false">
+            <span class="header__toggle-icon"></span>
+        </button>
+        <nav class="header__nav nav" id="main-nav" aria-label="Navegación principal">
+            <a href="/" class="nav__link">Portada</a>
+            <a href="/biblioteca/" class="nav__link">Biblioteca</a>
+            <!-- QUÉ HACE: Inyecta la ruta del Perfil Semántico (Anti-ATS). -->
+            <!-- POR QUÉ: Integra la autoridad profesional directamente en el flujo de navegación de infraestructura. -->
+            <a href="/sobre-mi/" class="nav__link">Sobre Mí</a>
+            <!-- QUÉ HACE: Diferencia este enlace del autogenerado por WordPress en las tarjetas. -->
+            <!-- POR QUÉ: Evita el error WAI-ARIA de "Enlaces idénticos con distinto destino". -->
+            <a href="/blog/" class="nav__link" aria-label="Ir a la portada del Blog">Blog</a>
+            <a href="/proyectos/" class="nav__link">Proyectos</a>
+            <a href="/blog/tienda/" class="nav__link">Tienda</a>
+            <a href="/contacto/" class="nav__link">Contacto</a>
+        </nav>
+    </header>
+    <main class="main--padded section" id="main">
+        <article class="card card--book">
+            <a href="/proyectos/" class="card__back-link">← Volver a Otros Proyectos</a>
+            <header>
+                    <h1 class="home-card__title--highlight">Showcase: Inyección Multimedia</h1>
+                <a href="/descargas/showcase-inyeccion-multimedia.pdf" class="card__download" target="_blank" rel="noopener noreferrer">📄 Abrir Edición PDF</a>
+            </header>
+            <div class="card__content">
+                <p>Esta es la primera publicación dentro del nuevo ecosistema <strong>Proyectos Satélite</strong>. El objetivo principal de este documento es poner a prueba las reglas de preprocesado multimedia definidas en <code>merci-publish.py</code> y las clases BEM responsivas (<code>multimedia-video</code>).</p>
+<h2>Prueba 1: Imagen Responsiva</h2>
+<p>A continuación, una imagen tradicional. WeasyPrint la convertirá al PDF y el HTML la mostrará sin problemas.</p>
+<p><img alt="Camiseta DevSecOps con logos" class="aspect-square" height="2048" loading="lazy" src="/assets/images/camiseta-devsecops.webp" width="2048" /></p>
+<h2>Prueba 2: Reproductor de Vídeo HTML5 (Zero-Bloat)</h2>
+<p>Markdown no soporta vídeos de manera nativa, pero nuestro conversor en <code>merci-publish.py</code> está programado para detectar enlaces a <code>.mp4</code> y <code>.webm</code> disfrazados de imágenes e inyectar el código HTML5 con la clase <code>.multimedia-video</code>, añadiendo un <em>fallback</em> automático para el PDF (que no puede reproducir vídeo).</p>
+<video controls width="100%" preload="none" aria-label="Demostración del Agente Merci" class="multimedia-video"><source src="/assets/videos/funcionamiento-merci-bibliotecario.mp4"><track kind="captions" src="" srclang="es" label="Español">Tu navegador no soporta video.</video>
+<div class="video-fallback">[Vídeo: Demostración del Agente Merci] <em>(Disponible en la versión web)</em></div>
+
+<hr />
+<h3>💡 El Aprendizaje / Deuda Técnica</h3>
+<p>La inyección mediante Expresiones Regulares en Python permite a los redactores no tener que saber escribir etiquetas <code>&lt;video&gt;</code> a mano. Al usar la sintaxis nativa de imagen de Markdown, el código fuente se mantiene limpio, y es el SSG quien asume el peso de la compilación HTML5.</p>
+            </div>
+        </article>
+    </main>
+    <a href="#top" class="floating-back-to-top" aria-label="Volver arriba">↑</a>
+    <footer class="footer">
+        <div class="footer__links">
+            <a href="https://linkedin.com/in/tu-perfil/" target="_blank" rel="noopener noreferrer"
+                class="footer__link">LinkedIn</a>
+            <a href="https://github.com/tu-usuario" target="_blank" rel="noopener noreferrer"
+                class="footer__link">GitHub</a>
+            <a href="https://github.com/MercedesDF/merci-boilerplate" target="_blank" rel="noopener noreferrer"
+                class="footer__link">Merci Boilerplate</a>
+        </div>
+        <div class="footer__text">
+            <a href="#top">↑ Volver arriba</a><br>
+            &copy; 2026 <strong>tuempresa</strong> — Base de código abierto bajo Licencia MIT.
+        </div>
+    </footer>
+
+    <!-- Asistente Virtual -->
+    <aside class="merci-ui" id="merci-ui" aria-label="Asistente virtual Merci">
+        <!-- QUÉ HACE: Oculta el globo de mensaje a lectores de pantalla (aria-hidden) hasta que haya texto -->
+        <div class="merci-ui__message-box" id="merci-message" aria-live="polite" aria-hidden="true">
+            <span class="merci-ui__message-text"></span>
+        </div>
+        <!-- QUÉ HACE: Usa un botón nativo (<button>) para atrapar el foco del tabulador (Accesibilidad) -->
+        <button class="merci-ui__trigger" aria-controls="merci-message" aria-expanded="false">
+            <img class="merci-ui__avatar" src="/assets/images/tu_avatar.webp?v=1781515055" alt="Interactuar con el asistente"
+                width="80" height="80" fetchpriority="low" decoding="async">
+        </button>
+    </aside>
+</body>
+</html>

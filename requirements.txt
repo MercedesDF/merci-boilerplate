@@ -15,7 +15,7 @@ Pillow==12.2.0
 markdown>=3.8.1
 
 # Orquestador unificado de IA (Ollama local / Gemini de contingencia)
-litellm>=1.48.0
+litellm[proxy]==1.83.14
 
 # SDK nativo de Google (requerido por LiteLLM para usar Gemini)
 google-generativeai>=0.5.2

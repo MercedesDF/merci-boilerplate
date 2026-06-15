@@ -57,6 +57,9 @@ Este documento consolida las medidas de seguridad aplicadas en la arquitectura h
   - Bloqueo arquitectónico: Detección de estilos en línea (`style="..."`) para proteger la metodología BEM.
   - Detección de "PHP (Hypertext Preprocessor - Preprocesador de Hipertexto) Smells" (Advertencias por uso de funciones peligrosas como `eval()`, `exec()`, `shell_exec()`).
   - Detección de "JS Smells" (Uso de `eval` o `new Function`).
+- [x] **Auditoría de Accesibilidad WAI-ARIA (`merci-linkcheck.py`):**
+  - Validación automatizada de toda la red de enlaces estáticos generados.
+  - Bloqueo automático del Pipeline si se detectan enlaces con la misma etiqueta semántica apuntando a destinos diferentes (Violación WCAG AAA).
 - [x] **Auditoría Estandarizada Pre-Merge:**
   - Obligatoriedad de ejecutar `python3 scripts/merci/merci-audit.py --strict-json-ld` para garantizar la presencia de datos estructurados antes de pasar a producción.
 - [x] **Blindaje Supply Chain (Cadena de Suministro) — `audit_python_imports`:**
@@ -68,6 +71,13 @@ Este documento consolida las medidas de seguridad aplicadas en la arquitectura h
 - [x] **Caché Multi-Entorno en Publicador Headless (`merci-wp.py`):**
   - El archivo `observabilidad/.wp_sync.json` almacena la clave centinela `_entorno` (valor del `WP_URL` activo). Al cambiar de entorno (local ↔ producción), la caché se invalida automáticamente sin intervención manual.
   - *Motivo:* Un Cache Hit válido para `localhost` es un Cache Hit falso para producción. Sin esta guardia, el publicador omite silenciosamente todos los artículos al cambiar el `WP_URL` del `.env`.
+- [x] **Verificación Automatizada Continuada (`merci-hardening.py`):**
+  - Auditoría por código de la postura de seguridad que comprueba:
+    - Que los permisos del archivo local `.env` estén restringidos a `600`.
+    - Que no se versionen por error archivos críticos de producción (`wp-config.php` o `docker-compose.override.yml`).
+    - Que el `.gitignore` proteja la fuga de datos confidenciales (DLP).
+    - Que los archivos compilados (`public/`) no contengan enlaces a recursos externos inseguros (Mixed Content HTTP).
+  - *Motivo:* Traduce las políticas de este manual de directrices teóricas a un conjunto de pruebas automatizadas y ejecutables integradas en el pipeline de validación local y CI/CD.
 
 ---
 *Última revisión: Épica 6 — E-commerce Híbrido Extremo (2026-05-26). Hardening de WooCommerce y E-commerce Headless incorporados.*

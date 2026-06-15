@@ -7,9 +7,9 @@ Herramienta interactiva de consola (CLI) para trasladar, curar y estandarizar bo
 """
 
 import re
-import unicodedata
-import sys
 import subprocess
+import sys
+import unicodedata
 from datetime import datetime
 from pathlib import Path
 
@@ -24,14 +24,21 @@ DESTINOS_DIR = [
 ]
 
 def slugify(texto: str) -> str:
-    """Convierte un texto en una cadena segura para URLs (slug)."""
+    """
+    QUÉ HACE: Convierte un texto en una cadena segura para URLs (slug) sin caracteres especiales.
+    POR QUÉ: Garantiza que las URLs de las páginas públicas sean limpias, seguras y legibles.
+    """
     texto = str(texto)
     texto = re.sub(r'[—–]', '-', texto)
     texto = unicodedata.normalize('NFKD', texto).encode('ascii', 'ignore').decode('ascii')
     texto = re.sub(r'[^\w\s-]', '', texto.lower())
     return re.sub(r'[-\s]+', '-', texto).strip('-_')
 
-def main():
+def main() -> None:
+    """
+    QUÉ HACE: Orquesta el flujo de promoción y curación interactivo de borradores a la raíz o biblioteca.
+    POR QUÉ: Facilita el enrutamiento de contenido y previene referencias cruzadas a documentos huérfanos.
+    """
     print("🚀 [Merci Promote] Iniciando flujo de promoción de conocimiento...")
 
     # 2. Escaneo Global: Laboratorio (nuevos) y Directorios Raíz (despublicados / huérfanos)
@@ -267,5 +274,8 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print("\n  🛑 Operación cancelada por la usuaria.")
+        print("\n🛑 [Merci Promote] Operación cancelada por la usuaria. Saliendo limpiamente.")
         sys.exit(130)
+    except Exception as e:
+        print(f"❌ [Merci Promote] Error fatal inesperado: {e}")
+        sys.exit(1)

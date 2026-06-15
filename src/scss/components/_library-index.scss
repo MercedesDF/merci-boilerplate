@@ -46,6 +46,19 @@
             color: $color-primary;
             border-bottom-color: $color-primary;
         }
+
+        &--sub {
+            font-size: 0.9em;
+            text-transform: none;
+            border-bottom: none;
+            color: $color-text-muted;
+            padding-bottom: 0;
+            
+            &:hover {
+                color: $color-primary;
+                border-bottom: none;
+            }
+        }
     }
 
     &__sub-theme {
@@ -140,5 +153,105 @@
         &:hover {
             color: $color-primary;
         }
+    }
+}
+// Inyección dinámica de colores por Estantería
+@each $theme, $color in $theme-colors {
+    .theme--#{$theme} {
+        // Colores en el menú lateral
+        .library-nav__theme-title {
+            color: $color;
+            border-bottom-color: rgba($color, 0.3);
+            &:hover {
+                filter: brightness(0.85);
+                border-bottom-color: $color;
+            }
+            &--sub {
+                color: $color-text-muted;
+                &:hover {
+                    color: $color;
+                    border-bottom: none;
+                }
+            }
+        }
+        
+        .library-nav__article-item:hover {
+            border-left-color: $color;
+            background-color: rgba($color, 0.05);
+        }
+        
+        .library-nav__article-link:hover {
+            color: $color;
+        }
+
+        // Colores en el cuerpo principal
+        .library-section__title,
+        .library-section__title a {
+            color: $color;
+        }
+        
+        .library-subsection__title {
+            border-bottom-color: rgba($color, 0.2);
+        }
+        
+        // Coloreamos los títulos de los artículos para priorizar la legibilidad y el escaneo
+        .card__title {
+            a {
+                color: $color;
+                // WCAG AAA: El subrayado transparente ayuda a indicar interactividad sin saturar visualmente
+                text-decoration: underline;
+                text-decoration-color: transparent;
+                transition: all 0.2s ease;
+                
+                &:hover, &:focus {
+                    text-decoration-color: $color;
+                    // Oscurecemos ligeramente usando CSS nativo para evitar warnings de SASS
+                    filter: brightness(0.85);
+                }
+                
+                &:visited {
+                    // UX Estándar: Indicar enlaces visitados
+                    color: $color-visited;
+                }
+            }
+        }
+    }
+}
+
+// Floating "Back to Top" button (Zero JS)
+.floating-back-to-top {
+    position: fixed;
+    bottom: 2rem;
+    left: 2rem;
+    background-color: $color-surface;
+    color: $color-text-muted;
+    border: 2px solid $color-border;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 1.2rem;
+    font-weight: bold;
+    box-shadow: $shadow-md;
+    transition: all 0.2s ease;
+    z-index: 50;
+    
+    &:hover, &:focus {
+        background-color: $color-primary;
+        color: white;
+        border-color: $color-primary;
+        transform: translateY(-4px);
+        box-shadow: $shadow-hover;
+    }
+    
+    @media (max-width: 768px) {
+        bottom: 1rem;
+        left: 1rem;
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
     }
 }

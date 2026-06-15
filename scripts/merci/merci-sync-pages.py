@@ -20,6 +20,7 @@ INDEX_PATH = PUBLIC_DIR / "index.html"
 # Exclusiones: biblioteca (merci-publish), blog (WordPress), descargas (PDFs)
 EXCLUDED_DIRS = {"biblioteca", "art-de-cote", "blog", "descargas"}
 
+
 def discover_target_pages() -> list[Path]:
     """
     QUÉ HACE: Autodescubre páginas HTML estáticas ignorando la portada y las rutas autogeneradas/dinámicas.
@@ -33,6 +34,7 @@ def discover_target_pages() -> list[Path]:
             pages.append(html_file)
     return pages
 
+
 def extract_block(html: str, regex_pattern: str, block_name: str) -> str:
     """
     QUÉ HACE: Extrae un bloque HTML usando expresiones regulares.
@@ -43,6 +45,7 @@ def extract_block(html: str, regex_pattern: str, block_name: str) -> str:
         print(f"[Merci Error] No se pudo extraer el bloque {block_name} de la portada.")
         sys.exit(1)
     return match.group(1)
+
 
 def replace_block(html: str, regex_pattern: str, new_content: str, block_name: str) -> str:
     """
@@ -55,7 +58,12 @@ def replace_block(html: str, regex_pattern: str, new_content: str, block_name: s
     # Usamos una función lambda para evitar que re.sub interprete barras invertidas erróneas.
     return re.sub(regex_pattern, lambda m: new_content, html, flags=re.DOTALL)
 
-def main():
+
+def main() -> None:
+    """
+    QUÉ HACE: Extrae componentes comunes (cabeceras, pies de página, estilos/scripts) de la portada y los replica en las páginas internas.
+    POR QUÉ: Garantiza la paridad visual y estructural entre todas las páginas estáticas sin la sobrecarga de un motor de plantillas pesado.
+    """
     print("🔄 [Merci Sync] Sincronizando estructuras comunes en páginas estáticas...")
     
     if not INDEX_PATH.exists():
@@ -87,9 +95,8 @@ def main():
         return
 
     for target_path in target_pages:
-        # Obtenemos el nombre de la carpeta contenedora para el log, o el nombre del archivo si está en la raíz
-        page_name = target_path.parent.name if target_path.parent.name != "public" else target_path.name
-        target_url = "/" if page_name == target_path.name else f"/{page_name}/"
+        # Obtenemos la ruta relativa para el log, así queda claro qué archivo exacto se sincroniza
+        rel_path = target_path.relative_to(PUBLIC_DIR)
         
         target_html = target_path.read_text(encoding="utf-8")
 
@@ -101,7 +108,12 @@ def main():
         nuevo_html = replace_block(nuevo_html, jsm_pattern, jsm_content, "JS Main Cache")
         
         target_path.write_text(nuevo_html, encoding="utf-8")
-        print(f"✅ {page_name.capitalize()} sincronizado con la portada.")
+        print(f"✅ {rel_path} sincronizado con la portada.")
+
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\n🛑 [Merci Sync] Sincronización cancelada por el usuario.")
+        sys.exit(130)

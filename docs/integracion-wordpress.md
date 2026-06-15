@@ -68,5 +68,27 @@ La sobreposición de rutas tiene el riesgo de romper la cadena de rastreo de SEO
 2. **Jerarquía Unificada del Sitemap:** Un sitemap de índice (`sitemap_index.xml`) puede declarar dónde localizar los XML locales estáticos creados por `merci_sitemap.py` y dónde iniciar la traza generada automáticamente por WordPress para el contenido.
 3. **Aislamiento de E-commerce (Zero-JS):** La tienda de WooCommerce se despliega bajo `/blog/tienda/` en una arquitectura "Headless en catálogo / Nativa en carrito". El frontend purga (dequeue) el 100% de los scripts dinámicos (AJAX) y delega las operaciones a formularios POST clásicos, logrando un TBT de 0ms.
 
+## Orquestación Headless y Sincronización Automatizada
+
+Para gobernar el CMS (WordPress) y la tienda (WooCommerce) de forma puramente declarativa mediante archivos Markdown y control de versiones (GitOps), se dispone de dos scripts de sincronización automatizada:
+
+1. **`merci-wp.py` (Publicador Headless para WordPress):**
+   - **Qué hace:** Convierte documentos Markdown locales ubicados en `/blog/` a formato HTML y los publica en WordPress a través de la API REST.
+   - **Mecanismos:** Resuelve los ID de categorías de forma dinámica por su nombre y evita la duplicación de entradas mediante la comprobación de slugs únicos en el CMS.
+   - **Ejecución:**
+     ```bash
+     python3 scripts/merci/merci-wp.py
+     ```
+
+2. **`merci-shop.py` (Orquestador Headless para WooCommerce):**
+   - **Qué hace:** Sincroniza el catálogo de productos (Mock E-commerce) definido en archivos Markdown dentro de `/tienda/` con la API REST de WooCommerce.
+   - **Mecanismos:** Actualiza precios, descripciones e imágenes del producto resolviéndolos por su slug. Implementa un cortafuegos (Kill-Switch) que ejecuta un *Hard Delete* en WooCommerce si el estado de un producto cambia a `"borrador"`, retornando el Markdown a la incubadora local.
+   - **Ejecución:**
+     ```bash
+     python3 scripts/merci/merci-shop.py
+     ```
+
+Ambos scripts leen las credenciales y URLs de los entornos desde el archivo `.env` de forma local y segura, y emplean una cabecera de autenticación gemela `X-Authorization` para sortear cualquier caché intermedia (Varnish/Nginx).
+
 ---
 *Conclusión de Épica 6. Este documento sella la decisión de diseño arquitectónico y marca la pauta de despliegue del ecosistema híbrido (Blog + E-commerce).*

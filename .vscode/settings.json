@@ -1,3 +1,8 @@
 {
-    "liveServer.settings.port": 5501
+    "liveServer.settings.port": 5501,
+    "antigravity.ai.apiBase": "http://localhost:4000/v1",
+    "antigravity.ai.provider": "openai",
+    "antigravity.ai.model": "ide-agent",
+    "antigravity.ai.contextWindow": 4096,
+    "antigravity.telemetry.enabled": false
 }

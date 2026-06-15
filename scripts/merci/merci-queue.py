@@ -9,11 +9,17 @@ con los artículos pendientes de revisar y los listos para emisión.
 """
 
 import re
+import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
-def main():
+
+def main() -> None:
+    """
+    QUÉ HACE: Escanea los directorios de contenido (blog, biblioteca, art-de-cote) buscando artículos en estado "publicado" con cola social.
+    POR QUÉ: Muestra un visor por consola con el buffer social y posts pendientes de emitir, facilitando la auditoría de contenidos.
+    """
     print("📊 [Merci Queue] Escaneando la cola de publicación social...\n")
     
     directorios = [
@@ -67,7 +73,12 @@ def main():
         for titulo, ruta in aprobados:
             print(f"  🟢 {titulo}\n     └─ {ruta}")
 
-    print(f"\n📈 Resumen: {len(en_cola)} por revisar | {len(aprobados)} en el buffer.\n")
+    print(f"\n📈 Resumen: {en_cola.__len__()} por revisar | {aprobados.__len__()} en el buffer.\n")
+
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\n🛑 [Merci Queue] Visor cerrado por el usuario.")
+        sys.exit(130)

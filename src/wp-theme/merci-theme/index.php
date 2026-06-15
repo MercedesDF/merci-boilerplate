@@ -31,11 +31,9 @@ if ( is_page('tienda') || (function_exists('is_shop') && is_shop()) ) {
 ?>
 <body id="<?php echo $body_id; ?>" <?php body_class('theme-body page'); ?>>
 
-    <!-- Ancla invisible WAI-ARIA para Volver Arriba -->
-    <div id="top" tabindex="-1" style="position: absolute; top: 0; left: 0;"></div>
-    <header class="header">
+    <header class="header" id="top">
         <a href="/" class="header__brand">
-            <img src="/assets/images/tu_logo.webp?v=1781255265" alt="tuempresa" class="header__logo" width="263" height="65" fetchpriority="low" decoding="async">
+            <img src="/assets/images/tu_logo.webp?v=1781515055" alt="tuempresa" class="header__logo" width="263" height="65" fetchpriority="low" decoding="async">
         </a>
         
         <button class="header__toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false">
@@ -46,6 +44,7 @@ if ( is_page('tienda') || (function_exists('is_shop') && is_shop()) ) {
             <a href="/biblioteca/" class="nav__link">Biblioteca</a>
             <a href="/sobre-mi/" class="nav__link">Sobre Mí</a>
             <a href="/blog/" class="nav__link" aria-label="Ir a la portada del Blog">Blog</a>
+            <a href="/proyectos/" class="nav__link">Proyectos</a>
             <a href="/blog/tienda/" class="nav__link">Tienda</a>
             <a href="/contacto/" class="nav__link">Contacto</a>
         </nav>
@@ -141,6 +140,7 @@ if ( is_page('tienda') || (function_exists('is_shop') && is_shop()) ) {
         ?>
         </section>
     </main>
+    <a href="#top" class="floating-back-to-top" aria-label="Volver arriba">↑</a>
     <footer class="footer">
         <div class="footer__links">
             <a href="https://linkedin.com/in/tu-perfil/" target="_blank" rel="noopener noreferrer" class="footer__link">LinkedIn</a>
@@ -159,7 +159,7 @@ if ( is_page('tienda') || (function_exists('is_shop') && is_shop()) ) {
             <span class="merci-ui__message-text"></span>
         </div>
         <button class="merci-ui__trigger" aria-controls="merci-message" aria-expanded="false">
-            <img class="merci-ui__avatar" src="/assets/images/tu_avatar.webp?v=1781255265" alt="Interactuar con el asistente" width="80" height="80" fetchpriority="low" decoding="async">
+            <img class="merci-ui__avatar" src="/assets/images/tu_avatar.webp?v=1781515055" alt="Interactuar con el asistente" width="80" height="80" fetchpriority="low" decoding="async">
         </button>
     </aside>
 

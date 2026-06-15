@@ -6,14 +6,14 @@ merci-publish.py — Orquestador maestro de publicación (Fase 7.1).
 Transforma documentos Markdown de la biblioteca en páginas HTML estáticas.
 """
 
-import argparse
-import re
-import sys
-import shutil
-import unicodedata
 import html
 import json
+import re
+import shutil
+import sys
+import unicodedata
 from pathlib import Path
+from typing import Any
 
 try:
     import markdown
@@ -30,8 +30,10 @@ except ImportError:
 REPO_ROOT = Path(__file__).resolve().parents[2]
 BIBLIOTECA_DIR = REPO_ROOT / "biblioteca"
 ART_DE_COTE_DIR = REPO_ROOT / "art-de-cote"
+PROYECTOS_DIR = REPO_ROOT / "proyectos-satelite"
 PUBLIC_BIBLIOTECA = REPO_ROOT / "public" / "biblioteca"
 PUBLIC_ART_DE_COTE = REPO_ROOT / "public" / "art-de-cote"
+PUBLIC_PROYECTOS = REPO_ROOT / "public" / "proyectos"
 PUBLIC_DESCARGAS = REPO_ROOT / "public" / "descargas"
 
 def slugify(texto: str) -> str:
@@ -50,14 +52,14 @@ def slugify(texto: str) -> str:
     # Reemplaza múltiples espacios o guiones por un solo guion
     return re.sub(r'[-\s]+', '-', texto).strip('-_')
 
-def limpiar_archivos_zombis(archivos_validos: set):
+def limpiar_archivos_zombis(archivos_validos: set[Path]) -> None:
     """
     QUÉ HACE: Patrón Mark and Sweep (Garbage Collection). Borra archivos que ya no tienen un Markdown origen.
     POR QUÉ: Permite la 'Compilación Incremental' reteniendo PDFs cacheados, pero erradica 
     archivos zombis si la autora renombra o elimina un documento.
     """
     zombis = 0
-    for directorio in [PUBLIC_BIBLIOTECA, PUBLIC_ART_DE_COTE, PUBLIC_DESCARGAS]:
+    for directorio in [PUBLIC_BIBLIOTECA, PUBLIC_ART_DE_COTE, PUBLIC_PROYECTOS, PUBLIC_DESCARGAS]:
         if not directorio.exists():
             continue
         for item in directorio.iterdir():
@@ -71,7 +73,11 @@ def limpiar_archivos_zombis(archivos_validos: set):
     if zombis > 0:
         print(f"  🧹 [Merci Publish] Purga Incremental: {zombis} artefacto(s) zombi(s) eliminado(s).")
 
-def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: int, js_c_v: int, js_m_v: int):
+def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: int, js_c_v: int, js_m_v: int) -> dict[str, Any] | bool:
+    """
+    QUÉ HACE: Procesa un archivo Markdown, extrae su YAML Frontmatter, genera su HTML y su PDF, y retorna sus metadatos.
+    POR QUÉ: Centraliza la conversión individual de documentos Markdown para inyectar plantillas comunes y metadatos SEO.
+    """
     content = filepath.read_text(encoding="utf-8")
     
     # 1. Extraer YAML Frontmatter y Cuerpo del Markdown
@@ -104,13 +110,11 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
     
     # QUÉ HACE: Trunca metadatos para SEO técnico (Shift-Left SEO)
     # POR QUÉ: Evita advertencias del linter y truncamientos en buscadores (SERPs).
-    titulo_seo = f"{titulo_html} — tuempresa.es"
-    if len(titulo_seo) > 65:
-        titulo_seo = f"{titulo_html[:60]}..." if len(titulo_html) > 60 else titulo_html
-        
-    desc_seo = descripcion_html
-    if len(desc_seo) > 150:
-        desc_seo = desc_seo[:147] + "..."
+    titulo_base = titulo[:48] + "..." if len(f"{titulo} — tuempresa.es") > 65 else titulo
+    titulo_seo = html.escape(f"{titulo_base} — tuempresa.es")
+    
+    desc_base = descripcion[:147] + "..." if len(descripcion) > 150 else descripcion
+    desc_seo = html.escape(desc_base)
 
     # QUÉ HACE: Genera los nombres de salida basándose en el título del YAML, no en el archivo.
     # POR QUÉ: Desacopla el sistema de archivos del routing web (Auto-nombrado).
@@ -119,9 +123,20 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
     out_pdf_filename = slug + ".pdf"
     
     is_art = "art-de-cote" in filepath.parts
-    out_base_dir = PUBLIC_ART_DE_COTE if is_art else PUBLIC_BIBLIOTECA
-    base_url_path = "/art-de-cote/" if is_art else "/biblioteca/"
-    back_text = "← Volver a Art de Coté" if is_art else "← Volver a la Biblioteca"
+    is_proy = "proyectos-satelite" in filepath.parts
+    
+    if is_art:
+        out_base_dir = PUBLIC_ART_DE_COTE
+        base_url_path = "/art-de-cote/"
+        back_text = "← Volver a Art de Coté"
+    elif is_proy:
+        out_base_dir = PUBLIC_PROYECTOS
+        base_url_path = "/proyectos/"
+        back_text = "← Volver a Otros Proyectos"
+    else:
+        out_base_dir = PUBLIC_BIBLIOTECA
+        base_url_path = "/biblioteca/"
+        back_text = "← Volver a la Biblioteca"
     
     html_target = out_base_dir / out_filename
     pdf_target = PUBLIC_DESCARGAS / out_pdf_filename
@@ -157,7 +172,7 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
     # ![alt](video.mp4) en un reproductor HTML5 accesible y creamos un texto de respaldo para el PDF.
     md_body = re.sub(
         r'!\[(.*?)\]\((.*?\.(?:mp4|webm|ogg))\)',
-        r'<video controls width="100%" preload="metadata" aria-label="\1" class="multimedia-video"><source src="\2">Tu navegador no soporta video.</video><div class="video-fallback">[Vídeo: \1] <em>(Disponible en la versión web)</em></div>',
+        r'<video controls width="100%" preload="none" aria-label="\1" class="multimedia-video"><source src="\2"><track kind="captions" src="" srclang="es" label="Español">Tu navegador no soporta video.</video><div class="video-fallback">[Vídeo: \1] <em>(Disponible en la versión web)</em></div>',
         md_body,
         flags=re.IGNORECASE
     )
@@ -166,7 +181,7 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
     # QUÉ HACE: Bloque try-except para atrapar errores de sintaxis en el conversor Markdown
     # POR QUÉ: Evita el colapso total del pipeline si un solo documento contiene caracteres o sintaxis corrupta.
     try:
-        html_content = markdown.markdown(md_body, extensions=['fenced_code'])
+        html_content = markdown.markdown(md_body, extensions=['fenced_code', 'attr_list'])
         
         # --- INYECCIÓN DE LA BURBUJA MERCI (TOOLTIPS) ---
         # QUÉ HACE: Escanea el HTML generado y envuelve los términos del glosario en una etiqueta <abbr>.
@@ -195,9 +210,9 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
     # QUÉ HACE: Sanitiza los campos menores del Frontmatter antes de inyectarlos al generador de PDF.
     # POR QUÉ: Evita inyecciones XSS y errores de compilación en WeasyPrint por caracteres malformados.
     fase_html = html.escape(str(fase))
-    fase_pdf_text = f" | Fase {fase_html}" if fase else ""
-    tipo_html = html.escape(str(tipo)).capitalize()
-    volumen_html = html.escape(str(meta.get('volumen', 1)))
+    fase_pdf_text = f" | {fase_html}" if fase else ""
+    tema_html = html.escape(str(tema))
+    subtema_html = html.escape(str(meta.get("subtema", "General")))
     fecha_html = html.escape(str(meta.get('fecha', '')))
     
     pdf_html_content = f"""<!DOCTYPE html>
@@ -211,6 +226,8 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
         .portada {{ text-align: center; page-break-after: always; padding-top: 30%; }}
         .portada h1 {{ font-size: 2.5em; color: #ea580c; margin-bottom: 0.2em; }}
         .portada p {{ font-size: 1.2em; color: #64748b; }}
+        .portada ul {{ list-style: none; padding: 0; color: #64748b; font-size: 1.1em; margin-top: 1em; }}
+        .portada ul li {{ margin-bottom: 0.3em; }}
         h2 {{ color: #ea580c; margin-top: 2em; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5em; }}
         pre {{ background: #f1f5f9; padding: 1em; border-radius: 4px; white-space: pre-wrap; word-wrap: break-word; font-size: 0.9em; }}
         code {{ font-family: monospace; background: #f1f5f9; padding: 0.2em 0.4em; border-radius: 3px; font-size: 0.9em; }}
@@ -222,7 +239,10 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
 <body>
     <div class="portada">
         <h1>{titulo_html}</h1>
-        <p>{tipo_html} | Vol. {volumen_html}</p>
+        <ul>
+            <li><strong>Estantería:</strong> {tema_html}</li>
+            <li><strong>Subtema:</strong> {subtema_html}</li>
+        </ul>
         <p><strong>tuempresa.es</strong> — {fecha_html}{fase_pdf_text}</p>
     </div>
     <div class="contenido">
@@ -256,7 +276,12 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
     # QUÉ HACE: Asigna la clase CSS BEM dinámicamente basándose en el atributo 'tipo'.
     # POR QUÉ: Respeta la decisión del autor en el YAML Frontmatter, aplicando degradación elegante.
     clase_css = "card--booklet" if tipo.lower() == "cuadernillo" else "card--book"
-    page_id = "page-art-de-cote" if is_art else "page-biblioteca"
+    if is_art:
+        page_id = "page-art-de-cote"
+    elif is_proy:
+        page_id = "page-proyectos"
+    else:
+        page_id = "page-biblioteca"
     
     html_final = f"""<!DOCTYPE html>
 <html lang="es">
@@ -293,6 +318,7 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
             </div>
         </article>
     </main>
+    <a href="#top" class="floating-back-to-top" aria-label="Volver arriba">↑</a>
     {footer_html}
 </body>
 </html>"""
@@ -316,19 +342,39 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
         "tipo": tipo,
         "fecha": meta.get("fecha", "1970-01-01"),
         "tema": tema,
+        "subtema": meta.get("subtema", "General").strip().strip('"\''),
+        "destacado": meta.get("destacado", "false").strip().lower() == "true",
         "fase": fase,
         "out_html_path": out_path,
         "out_pdf_path": out_pdf_path,
         "slug": slug
     }
 
-def generar_indice(publicaciones, out_path, title, meta_desc, hero_subtitle, canonical_url, header_html, footer_html, css_v: int, js_c_v: int, js_m_v: int):
+def generar_indice(
+    publicaciones: list[dict[str, Any]],
+    out_path: Path,
+    title: str,
+    meta_desc: str,
+    hero_subtitle: str,
+    canonical_url: str,
+    header_html: str,
+    footer_html: str,
+    css_v: int,
+    js_c_v: int,
+    js_m_v: int
+) -> None:
+    """
+    QUÉ HACE: Genera el índice HTML temático para las publicaciones de la Biblioteca o Art de Coté.
+    POR QUÉ: Agrupa las publicaciones en estanterías temáticas y crea navegación accesible intra-página.
+    """
     print(f"📖 Generando índice temático para {title}...")
     
     if title == "La Biblioteca":
         title_html = 'la biblio<span class="hero__highlight">teca</span>'
     elif title == "Art de Coté":
         title_html = 'art de <span class="hero__highlight">coté</span>'
+    elif title == "Proyectos Satélite":
+        title_html = 'proyectos <span class="hero__highlight">satélite</span>'
     else:
         title_html = html.escape(title)
         
@@ -338,19 +384,16 @@ def generar_indice(publicaciones, out_path, title, meta_desc, hero_subtitle, can
     # Agrupar publicaciones por tema (Estanterías)
     estanterias = {}
     for pub in publicaciones:
-        # QUÉ HACE: Implementa agrupación jerárquica (Tema / Subtema).
-        # POR QUÉ: Permite una arquitectura de la información más limpia y escalable.
-        tema_raw = pub.get("tema") or "General"
-        tema_completo = str(tema_raw).split('/')
-        tema_principal = tema_completo[0].strip().casefold()
-        sub_tema = tema_completo[1].strip().casefold() if len(tema_completo) > 1 else "General"
+        # QUÉ HACE: Implementa agrupación por Tema principal y Subtema desde el frontmatter.
+        tema_principal = pub.get("tema", "Varios").strip()
+        sub_tema = pub.get("subtema", "General").strip()
 
         if tema_principal not in estanterias:
             estanterias[tema_principal] = {}
-        
+
         if sub_tema not in estanterias[tema_principal]:
             estanterias[tema_principal][sub_tema] = []
-            
+
         estanterias[tema_principal][sub_tema].append(pub)
         
     secciones_html = ""
@@ -365,54 +408,58 @@ def generar_indice(publicaciones, out_path, title, meta_desc, hero_subtitle, can
         tema_html = html.escape(tema_principal)
         
         # Construimos el contenedor principal de la estantería (con diseño de columnas responsivo)
-        enlaces_indice_html += f'                <li class="library-nav__item">\n'
+        enlaces_indice_html += f'                <li class="library-nav__item theme--{tema_slug}">\n'
         # QUÉ HACE: Delega el color a la clase SASS .indice__tema para permitir pseudo-clases interactivas (:visited).
         enlaces_indice_html += f'                    <a href="#{tema_slug}" class="library-nav__theme-title" aria-label="Explorar estantería: {tema_html}">{tema_html}</a>\n'
         enlaces_indice_html += f'                    <ul class="library-nav__article-list">\n'
 
         sub_temas_ordenados = sorted(estanterias[tema_principal].keys())
         for sub_tema in sub_temas_ordenados:
-            sub_tema_html = html.escape(sub_tema)
-            enlaces_indice_html += f'                        <li class="library-nav__sub-theme">{sub_tema_html}</li>\n'
+            sub_tema_slug = f"{tema_slug}-{slugify(sub_tema)}"
+            num_articulos = len(estanterias[tema_principal][sub_tema])
+            sub_tema_html = html.escape(f"{sub_tema} ({num_articulos})")
             
+            # El subtema enlaza a la sección principal
+            enlaces_indice_html += f'                        <li class="library-nav__sub-theme"><a href="#{sub_tema_slug}" class="library-nav__theme-title library-nav__theme-title--sub" aria-label="{sub_tema_html} en {tema_html}">{sub_tema_html}</a></li>\n'
+            
+            # Filtramos solo los destacados, máximo 3
             pubs_sub_tema = sorted(estanterias[tema_principal][sub_tema], key=lambda x: (x["tipo"].lower() == "compendio", x["fecha"]), reverse=True)
-            for pub in pubs_sub_tema:
+            pubs_destacados = [p for p in pubs_sub_tema if p.get("destacado")]
+            
+            for pub in pubs_destacados[:3]:
                 pub_slug = pub.get("slug", slugify(pub["titulo"]))
                 pub_titulo_html = html.escape(pub["titulo"])
-                pub_fecha_html = html.escape(str(pub["fecha"]))
                 
                 enlaces_indice_html += f'                        <li class="library-nav__article-item">\n'
-                enlaces_indice_html += f'                            <a href="#{pub_slug}" class="library-nav__article-link" aria-label="Ir al resumen de: {pub_titulo_html} ({pub_fecha_html})">{pub_titulo_html}</a>\n'
+                enlaces_indice_html += f'                            <a href="#{pub_slug}" class="library-nav__article-link" aria-label="Ir al resumen de: {pub_titulo_html}">★ {pub_titulo_html}</a>\n'
                 enlaces_indice_html += f'                        </li>\n'
 
         enlaces_indice_html += f'                    </ul>\n                </li>\n'
-                
-        # QUÉ HACE: Inyecta el ID para el ancla, 'scroll-margin-top' y un contenedor flex para alinear el botón "Volver arriba" a la derecha.
-        # POR QUÉ: Mejora la navegación permitiendo al usuario saltar de vuelta al Mega-Menú inmediatamente después de explorar una estantería.
+
         secciones_html += f"""
-        <section class="library-section" id="{tema_slug}">
+        <section class="library-section theme--{tema_slug}" id="{tema_slug}">
             <div class="library-section__header">
                 <h2 class="library-section__title home-card__title--highlight"><a href="#{tema_slug}" aria-label="Ver sección: {tema_html}">{tema_html}</a></h2>
-                <a href="#top" class="library-section__back-link">↑ Volver arriba</a>
+                
             </div>"""
 
+        secciones_html += '\n            <div class="library-grid">'
         for sub_tema in sub_temas_ordenados:
+            sub_tema_slug = f"{tema_slug}-{slugify(sub_tema)}"
             sub_tema_html = html.escape(sub_tema)
-            secciones_html += f'\n            <h3 class="library-subsection__title">{sub_tema_html}</h3>'
-            secciones_html += '\n            <div class="home-grid">'
-            
+            secciones_html += f'\n                <h3 class="library-subsection__title" id="{sub_tema_slug}">{sub_tema_html}</h3>'
+
             pubs_sub_tema = sorted(estanterias[tema_principal][sub_tema], key=lambda x: (x["tipo"].lower() == "compendio", x["fecha"]), reverse=True)
-            cards_html = ""
             for pub in pubs_sub_tema:
                 pub_slug = pub.get("slug", slugify(pub["titulo"]))
                 pub_titulo_html = html.escape(pub["titulo"])
                 pub_desc_html = html.escape(pub["descripcion"])
                 pub_fecha_html = html.escape(str(pub["fecha"]))
                 badge_html = html.escape(str(pub["tipo"])).capitalize()
-                fase_badge_html = f" &middot; Fase {html.escape(str(pub['fase']))}" if pub.get("fase") else ""
+                fase_badge_html = f" &middot; {html.escape(str(pub['fase']))}" if pub.get("fase") else ""
                 clase_css = "card--booklet" if pub["tipo"].lower() == "cuadernillo" else "card--book"
-                
-                cards_html += f"""
+
+                secciones_html += f"""
                 <article class="card {clase_css}" id="{pub_slug}">
                     <header>
                         <span class="card__meta">{pub_fecha_html} — {badge_html}{fase_badge_html}</span>
@@ -422,17 +469,12 @@ def generar_indice(publicaciones, out_path, title, meta_desc, hero_subtitle, can
                         <p>{pub_desc_html}</p>
                     </div>
                 </article>"""
-            secciones_html += cards_html
-            secciones_html += '\n            </div>'
-
-        secciones_html += '\n        </section>'
+        secciones_html += '\n            </div>\n        </section>'
                 
     # QUÉ HACE: Inyecta el "Announcement Badge" dinámicamente en las portadas
     badge_html = ""
-    page_id = "page-biblioteca"
     if title == "Art de Coté":
         page_id = "page-art-de-cote"
-        
         # Búsqueda dinámica de la última versión de la Anatomía del Boilerplate
         docs_anatomia = [p for p in publicaciones if "Anatomía de Merci Boilerplate" in p.get("titulo", "")]
         if docs_anatomia:
@@ -443,10 +485,15 @@ def generar_indice(publicaciones, out_path, title, meta_desc, hero_subtitle, can
             {html.escape(latest_anatomia['titulo'])} →
         </a>"""
     elif title == "La Biblioteca":
+        page_id = "page-biblioteca"
         badge_html = """<a href="/biblioteca/glosario-tecnico.html" class="hero__badge">
             <span class="hero__badge-tag">Diccionario Data-Driven</span>
             Glosario Técnico DevSecOps →
         </a>"""
+    elif title == "Proyectos Satélite":
+        page_id = "page-proyectos"
+    else:
+        page_id = "page-biblioteca"
         
     # QUÉ HACE: Trunca metadatos para el índice
     titulo_seo = f"{title} — tuempresa.es"
@@ -499,6 +546,7 @@ def generar_indice(publicaciones, out_path, title, meta_desc, hero_subtitle, can
         
         {secciones_html}
     </main>
+    <a href="#top" class="floating-back-to-top" aria-label="Volver arriba">↑</a>
     {footer_html}
 </body>
 </html>"""
@@ -506,7 +554,11 @@ def generar_indice(publicaciones, out_path, title, meta_desc, hero_subtitle, can
     out_path.write_text(html_final, encoding="utf-8")
     print(f"  ✅ Índice generado con éxito: {out_path.relative_to(REPO_ROOT)}")
 
-def main(): # type: ignore
+def main() -> None:
+    """
+    QUÉ HACE: Orquesta la compilación estática (SSG) de todos los archivos Markdown de la Biblioteca y Art de Coté.
+    POR QUÉ: Automatiza la generación y sincronización del núcleo estático del sitio web.
+    """
     print("🚀 [Merci Publish] Iniciando orquestador de publicación...")
     
     # Set para rastrear archivos legítimos y purgar zombis al final (Garbage Collection)
@@ -546,10 +598,12 @@ def main(): # type: ignore
 
     publicaciones_bib = []
     publicaciones_art = []
+    publicaciones_proy = []
 
     # Añadimos los índices principales a la lista de archivos válidos
     archivos_validos.add((PUBLIC_BIBLIOTECA / "index.html").resolve())
     archivos_validos.add((PUBLIC_ART_DE_COTE / "index.html").resolve())
+    archivos_validos.add((PUBLIC_PROYECTOS / "index.html").resolve())
 
     # QUÉ HACE: Lee recursivamente todos los archivos .md en la biblioteca y sus subcarpetas.
     # POR QUÉ: Permite al autor organizar los archivos fuente en subdirectorios temáticos 
@@ -570,6 +624,14 @@ def main(): # type: ignore
                 archivos_validos.add(meta["out_html_path"].resolve())
                 archivos_validos.add(meta["out_pdf_path"].resolve())
                 
+    if PROYECTOS_DIR.exists():
+        for md_file in PROYECTOS_DIR.rglob("*.md"):
+            meta = procesar_archivo(md_file, header_html, footer_html, css_version, js_controller_version, js_main_version)
+            if meta:
+                publicaciones_proy.append(meta)
+                archivos_validos.add(meta["out_html_path"].resolve())
+                archivos_validos.add(meta["out_pdf_path"].resolve())
+                
     if publicaciones_bib:
         PUBLIC_BIBLIOTECA.mkdir(parents=True, exist_ok=True)
         generar_indice(publicaciones_bib, PUBLIC_BIBLIOTECA / "index.html", "La Biblioteca", "Archivo técnico y documentación oficial. Compendios de arquitectura DevSecOps, automatización Python y metodologías Zero-Bloat.", "El conocimiento inmutable del ecosistema. Documentación técnica, metodología Spec as Source y cuadernillos de ingeniería DevSecOps. Todo lo que el sistema construye, la biblioteca lo preserva.", "https://tuempresa.es/biblioteca/", header_html, footer_html, css_version, js_controller_version, js_main_version)
@@ -577,11 +639,22 @@ def main(): # type: ignore
     if publicaciones_art:
         PUBLIC_ART_DE_COTE.mkdir(parents=True, exist_ok=True)
         generar_indice(publicaciones_art, PUBLIC_ART_DE_COTE / "index.html", "Art de Coté", "Índice de scripts experimentales, andamiajes y código colateral.", "Scripts, flujos de automatización y código experimental preservado bajo la filosofía Zero Waste (Cero Desperdicio).", "https://tuempresa.es/art-de-cote/", header_html, footer_html, css_version, js_controller_version, js_main_version)
+        
+    if publicaciones_proy:
+        PUBLIC_PROYECTOS.mkdir(parents=True, exist_ok=True)
+        generar_indice(publicaciones_proy, PUBLIC_PROYECTOS / "index.html", "Proyectos Satélite", "Índice de otros proyectos y experimentos multimedia.", "Pruebas de inyección multimedia y despliegue de contenido interactivo.", "https://tuempresa.es/proyectos/", header_html, footer_html, css_version, js_controller_version, js_main_version)
             
-    total_pubs = len(publicaciones_bib) + len(publicaciones_art)
+    total_pubs = len(publicaciones_bib) + len(publicaciones_art) + len(publicaciones_proy)
     limpiar_archivos_zombis(archivos_validos)
     print(f"  ✅ {total_pubs} documentos estáticos compilados y publicados exitosamente.")
     print("🚀 [Merci Publish] Pipeline de conversión finalizado.")
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\n🛑 [Merci Publish] Compilación interrumpida por la usuaria. Saliendo limpiamente.")
+        sys.exit(130)
+    except Exception as e:
+        print(f"❌ [Merci Publish] Error fatal inesperado: {e}")
+        sys.exit(1)

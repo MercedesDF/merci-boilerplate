@@ -1,0 +1,22 @@
+# observabilidad/router.yaml
+# QUÉ HACE: Define el enrutador inteligente de LiteLLM para todo el ecosistema.
+# POR QUÉ: Implementa el patrón Proxy y Fallback (Degradación Elegante) para evitar 
+# bloqueos de cuota o caídas de red, garantizando cero fricción.
+
+model_list:
+  # 1. Intento Primario: Nube (Máxima capacidad cognitiva para el IDE)
+  - model_name: ide-agent
+    litellm_params:
+      model: gemini/gemini-1.5-flash-latest
+      api_key: "os.environ/GEMINI_API_KEY"
+
+  # 2. Fallback de Contingencia: Local (Hardware propio, latencia cero)
+  - model_name: local-agent
+    litellm_params:
+      model: openai/qwen2.5-coder-7b-instruct
+      api_base: "http://localhost:1234/v1"
+      api_key: "sk-local"
+
+litellm_settings:
+  # Regla innegociable de Fail Gracefully: Si Gemini falla (HTTP 429, 500), pasa al motor local
+  fallbacks: [{"ide-agent": ["local-agent"]}]

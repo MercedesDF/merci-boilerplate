@@ -6,23 +6,27 @@ merci-linkedin.py — Motor de automatización social (Fase 8.3).
 Arquitectura OIDC (Three-legged OAuth) con 0 dependencias externas.
 """
 
-import os
-import sys
 import json
+import os
 import re
-import urllib.request
-import urllib.parse
+import sys
 import unicodedata
+import urllib.parse
+import urllib.request
 import webbrowser
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
+from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 ENV_PATH = REPO_ROOT / ".env"
 TOKEN_PATH = REPO_ROOT / ".linkedin_token.json" # Aquí guardaremos la llave
 
 def slugify(texto: str) -> str:
-    """Convierte un texto en una cadena segura para URLs (slug)."""
+    """
+    QUÉ HACE: Convierte un texto en una cadena segura para URLs (slug) sin caracteres especiales.
+    POR QUÉ: Normaliza y unifica la generación de slugs de forma idéntica al SSG.
+    """
     texto = str(texto)
     texto = re.sub(r'[—–]', '-', texto)
     texto = unicodedata.normalize('NFKD', texto).encode('ascii', 'ignore').decode('ascii')
@@ -39,7 +43,7 @@ class OAuthCallbackHandler(BaseHTTPRequestHandler):
     POR QUÉ: LinkedIn redirigirá tu navegador aquí después de que apruebes los permisos.
     Necesitamos atrapar el código que viene en la URL (?code=XYZ).
     """
-    def do_GET(self):
+    def do_GET(self) -> None:
         parsed_path = urllib.parse.urlparse(self.path)
         
         if parsed_path.path == '/callback':
@@ -73,8 +77,11 @@ class OAuthCallbackHandler(BaseHTTPRequestHandler):
 # 2. EL FLUJO OAUTH (El Canje)
 # =========================================================================
 
-def obtener_credenciales():
-    """Extrae las credenciales del .env de forma segura."""
+def obtener_credenciales() -> tuple[str | None, str | None, str | None]:
+    """
+    QUÉ HACE: Extrae las credenciales de la API de LinkedIn desde el archivo .env.
+    POR QUÉ: Permite autenticar el flujo OIDC local sin codificar secretos en el script.
+    """
     if not ENV_PATH.exists():
         print("❌ Error: No se encontró el archivo .env seguro.")
         sys.exit(1)
@@ -87,7 +94,11 @@ def obtener_credenciales():
             
     return env_data.get("LINKEDIN_CLIENT_ID"), env_data.get("LINKEDIN_CLIENT_SECRET"), env_data.get("LINKEDIN_REDIRECT_URI")
 
-def autenticar_linkedin():
+def autenticar_linkedin() -> None:
+    """
+    QUÉ HACE: Realiza la autenticación segura OIDC levantando un servidor local y abriendo el navegador.
+    POR QUÉ: Obtiene el token de acceso inicial y lo persiste en .linkedin_token.json de forma local.
+    """
     print("🚀 [Merci LinkedIn] Iniciando flujo OIDC seguro...")
     client_id, client_secret, redirect_uri = obtener_credenciales()
     
@@ -145,8 +156,11 @@ def autenticar_linkedin():
 # 3. EL PUBLICADOR (El Lector de Markdown)
 # =========================================================================
 
-def obtener_urn_usuario(access_token):
-    """Obtiene el ID único (URN) de tu perfil en LinkedIn."""
+def obtener_urn_usuario(access_token: str) -> str | None:
+    """
+    QUÉ HACE: Obtiene el URN (identificador único) de la cuenta de LinkedIn autenticada.
+    POR QUÉ: La API REST de LinkedIn exige especificar el autor mediante su URN al publicar.
+    """
     url = "https://api.linkedin.com/v2/userinfo"
     req = urllib.request.Request(url, headers={"Authorization": f"Bearer {access_token}"})
     try:
@@ -157,8 +171,11 @@ def obtener_urn_usuario(access_token):
         print(f"❌ Error al obtener identidad de LinkedIn: {e}")
         return None
 
-def publicar_texto_linkedin(access_token, author_urn, texto):
-    """Envía el POST a la API de LinkedIn para publicar un texto plano."""
+def publicar_texto_linkedin(access_token: str, author_urn: str, texto: str) -> str | None:
+    """
+    QUÉ HACE: Publica un post de texto plano (con enlace inyectado) en LinkedIn usando la API de UGC posts.
+    POR QUÉ: Automatiza la comunicación social del ecosistema DevRel.
+    """
     url = "https://api.linkedin.com/v2/ugcPosts"
     payload = {
         "author": author_urn,
@@ -190,7 +207,11 @@ def publicar_texto_linkedin(access_token, author_urn, texto):
         print(f"❌ Error API LinkedIn: {e.read().decode('utf-8')}")
         return None
 
-def procesar_linkedin(modo_auto=False):
+def procesar_linkedin(modo_auto: bool = False) -> None:
+    """
+    QUÉ HACE: Lee el buffer social de los archivos Markdown y publica o gestiona la cola de posts.
+    POR QUÉ: Implementa la gobernanza declarativa de las redes sociales en el ecosistema.
+    """
     print(f"🚀 [Merci LinkedIn] {'Modo Automático (Cron)' if modo_auto else 'Modo Revisión Interactiva'}...")
     
     token_data = json.loads(TOKEN_PATH.read_text(encoding="utf-8"))
@@ -434,8 +455,15 @@ def procesar_linkedin(modo_auto=False):
                         print("  ❌ Entrada inválida.")
 
 if __name__ == "__main__":
-    modo_auto = "--auto" in sys.argv or "--cron" in sys.argv
-    if not TOKEN_PATH.exists():
-        autenticar_linkedin()
-    else:
-        procesar_linkedin(modo_auto)
+    try:
+        modo_auto = "--auto" in sys.argv or "--cron" in sys.argv
+        if not TOKEN_PATH.exists():
+            autenticar_linkedin()
+        else:
+            procesar_linkedin(modo_auto)
+    except KeyboardInterrupt:
+        print("\n🛑 [Merci LinkedIn] Operación interrumpida por la usuaria. Saliendo limpiamente.")
+        sys.exit(130)
+    except Exception as e:
+        print(f"❌ [Merci LinkedIn] Error fatal inesperado: {e}")
+        sys.exit(1)

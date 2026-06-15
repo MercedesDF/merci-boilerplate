@@ -7,16 +7,17 @@ Lee los archivos Markdown de laboratorio/tienda/ y los sincroniza
 con la API REST de WooCommerce usando autenticación segura.
 """
 
-import os
-import sys
-import json
 import argparse
 import base64
-import urllib.request
-import urllib.error
-from pathlib import Path
+import json
+import os
 import re
 import shutil
+import sys
+import urllib.error
+import urllib.request
+from pathlib import Path
+from typing import Any
 
 try:
     import markdown
@@ -54,7 +55,7 @@ def cargar_credenciales() -> tuple[str, str]:
     auth_b64 = base64.b64encode(credenciales.encode("utf-8")).decode("utf-8")
     return wp_url, f"Basic {auth_b64}"
 
-def realizar_peticion_wc(url: str, auth_header: str, method: str = "GET", data: dict | None = None) -> dict | None:
+def realizar_peticion_wc(url: str, auth_header: str, method: str = "GET", data: dict[str, Any] | None = None) -> Any:
     """
     QUÉ HACE: Ejecuta peticiones HTTP a la API REST de WooCommerce (v3).
     POR QUÉ: Usa X-Authorization para eludir la ceguera de proxy de Varnish/Nginx
@@ -82,8 +83,11 @@ def realizar_peticion_wc(url: str, auth_header: str, method: str = "GET", data: 
         print(f"  ❌ Error de conexión: {e}")
         return None
 
-def obtener_producto_por_slug(wc_endpoint: str, auth_header: str, slug: str):
-    """Busca si el producto ya existe en WooCommerce mediante su slug."""
+def obtener_producto_por_slug(wc_endpoint: str, auth_header: str, slug: str) -> int | None:
+    """
+    QUÉ HACE: Busca si el producto ya existe en WooCommerce mediante su slug.
+    POR QUÉ: Evita duplicar productos en WooCommerce basándose en slugs declarados.
+    """
     url = f"{wc_endpoint}?slug={slug}"
     try:
         respuesta = realizar_peticion_wc(url, auth_header)
@@ -93,7 +97,11 @@ def obtener_producto_por_slug(wc_endpoint: str, auth_header: str, slug: str):
         pass
     return None
 
-def main(argv=None):
+def main(argv: list[str] | None = None) -> None:
+    """
+    QUÉ HACE: Orquesta la sincronización del catálogo de productos en WooCommerce a partir de Markdowns.
+    POR QUÉ: Implementa el catálogo declarativo sincronizado de WooCommerce de forma automática.
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument("--verbose", "-v", action="store_true")
     args = parser.parse_args(argv)
@@ -186,5 +194,8 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print("\n[Merci Shop] Interrumpido por el usuario.")
+        print("\n🛑 [Merci Shop] Sincronización interrumpida por la usuaria. Saliendo limpiamente.")
         sys.exit(130)
+    except Exception as e:
+        print(f"❌ [Merci Shop] Error fatal inesperado: {e}")
+        sys.exit(1)
