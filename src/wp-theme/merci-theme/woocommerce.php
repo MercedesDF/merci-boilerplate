@@ -19,7 +19,7 @@ $js_main_v = time();
 <body id="page-tienda" <?php body_class('theme-body page'); ?>>
     <header class="header" id="top">
         <a href="/" class="header__brand">
-            <img src="/assets/images/tu_logo.webp?v=1781515055" alt="tuempresa" class="header__logo" width="263" height="65" fetchpriority="low" decoding="async">
+            <img src="/assets/images/tu_logo.webp?v=1781768797" alt="tuempresa" class="header__logo" width="263" height="65" fetchpriority="low" decoding="async">
         </a>
         
         <?php 
@@ -51,12 +51,17 @@ $js_main_v = time();
         <section class="hero">
             <h1 class="hero__title">Merci'<span class="hero__highlight">Shop</span></h1>
             <p class="hero__subtitle"><strong><em>la tienda no tienda</em></strong><br>merchandising oficial del ecosistema Mercí</p>
+            <?php
+            if ( function_exists('merci_get_sre_badge_html') && function_exists('is_shop') && is_shop() ) {
+                echo merci_get_sre_badge_html('https://tuempresa.es/blog/tienda/');
+            }
+            ?>
             <?php if ( function_exists('is_shop') && is_shop() ) : ?>
                 <div class="woocommerce">
                     <div class="woocommerce-notices-wrapper">
                         <div class="woocommerce-info woocommerce-info--store-notice">
                             ℹ️ <strong>Economía Simulada:</strong> <br>Este catálogo es una demostración técnica (E-commerce Zero-JS).<br>
-                            Los precios están en <em>Merci-coins</em> <img src="/favicon.ico" alt="Llama" width="16" height="16" class="merci-coin-icon"><br>
+                            Los precios están en <em>Merci-coins</em> <img src="/assets/images/tu_logo-80w.webp" alt="Llama" width="16" height="16" class="merci-coin-icon"><br>
                             ¡Añade al carrito sin miedo!
                         </div>
                     </div>
@@ -87,7 +92,7 @@ $js_main_v = time();
     </footer>
     <aside class="merci-ui" id="merci-ui" aria-label="Asistente virtual Merci">
         <div class="merci-ui__message-box" id="merci-message" aria-live="polite" aria-hidden="true"><span class="merci-ui__message-text"></span></div>
-        <button class="merci-ui__trigger" aria-controls="merci-message" aria-expanded="false"><img class="merci-ui__avatar" src="/assets/images/tu_avatar.webp?v=1781515055" alt="Interactuar con el asistente" width="80" height="80" fetchpriority="low" decoding="async"></button>
+        <button class="merci-ui__trigger" aria-controls="merci-message" aria-expanded="false"><img class="merci-ui__avatar" src="/assets/images/tu_avatar.webp?v=1781768797" alt="Interactuar con el asistente" width="80" height="80" fetchpriority="low" decoding="async"></button>
     </aside>
     <?php wp_footer(); ?>
 </body>

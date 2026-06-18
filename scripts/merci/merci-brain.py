@@ -38,26 +38,61 @@ def slugify(texto: str) -> str:
     texto = re.sub(r'[^\w\s-]', '', texto.lower())
     return re.sub(r'[-\s]+', '-', texto).strip('-_')
 
+import os
+
+try:
+    os.environ["LITELLM_LOCAL_MODEL_COST_MAP"] = "True"
+    import logging
+    logging.getLogger('LiteLLM').setLevel(logging.ERROR)
+    from litellm import completion
+    import litellm
+    litellm.telemetry = False
+except ImportError:
+    pass
+
 def consultar_ia_local(prompt: str) -> str:
     """
-    QUÉ HACE: Realiza una petición POST nativa a la API local de Ollama (qwen2.5-coder).
-    POR QUÉ: Aísla el proceso de la nube, garantizando cero latencia de red y privacidad total.
+    QUÉ HACE: Orquesta la Pila Híbrida (Hybrid Stack). Intenta primero el modelo local,
+              y si falla o no está disponible, hace fallback al proxy Gemini (Antigravity).
+    POR QUÉ: Garantiza resiliencia total y gratuidad por defecto.
     """
     try:
-        local_url = "http://localhost:11434/api/generate"
-        local_payload = {
-            "model": "qwen2.5-coder",
-            "prompt": prompt,
-            "stream": False,
-            "options": {"temperature": 0.65}
-        }
-        local_req = urllib.request.Request(local_url, data=json.dumps(local_payload).encode("utf-8"), method="POST")
-        local_req.add_header("Content-Type", "application/json")
-        with urllib.request.urlopen(local_req, timeout=120) as local_response:
-            local_data = json.loads(local_response.read().decode("utf-8"))
-            return local_data["response"].strip()
+        # Intento 1: Motor Local Primario (Ollama)
+        # Timeout corto (10s) para no bloquear el pipeline si Ollama está caído
+        respuesta = completion(
+            model="ollama/qwen2.5-coder",
+            api_base=os.environ.get("OLLAMA_API_BASE", "http://localhost:11434"),
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.65,
+            timeout=10
+        )
+        return respuesta.choices[0].message.content.strip()
     except Exception as e_local:
-        return f"Error HTTP Local: {e_local}"
+        print(f"  ⚠️ Ollama no responde ({e_local}). Ejecutando Fallback a Antigravity (Gemini Proxy)...")
+        # Intento 2: Fallback a Antigravity / Gemini Proxy
+        try:
+            api_key = os.environ.get("GEMINI_API_KEY")
+            if not api_key:
+                env_path = REPO_ROOT / ".env"
+                if env_path.exists():
+                    for line in env_path.read_text(encoding="utf-8").splitlines():
+                        if line.startswith("GEMINI_API_KEY="):
+                            api_key = line.split("=", 1)[1].strip('"\'')
+                            os.environ["GEMINI_API_KEY"] = api_key
+                            break
+                            
+            if not api_key:
+                return "Error: GEMINI_API_KEY no encontrada en .env"
+
+            respuesta = completion(
+                model="gemini/gemini-2.5-flash",
+                messages=[{"role": "user", "content": prompt}],
+                api_key=api_key,
+                temperature=0.65
+            )
+            return respuesta.choices[0].message.content.strip()
+        except Exception as e_cloud:
+            return f"Error HTTP Local: {e_cloud}"
 
 def generar_cerebro_estatico(force_clean: bool = False) -> None:
     """

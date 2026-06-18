@@ -6,6 +6,8 @@
   "network_latency_ms": 1,
   "network_ttfb_ms": 1,
   "cwv_tbt_ms": 0,
-  "cwv_lcp_ms": 993,
-  "cwv_cls": 0.0
+  "cwv_lcp_ms": 989,
+  "cwv_cls": 0.0,
+  "lighthouse_accessibility_contrast_errors": 0,
+  "lighthouse_accessibility_aria_errors": 0
 }

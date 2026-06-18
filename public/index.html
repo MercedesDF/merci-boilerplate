@@ -21,7 +21,7 @@
         content="Laboratorio DevSecOps gobernado por 25+ agentes IA y metodología Spec as Source.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://tuempresa.es/">
-    <meta property="og:image" content="https://tuempresa.es/assets/images/tu_logo.webp?v=1781515055">
+    <meta property="og:image" content="https://tuempresa.es/assets/images/tu_logo.webp?v=1781768797">
 
     <title>tuempresa — Ingeniería de Rendimiento & DevSecOps</title>
 
@@ -29,9 +29,9 @@
     <link rel="icon" href="/favicon.ico?v=2" type="image/x-icon">
     <!-- QUÉ HACE: Cache Busting dinámico incrementado a v14 -->
     <!-- POR QUÉ: Obliga a Varnish y a navegadores móviles a purgar la caché y descargar la nueva rejilla de 5 columnas. -->
-    <link rel="stylesheet" href="/css/main.css?v=1781515056">
+    <link rel="stylesheet" href="/css/main.css?v=1781768798">
     <script src="/js/MerciController.js?v=1781503814" defer></script>
-    <script src="/js/main.js?v=1779435201" defer></script>
+    <script src="/js/main.js?v=1781552845" defer></script>
     <link rel="canonical" href="https://tuempresa.es">
 
     <!-- JSON-LD Mínimo Fase 2 -->
@@ -48,9 +48,10 @@
 <body class="page" id="page-home">
     <!-- QUÉ HACE: Centraliza el foco de "Volver arriba" semánticamente en el header -->
     <!-- POR QUÉ: Elimina el anti-patrón de accesibilidad de usar divs invisibles con tabindex="-1" -->
-    <header class="header" id="top">
+    <div id="top" tabindex="-1" style="position: absolute; top: 0; left: 0;"></div>
+    <header class="header">
         <a href="/" class="header__brand">
-            <img src="/assets/images/tu_logo.webp?v=1781515055" alt="tuempresa" class="header__logo" width="263" height="65"
+            <img src="/assets/images/tu_logo.webp?v=1781768797" alt="tuempresa" class="header__logo" width="263" height="65"
                 fetchpriority="low" decoding="async">
         </a>
         <button class="header__toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false">
@@ -88,7 +89,7 @@
 
             <div class="hero__cta">
                 <a href="/sobre-mi/" class="hero__btn">Ver perfil</a>
-                <a href="https://github.com/MercedesDF/merci-boilerplate" target="_blank" rel="noopener noreferrer"
+                <a href="https://github.com/MercedesDF/PROYECTO_tuempresa.es" target="_blank" rel="noopener noreferrer"
                     class="hero__btn">Ver el código fuente</a>
                 <a href="/proyectos/" class="hero__btn">Otros proyectos</a>
             </div>
@@ -113,8 +114,7 @@
                 </div>
                 <div class="hero__metric">
                     <span class="hero__metric-label">INP</span>
-                    <span class="hero__metric-value">
-                        <100ms< /span>
+                    <span class="hero__metric-value">&lt;100ms</span>
                 </div>
                 <div class="hero__metric">
                     <span class="hero__metric-label">CLS</span>
@@ -126,7 +126,7 @@
                 </div>
                 <div class="hero__metric">
                     <span class="hero__metric-label">SI</span>
-                    <span class="hero__metric-value">0.8 s</span>
+                    <span class="hero__metric-value">1.4 s</span>
                 </div>
                 <div class="hero__metric">
                     <span class="hero__metric-label">Descarga</span>
@@ -148,7 +148,7 @@
 
             <!-- QUÉ HACE: Expone las puntuaciones de Lighthouse (CWV) y diagnostica problemas de red. -->
             <div id="lighthouse-scores" class="hero__scores-summary">
-                100 en Rendimiento | 100 en Accesibilidad | 100 en Mejores Prácticas | 100 en SEO
+                ⚡ 100 en Rendimiento | ♿ 100 en Accesibilidad | 🛡️ 100 en Mejores Prácticas | 🔍 100 en SEO
             </div>
 
             <!-- ===================== -->
@@ -165,7 +165,6 @@
         </section>
 
     </main>
-    <a href="#top" class="floating-back-to-top" aria-label="Volver arriba">↑</a>
     <footer class="footer">
         <div class="footer__links">
             <a href="https://linkedin.com/in/tu-perfil/" target="_blank" rel="noopener noreferrer"
@@ -189,10 +188,11 @@
         </div>
         <!-- QUÉ HACE: Usa un botón nativo (<button>) para atrapar el foco del tabulador (Accesibilidad) -->
         <button class="merci-ui__trigger" aria-controls="merci-message" aria-expanded="false">
-            <img class="merci-ui__avatar" src="/assets/images/tu_avatar.webp?v=1781515055" alt="Interactuar con el asistente"
+            <img class="merci-ui__avatar" src="/assets/images/tu_avatar.webp?v=1781768797" alt="Interactuar con el asistente"
                 width="80" height="80" fetchpriority="low" decoding="async">
         </button>
     </aside>
+    <a href="#top" class="floating-back-to-top" aria-label="Volver arriba">↑</a>
 </body>
 
 </html>

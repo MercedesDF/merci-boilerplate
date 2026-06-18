@@ -1,0 +1,49 @@
+// Componente: SRE Micro-Badge (Lighthouse Telemetry)
+// QUÉ HACE: Estiliza un micro-sello horizontal translucido/sutil para mostrar puntuaciones de Lighthouse.
+// POR QUÉ: Ofrece una visualización Premium y 100% Accesible (WCAG AA > 4.5:1) de la telemetría sobre fondos claros.
+
+.sre-badge {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  background: #f8fafc; // $color-surface
+  border: 1px solid #e2e8f0; // $color-border
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-family: inherit;
+  font-size: 0.75rem;
+  align-items: center;
+  margin: 0.5rem 0;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); // $shadow-sm
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.1rem 0.4rem;
+    background: #ffffff;
+    border: 1px solid rgba(15, 23, 42, 0.06);
+    border-radius: 9999px;
+    color: #334155; // $color-text-muted (Slate 700)
+    font-weight: 500;
+  }
+
+  &__icon {
+    font-size: 0.85rem;
+    line-height: 1;
+  }
+
+  &__score {
+    font-weight: 700;
+
+    &--green {
+      color: #065f46; // Emerald 800 (Tema IA - Contraste > 7:1)
+    }
+    &--orange {
+      color: #9a3412; // Orange 800 (Tema Gobernanza - Contraste > 6:1)
+    }
+    &--red {
+      color: #b91c1c; // Red 700 (Tema DevSecOps - Contraste > 7:1)
+    }
+  }
+}

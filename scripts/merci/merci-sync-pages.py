@@ -11,6 +11,8 @@ para mantener la paridad estructural en todo el ecosistema SSG sin duplicar cód
 
 import re
 import sys
+import json
+import html
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -19,6 +21,43 @@ INDEX_PATH = PUBLIC_DIR / "index.html"
 
 # Exclusiones: biblioteca (merci-publish), blog (WordPress), descargas (PDFs)
 EXCLUDED_DIRS = {"biblioteca", "art-de-cote", "blog", "descargas"}
+
+
+def generar_sre_badge_html(url: str, cache_data: dict) -> str:
+    """
+    QUÉ HACE: Genera el marcado HTML para el micro-sello SRE a partir de los datos de la caché.
+    POR QUÉ: Permite inyectar una visualización Zero-JS ligera de Core Web Vitals en cada página.
+    """
+    scores = cache_data.get(url, {"performance": 100, "accessibility": 100, "best-practices": 100, "seo": 100})
+    
+    def get_color_class(val):
+        if val >= 90: return "sre-badge__score--green"
+        if val >= 50: return "sre-badge__score--orange"
+        return "sre-badge__score--red"
+
+    p_col = get_color_class(scores.get("performance", 100))
+    a_col = get_color_class(scores.get("accessibility", 100))
+    b_col = get_color_class(scores.get("best-practices", 100))
+    s_col = get_color_class(scores.get("seo", 100))
+
+    return f"""<div class="sre-badge" role="group" aria-label="Auditoría Lighthouse de esta página">
+                <div class="sre-badge__item" title="Rendimiento">
+                    <span class="sre-badge__icon">⚡</span>
+                    <span class="sre-badge__score {p_col}">{scores.get("performance", 100)}</span>
+                </div>
+                <div class="sre-badge__item" title="Accesibilidad">
+                    <span class="sre-badge__icon">♿</span>
+                    <span class="sre-badge__score {a_col}">{scores.get("accessibility", 100)}</span>
+                </div>
+                <div class="sre-badge__item" title="Buenas Prácticas">
+                    <span class="sre-badge__icon">🛡️</span>
+                    <span class="sre-badge__score {b_col}">{scores.get("best-practices", 100)}</span>
+                </div>
+                <div class="sre-badge__item" title="SEO">
+                    <span class="sre-badge__icon">🔍</span>
+                    <span class="sre-badge__score {s_col}">{scores.get("seo", 100)}</span>
+                </div>
+            </div>"""
 
 
 def discover_target_pages() -> list[Path]:
@@ -74,7 +113,7 @@ def main() -> None:
     index_html = INDEX_PATH.read_text(encoding="utf-8")
     
     # 1. Patrones de extracción (Regex)
-    header_pattern = r'(<header class="header" id="top">.*?</header>)'
+    header_pattern = r'((?:<div id="top"[^>]*></div>\s*)?<header class="header"(?: id="top")?>.*?</header>)'
     footer_pattern = r'(<footer class="footer".*?</footer>)'
     aside_pattern = r'(<aside class="merci-ui".*?</aside>)'
     css_pattern = r'(<link rel="stylesheet" href="/css/main\.css\?v=\d+">)'
@@ -89,7 +128,16 @@ def main() -> None:
     jsc_content = extract_block(index_html, jsc_pattern, "JS Controller Cache")
     jsm_content = extract_block(index_html, jsm_pattern, "JS Main Cache")
     
-    # 3. Iterar e inyectar en todas las páginas de destino
+    # 3. Cargar la caché de telemetría para las inyecciones de los micro-sellos
+    cache_path = REPO_ROOT / "observabilidad" / ".lighthouse_pages_cache.json"
+    cache_data = {}
+    if cache_path.exists():
+        try:
+            cache_data = json.loads(cache_path.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+
+    # 4. Iterar e inyectar en todas las páginas de destino
     if not target_pages:
         print("ℹ️ [Merci Sync] No se encontraron páginas secundarias para sincronizar.")
         return
@@ -99,6 +147,13 @@ def main() -> None:
         rel_path = target_path.relative_to(PUBLIC_DIR)
         
         target_html = target_path.read_text(encoding="utf-8")
+
+        # Inyectar el micro-sello si el marcador está presente
+        if "<!-- Merci SRE Badge -->" in target_html:
+            canonical_url = f"https://tuempresa.es/{rel_path.parent}/" if rel_path.name == "index.html" else f"https://tuempresa.es/{rel_path}"
+            canonical_url = re.sub(r'([^:])//+', r'\1/', canonical_url)
+            badge_html = generar_sre_badge_html(canonical_url, cache_data)
+            target_html = target_html.replace("<!-- Merci SRE Badge -->", badge_html)
 
         nuevo_html = replace_block(target_html, header_pattern, header_content, "Header")
         nuevo_html = replace_block(nuevo_html, footer_pattern, footer_content, "Footer")

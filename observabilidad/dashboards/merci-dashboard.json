@@ -42,15 +42,15 @@
       }
     ],
     "cursorSync": "Off",
-    "description": "métricas de tuempresa.es en local",
+    "description": "m\u00e9tricas de tuempresa.es en local",
     "editable": true,
     "elements": {
       "panel-1": {
         "kind": "Panel",
         "spec": {
           "id": 1,
-          "title": "INCUBACIÓN",
-          "description": "Documentos en incubación para revisión manual.",
+          "title": "INCUBACI\u00d3N",
+          "description": "Documentos en incubaci\u00f3n para revisi\u00f3n manual.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -135,7 +135,7 @@
         "kind": "Panel",
         "spec": {
           "id": 2,
-          "title": "Listos para PROMOCIÓN",
+          "title": "Listos para PROMOCI\u00d3N",
           "description": "",
           "links": [],
           "data": {
@@ -391,8 +391,8 @@
         "kind": "Panel",
         "spec": {
           "id": 5,
-          "title": "Duración del PIPELINE",
-          "description": "Qué tarda merci-total en ejecutarse",
+          "title": "Duraci\u00f3n del PIPELINE",
+          "description": "Qu\u00e9 tarda merci-total en ejecutarse",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -439,6 +439,50 @@
                       }
                     },
                     "refId": "B",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "type": "prometheus",
+                        "uid": "prometheus"
+                      },
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "merci_commit_duration_seconds{}",
+                        "legendFormat": "Commit (merci commit)",
+                        "range": true
+                      }
+                    },
+                    "refId": "C",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "type": "prometheus",
+                        "uid": "prometheus"
+                      },
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "merci_deploy_duration_seconds{}",
+                        "legendFormat": "Deploy (merci deploy)",
+                        "range": true
+                      }
+                    },
+                    "refId": "D",
                     "hidden": false
                   }
                 }
@@ -598,7 +642,7 @@
         "kind": "Panel",
         "spec": {
           "id": 7,
-          "title": "Control Versión Documental",
+          "title": "Control Versi\u00f3n Documental",
           "description": "",
           "links": [],
           "data": {
@@ -766,7 +810,7 @@
         "kind": "Panel",
         "spec": {
           "id": 9,
-          "title": "ART DE COTÉ",
+          "title": "ART DE COT\u00c9",
           "description": "",
           "links": [],
           "data": {
@@ -849,7 +893,7 @@
         "spec": {
           "id": 10,
           "title": "Rendimiento (Lighthouse)",
-          "description": "Puntuación Lighthouse Performance (0-100)",
+          "description": "Puntuaci\u00f3n Lighthouse Performance (0-100)",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -940,7 +984,7 @@
         "spec": {
           "id": 11,
           "title": "Accesibilidad (Lighthouse)",
-          "description": "Puntuación Lighthouse Accessibility (0-100)",
+          "description": "Puntuaci\u00f3n Lighthouse Accessibility (0-100)",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -1030,8 +1074,8 @@
         "kind": "Panel",
         "spec": {
           "id": 12,
-          "title": "Mejores Prácticas (Lighthouse)",
-          "description": "Puntuación Lighthouse Best Practices (0-100)",
+          "title": "Mejores Pr\u00e1cticas (Lighthouse)",
+          "description": "Puntuaci\u00f3n Lighthouse Best Practices (0-100)",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -1122,7 +1166,7 @@
         "spec": {
           "id": 13,
           "title": "SEO (Lighthouse)",
-          "description": "Puntuación Lighthouse SEO (0-100)",
+          "description": "Puntuaci\u00f3n Lighthouse SEO (0-100)",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -1473,8 +1517,8 @@
         "kind": "Panel",
         "spec": {
           "id": 17,
-          "title": "Latencia Física (Ping)",
-          "description": "Latencia física de red",
+          "title": "Latencia F\u00edsica (Ping)",
+          "description": "Latencia f\u00edsica de red",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -1647,8 +1691,8 @@
         "kind": "Panel",
         "spec": {
           "id": 19,
-          "title": "Errores de Auditoría",
-          "description": "Errores críticos de seguridad",
+          "title": "Errores de Auditor\u00eda",
+          "description": "Errores cr\u00edticos de seguridad",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -1729,7 +1773,7 @@
         "kind": "Panel",
         "spec": {
           "id": 20,
-          "title": "Advertencias de Auditoría",
+          "title": "Advertencias de Auditor\u00eda",
           "description": "Alertas de seguridad no bloqueantes",
           "links": [],
           "data": {
@@ -2053,7 +2097,7 @@
         "kind": "Panel",
         "spec": {
           "id": 24,
-          "title": "Duración por Script (Pipeline)",
+          "title": "Duraci\u00f3n por Script (Pipeline)",
           "description": "Segundos consumidos por cada paso del pipeline",
           "links": [],
           "data": {
@@ -2117,8 +2161,8 @@
         "kind": "Panel",
         "spec": {
           "id": 25,
-          "title": "Glosario (Términos)",
-          "description": "Términos técnicos registrados",
+          "title": "Glosario (T\u00e9rminos)",
+          "description": "T\u00e9rminos t\u00e9cnicos registrados",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -2175,6 +2219,259 @@
                   "color": {
                     "mode": "fixed",
                     "fixedColor": "semi-dark-orange"
+                  }
+                },
+                "overrides": []
+              }
+            }
+          }
+        }
+      },
+      "panel-26": {
+        "kind": "Panel",
+        "spec": {
+          "id": 26,
+          "title": "Peso Est\u00e1tico (/public)",
+          "description": "Tama\u00f1o total en MB",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "type": "prometheus",
+                        "uid": "prometheus"
+                      },
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "merci_public_folder_size_bytes",
+                        "legendFormat": "__auto",
+                        "range": true
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "stat",
+            "version": "13.0.1",
+            "spec": {
+              "options": {
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "textMode": "auto",
+                "colorMode": "value",
+                "graphMode": "area",
+                "justifyMode": "center",
+                "orientation": "auto"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "decbytes",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 10000000,
+                        "color": "orange"
+                      },
+                      {
+                        "value": 20000000,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "thresholds"
+                  }
+                },
+                "overrides": []
+              }
+            }
+          }
+        }
+      },
+      "panel-27": {
+        "kind": "Panel",
+        "spec": {
+          "id": 27,
+          "title": "Errores Contraste (A11y)",
+          "description": "Elementos con contraste de color insuficiente",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "type": "prometheus",
+                        "uid": "prometheus"
+                      },
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "merci_lighthouse_accessibility_contrast_errors",
+                        "legendFormat": "__auto",
+                        "range": true
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "stat",
+            "version": "13.0.1",
+            "spec": {
+              "options": {
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "textMode": "auto",
+                "colorMode": "value",
+                "graphMode": "area",
+                "justifyMode": "center",
+                "orientation": "auto"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "short",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 1,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "thresholds"
+                  }
+                },
+                "overrides": []
+              }
+            }
+          }
+        }
+      },
+      "panel-28": {
+        "kind": "Panel",
+        "spec": {
+          "id": 28,
+          "title": "Errores ARIA (A11y)",
+          "description": "Elementos con errores en atributos ARIA",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "type": "prometheus",
+                        "uid": "prometheus"
+                      },
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "merci_lighthouse_accessibility_aria_errors",
+                        "legendFormat": "__auto",
+                        "range": true
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "stat",
+            "version": "13.0.1",
+            "spec": {
+              "options": {
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "textMode": "auto",
+                "colorMode": "value",
+                "graphMode": "area",
+                "justifyMode": "center",
+                "orientation": "auto"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "short",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 1,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "thresholds"
                   }
                 },
                 "overrides": []
@@ -2313,6 +2610,51 @@
                           "kind": "ElementReference",
                           "name": "panel-16"
                         }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 0,
+                        "y": 12,
+                        "width": 4,
+                        "height": 6,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-26"
+                        },
+                        "h": 4,
+                        "w": 4
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 4,
+                        "y": 12,
+                        "width": 4,
+                        "height": 6,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-27"
+                        },
+                        "h": 4,
+                        "w": 4
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 8,
+                        "y": 12,
+                        "width": 4,
+                        "height": 6,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-28"
+                        },
+                        "h": 4,
+                        "w": 4
                       }
                     }
                   ]

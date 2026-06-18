@@ -36,12 +36,48 @@ class NavigationController {
     }
 }
 
+class BackToTopController {
+    constructor() {
+        this.buttons = document.querySelectorAll('.floating-back-to-top');
+        if (!this.buttons.length) return;
+        
+        // Hide by default initially
+        this.buttons.forEach(btn => {
+            btn.style.opacity = '0';
+            btn.style.visibility = 'hidden';
+            // Wait for next frame to add transition so it doesn't animate on load
+            requestAnimationFrame(() => {
+                btn.style.transition = 'opacity 0.3s ease, visibility 0.3s ease, transform 0.2s ease, background-color 0.2s ease';
+            });
+        });
+        
+        this.checkScroll();
+        window.addEventListener('scroll', () => this.checkScroll(), { passive: true });
+    }
+
+    checkScroll() {
+        const scrolled = window.scrollY > 300;
+        this.buttons.forEach(btn => {
+            if (scrolled) {
+                btn.style.opacity = '1';
+                btn.style.visibility = 'visible';
+            } else {
+                btn.style.opacity = '0';
+                btn.style.visibility = 'hidden';
+            }
+        });
+    }
+}
+
 // Instanciación controlada al cargar el árbol de nodos
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Inicializamos el menú de navegación (tu código original)
     new NavigationController('menu-toggle', 'main-nav');
     
-    // 2. Inicializamos a Merci solo si su script se ha cargado correctamente
+    // 2. Inicializamos botón volver arriba
+    new BackToTopController();
+    
+    // 3. Inicializamos a Merci solo si su script se ha cargado correctamente
     if (typeof MerciController !== 'undefined') {
         // QUÉ HACE: Aplica el patrón Yielding (Ceder el paso) mediante requestIdleCallback.
         // POR QUÉ: El asistente es una mejora progresiva. Retrasar su inicialización

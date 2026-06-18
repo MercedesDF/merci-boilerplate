@@ -3,8 +3,12 @@
     "best_deploy_time": 8.556550979614258,
     "last_deploy_time": 53.852155923843384
   },
-  "v1.0.0": {
+  "v1.19.0": {
     "best_deploy_time": 53.852155923843384,
-    "last_deploy_time": 53.852155923843384
+    "last_deploy_time": 64.5870668888092
+  },
+  "v1.0.0": {
+    "best_deploy_time": 64.5870668888092,
+    "last_deploy_time": 64.5870668888092
   }
 }

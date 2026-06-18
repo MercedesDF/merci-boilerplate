@@ -99,8 +99,9 @@ def parse_latest_entry(content: str) -> tuple[str, str, str]:
     date, title, body = match.groups()
     
     # RegEx adicionales para extraer bloques específicos dentro del cuerpo
-    context_match = re.search(r"\*\*Contexto:\*\*\s*(.*?)(?=\*\*Hecho:\*\*|\*\*Detalle)", body, re.DOTALL)
-    hecho_match = re.search(r"\*\*Hecho:\*\*\s*(.*?)(?=\*\*Detalle|\*\*Motivo)", body, re.DOTALL)
+    # Hacemos la búsqueda tolerante a los "átomos" opcionales como (Desafío) o (Maniobra)
+    context_match = re.search(r"\*\*Contexto(?:[^\*]*):\*\*\s*(.*?)(?=\*\*Hecho(?:[^\*]*):\*\*|\*\*Detalle(?:[^\*]*):\*\*|\*\*Motivo(?:[^\*]*):\*\*|$)", body, re.DOTALL)
+    hecho_match = re.search(r"\*\*Hecho(?:[^\*]*):\*\*\s*(.*?)(?=\*\*Detalle(?:[^\*]*):\*\*|\*\*Motivo(?:[^\*]*):\*\*|\*\*Siguiente(?:[^\*]*):\*\*|$)", body, re.DOTALL)
 
     context = context_match.group(1).strip() if context_match else "Sin contexto explícito."
     hecho = hecho_match.group(1).strip() if hecho_match else "Sin hechos documentados."

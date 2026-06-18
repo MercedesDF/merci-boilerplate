@@ -97,7 +97,9 @@ def main() -> None:
             motivos = []
             
             # Buscar manuales asignados o aplicar fallback a instrucciones.md
-            required_docs = SCRIPT_MAPPINGS.get(s.name, ["instrucciones.md"])
+            required_docs = list(SCRIPT_MAPPINGS.get(s.name, ["instrucciones.md"]))
+            if "README.md" not in required_docs:
+                required_docs.append("README.md")
             faltantes = []
             for doc in required_docs:
                 content = get_file_content(doc)

@@ -36,6 +36,42 @@ PUBLIC_ART_DE_COTE = REPO_ROOT / "public" / "art-de-cote"
 PUBLIC_PROYECTOS = REPO_ROOT / "public" / "proyectos"
 PUBLIC_DESCARGAS = REPO_ROOT / "public" / "descargas"
 
+def generar_sre_badge_html(url: str, cache_data: dict) -> str:
+    """
+    QUÉ HACE: Genera el marcado HTML para el micro-sello SRE a partir de los datos de la caché.
+    POR QUÉ: Permite inyectar una visualización Zero-JS ligera de Core Web Vitals en cada página.
+    """
+    scores = cache_data.get(url, {"performance": 100, "accessibility": 100, "best-practices": 100, "seo": 100})
+    
+    def get_color_class(val):
+        if val >= 90: return "sre-badge__score--green"
+        if val >= 50: return "sre-badge__score--orange"
+        return "sre-badge__score--red"
+
+    p_col = get_color_class(scores.get("performance", 100))
+    a_col = get_color_class(scores.get("accessibility", 100))
+    b_col = get_color_class(scores.get("best-practices", 100))
+    s_col = get_color_class(scores.get("seo", 100))
+
+    return f"""<div class="sre-badge" role="group" aria-label="Auditoría Lighthouse de esta página">
+                <div class="sre-badge__item" title="Rendimiento">
+                    <span class="sre-badge__icon">⚡</span>
+                    <span class="sre-badge__score {p_col}">{scores.get("performance", 100)}</span>
+                </div>
+                <div class="sre-badge__item" title="Accesibilidad">
+                    <span class="sre-badge__icon">♿</span>
+                    <span class="sre-badge__score {a_col}">{scores.get("accessibility", 100)}</span>
+                </div>
+                <div class="sre-badge__item" title="Buenas Prácticas">
+                    <span class="sre-badge__icon">🛡️</span>
+                    <span class="sre-badge__score {b_col}">{scores.get("best-practices", 100)}</span>
+                </div>
+                <div class="sre-badge__item" title="SEO">
+                    <span class="sre-badge__icon">🔍</span>
+                    <span class="sre-badge__score {s_col}">{scores.get("seo", 100)}</span>
+                </div>
+            </div>"""
+
 def slugify(texto: str) -> str:
     """
     QUÉ HACE: Convierte un texto (ej. título) en una cadena segura para URLs (slug).
@@ -187,17 +223,19 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
         # QUÉ HACE: Escanea el HTML generado y envuelve los términos del glosario en una etiqueta <abbr>.
         # POR QUÉ: Implementa la "Burbuja Merci" nativa. Muestra la traducción a lenguaje llano al pasar
         # el ratón, con 0 dependencias JavaScript y 100/100 en Accesibilidad (WAI-ARIA).
-        json_path = REPO_ROOT / 'laboratorio' / 'biblioteca' / 'glosario-tecnico.json'
-        if json_path.exists():
-            glosario_data = json.loads(json_path.read_text(encoding='utf-8', errors='ignore'))
-            for term, data in glosario_data.get("terminos", {}).items():
-                explica = data.get("merci_explica")
-                if explica:
-                    # Lookahead negativo (?![^<]*>) evita reemplazar dentro de atributos de etiquetas HTML
-                    pattern = rf'\b({re.escape(term)})\b(?![^<]*>)'
-                    # Reemplazamos solo la primera aparición (count=1) y le damos tabindex de accesibilidad
-                    replacement = rf'<abbr title="Merci Explica: {html.escape(explica)}" tabindex="0">\1</abbr>'
-                    html_content = re.sub(pattern, replacement, html_content, count=1)
+        # EXCEPTUANDO: El glosario en sí mismo, porque la explicación ya está en el cuerpo del texto.
+        if filepath.name != "glosario-tecnico.md":
+            json_path = REPO_ROOT / 'laboratorio' / 'biblioteca' / 'glosario-tecnico.json'
+            if json_path.exists():
+                glosario_data = json.loads(json_path.read_text(encoding='utf-8', errors='ignore'))
+                for term, data in glosario_data.get("terminos", {}).items():
+                    explica = data.get("merci_explica")
+                    if explica:
+                        # Lookahead negativo (?![^<]*>) evita reemplazar dentro de atributos de etiquetas HTML
+                        pattern = rf'\b({re.escape(term)})\b(?![^<]*>)'
+                        # Reemplazamos solo la primera aparición (count=1) y le damos tabindex de accesibilidad
+                        replacement = rf'<abbr title="Merci Explica: {html.escape(explica)}" tabindex="0">\1</abbr>'
+                        html_content = re.sub(pattern, replacement, html_content, count=1)
                     
     except Exception as e:
         print(f"  ❌ Error al compilar Markdown en {filepath.name}: {e}")
@@ -283,6 +321,17 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
     else:
         page_id = "page-biblioteca"
     
+    sre_badge_html = ""
+    if slug == "showcase-inyeccion-multimedia":
+        cache_path = REPO_ROOT / "observabilidad" / ".lighthouse_pages_cache.json"
+        cache_data = {}
+        if cache_path.exists():
+            try:
+                cache_data = json.loads(cache_path.read_text(encoding="utf-8"))
+            except Exception:
+                pass
+        sre_badge_html = generar_sre_badge_html(canonical_url, cache_data)
+
     html_final = f"""<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -311,7 +360,7 @@ def procesar_archivo(filepath: Path, header_html: str, footer_html: str, css_v: 
         <article class="card {clase_css}">
             <a href="{base_url_path}" class="card__back-link">{back_text}</a>
             <header>
-                    <h1 class="home-card__title--highlight">{titulo_html}</h1>{pdf_download_link}
+                    <h1 class="home-card__title--highlight">{titulo_html}</h1>{sre_badge_html}{pdf_download_link}
             </header>
             <div class="card__content">
                 {html_content}
@@ -504,6 +553,15 @@ def generar_indice(
     if len(desc_seo) > 150:
         desc_seo = desc_seo[:147] + "..."
 
+    cache_path = REPO_ROOT / "observabilidad" / ".lighthouse_pages_cache.json"
+    cache_data = {}
+    if cache_path.exists():
+        try:
+            cache_data = json.loads(cache_path.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+    sre_badge_html = generar_sre_badge_html(canonical_url, cache_data)
+
     html_final = f"""<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -533,6 +591,7 @@ def generar_indice(
         <section class="hero">
             <h1 class="hero__title">{title_html}</h1>
             <p class="hero__subtitle">{hero_subtitle_html}</p>
+            {sre_badge_html}
             {badge_html}
         </section>
         

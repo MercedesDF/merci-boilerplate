@@ -131,21 +131,34 @@ def main() -> None:
 
     print(f"\n  🧠 Redactando artículo a partir de '{nota_elegida.name}'...")
     
-    print("  🏠 Consultando a motor local (Ollama - qwen2.5-coder)...")
     try:
+        api_key = os.environ.get("GEMINI_API_KEY")
+        if not api_key:
+            env_path = REPO_ROOT / ".env"
+            if env_path.exists():
+                for line in env_path.read_text().splitlines():
+                    if line.startswith("GEMINI_API_KEY="):
+                        api_key = line.split("=", 1)[1].strip('"\'')
+                        os.environ["GEMINI_API_KEY"] = api_key
+                        break
+        
+        if not api_key:
+            print("  ❌ [Merci Error] GEMINI_API_KEY no detectada. Cancelando Blogger.")
+            sys.exit(1)
+
         respuesta = completion(
-            model="ollama/qwen2.5-coder",
-            api_base="http://localhost:11434",
+            model="gemini/gemini-2.5-flash",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": nota_contenido}
             ],
+            api_key=api_key,
             temperature=0.6,
             max_tokens=3000
         )
         respuesta_texto = respuesta.choices[0].message.content
-    except Exception as e:
-        print(f"  ❌ Error en motor local: {e}")
+    except Exception as e_cloud:
+        print(f"  ❌ Error en motor Antigravity Proxy (Gemini Flash): {e_cloud}")
         sys.exit(1)
             
     # Limpieza de bloque de código Markdown residual

@@ -14,13 +14,24 @@ import os
 import re
 import subprocess
 import sys
-import urllib.request
 import warnings
 from datetime import datetime
 from pathlib import Path
 
 # Silenciamos advertencias de deprecación de librerías de terceros (ej. google.generativeai) para mantener la consola limpia
 warnings.filterwarnings("ignore", category=FutureWarning)
+
+try:
+    os.environ["LITELLM_LOCAL_MODEL_COST_MAP"] = "True"
+    import logging
+    logging.getLogger('LiteLLM').setLevel(logging.ERROR)
+    from litellm import completion
+    import litellm
+    litellm.telemetry = False
+    litellm.suppress_debug_info = True
+except ImportError:
+    print("ℹ️ [Merci Librarian] LiteLLM no está instalado. Instalalo para usar el motor híbrido.")
+    sys.exit(0)
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 NOTES_DIR = REPO_ROOT / "laboratorio" / "notas_rapidas"
@@ -29,37 +40,57 @@ LAB_DIR = REPO_ROOT / "laboratorio"
 PROMPT_PATH = REPO_ROOT / "laboratorio" / "prompts" / "prompt-bibliotecario.md"
 ENV_PATH = REPO_ROOT / ".env"
 
-def consultar_ia_local(prompt: str, system_prompt: str) -> str:
+def consultar_ia_hibrida(prompt: str, system_prompt: str) -> str:
     """
-    QUÉ HACE: Realiza una petición POST nativa a la API local de Ollama.
-    POR QUÉ: Erradica la dependencia de LiteLLM y la nube, consolidando la arquitectura 100% local.
+    QUÉ HACE: Realiza una petición a Gemini Pro mediante LiteLLM, con fallback a Gemini Flash.
+    POR QUÉ: Asegura la máxima capacidad analítica para cerrar la Épica.
     """
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key and ENV_PATH.exists():
+        for line in ENV_PATH.read_text().splitlines():
+            if line.startswith("GEMINI_API_KEY="):
+                api_key = line.split("=", 1)[1].strip('"\'')
+                os.environ["GEMINI_API_KEY"] = api_key
+                break
+
+    if not api_key:
+        return "Error: GEMINI_API_KEY no detectada en el entorno ni en .env."
+
     try:
-        local_url = "http://localhost:11434/api/generate"
-        local_payload = {
-            "model": "qwen2.5-coder",
-            "prompt": prompt,
-            "system": system_prompt,
-            "stream": False,
-            "options": {
-                "temperature": 0.0,
-                "num_ctx": 4096
-            }
-        }
-        local_req = urllib.request.Request(local_url, data=json.dumps(local_payload).encode("utf-8"), method="POST")
-        local_req.add_header("Content-Type", "application/json")
-        with urllib.request.urlopen(local_req, timeout=600) as local_response:
-            local_data = json.loads(local_response.read().decode("utf-8"))
-            return local_data["response"].strip()
-    except Exception as e_local:
-        return f"Error HTTP Local: {e_local}"
+        respuesta = completion(
+            model="gemini/gemini-1.5-pro-latest",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": prompt}
+            ],
+            api_key=api_key,
+            temperature=0.0,
+            max_tokens=4000
+        )
+        return respuesta.choices[0].message.content.strip()
+    except Exception as e_pro:
+        print(f"  ⚠️ Gemini Pro no responde ({e_pro}). Ejecutando Fallback a Gemini Flash...")
+        try:
+            respuesta_flash = completion(
+                model="gemini/gemini-2.5-flash",
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": prompt}
+                ],
+                api_key=api_key,
+                temperature=0.0,
+                max_tokens=4000
+            )
+            return respuesta_flash.choices[0].message.content.strip()
+        except Exception as e_flash:
+            return f"Error HTTP Nube: Falló Pro y Flash. {e_flash}"
 
 def get_bitacora_context(nota_cruda: str) -> str:
     """
     QUÉ HACE: Extrae palabras clave de la nota y filtra entradas relevantes de la bitácora (RAG Optimizado).
     POR QUÉ: Proporciona contexto histórico a la IA para evitar alucinaciones y mantener la trazabilidad.
     """
-    bitacoras = [LAB_DIR / "bitacora-tuempresa-orquestacion-ia.md", LAB_DIR / "bitacora-tuempresa.md"]
+    bitacoras = list((REPO_ROOT / "laboratorio").glob("bitacora-tuempresa-epic-*.md"))
     contexto = ""
     palabras_clave = [p.lower() for p in re.findall(r'\b[a-zA-Z]{5,}\b', nota_cruda)]
 
@@ -154,11 +185,11 @@ def process_note(note_path: Path) -> None:
     # Inyectamos el tipo de documento dinámicamente en el molde mental (System Prompt)
     system_prompt = get_system_prompt().replace('tipo: "cuadernillo"', f'tipo: "{tipo_doc}"')
     
-    print(f"  🧠 [Merci Librarian] Solicitando redacción a Ollama local (qwen2.5-coder)...")
-    respuesta = consultar_ia_local(prompt, system_prompt)
+    print(f"  🧠 [Merci Librarian] Solicitando redacción a Antigravity (Gemini Pro)...")
+    respuesta = consultar_ia_hibrida(prompt, system_prompt)
     
-    if respuesta.startswith("Error HTTP Local"):
-        print(f"  ❌ [Merci Error] Fallo total de IA Local: {respuesta}")
+    if respuesta.startswith("Error"):
+        print(f"  ❌ [Merci Error] Fallo total de IA Híbrida: {respuesta}")
         return
             
     try:

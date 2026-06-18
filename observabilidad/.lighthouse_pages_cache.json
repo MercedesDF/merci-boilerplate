@@ -1,0 +1,56 @@
+{
+  "https://tuempresa.es/contacto/": {
+    "performance": 100,
+    "accessibility": 100,
+    "best-practices": 100,
+    "seo": 100
+  },
+  "https://tuempresa.es/proyectos/": {
+    "performance": 100,
+    "accessibility": 100,
+    "best-practices": 100,
+    "seo": 100
+  },
+  "https://tuempresa.es/sobre-mi/": {
+    "performance": 100,
+    "accessibility": 100,
+    "best-practices": 100,
+    "seo": 100
+  },
+  "https://tuempresa.es/": {
+    "performance": 100,
+    "accessibility": 100,
+    "best-practices": 100,
+    "seo": 100
+  },
+  "https://tuempresa.es/proyectos/showcase-inyeccion-multimedia.html": {
+    "performance": 100,
+    "accessibility": 100,
+    "best-practices": 100,
+    "seo": 100
+  },
+  "https://tuempresa.es/art-de-cote/": {
+    "performance": 100,
+    "accessibility": 100,
+    "best-practices": 100,
+    "seo": 100
+  },
+  "https://tuempresa.es/blog/": {
+    "performance": 100,
+    "accessibility": 100,
+    "best-practices": 100,
+    "seo": 100
+  },
+  "https://tuempresa.es/biblioteca/": {
+    "performance": 100,
+    "accessibility": 100,
+    "best-practices": 100,
+    "seo": 100
+  },
+  "https://tuempresa.es/blog/tienda/": {
+    "performance": 100,
+    "accessibility": 100,
+    "best-practices": 92,
+    "seo": 100
+  }
+}
