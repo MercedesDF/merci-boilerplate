@@ -1,10 +1,17 @@
-# Merci Boilerplate v1.19.0
+# Merci Boilerplate v1.20.0
 
 Un ecosistema DevSecOps autónomo impulsado por Inteligencia Artificial Local (Shift-Left AI) y Desarrollo Guiado por Especificaciones (Spec-Driven Development). 
 
 Combina un orquestador local en Python puro (Sistema Merci) que automatiza la calidad del código, un núcleo estático ultrarrápido (HTML5, SASS, Vanilla JS, BEM) y un motor dinámico aislado opcional (WordPress Headless). Diseñado para alcanzar un rendimiento perfecto (Core Web Vitals 100/100) con 0 dependencias externas bloqueantes en el pipeline.
 
 > 🤖 **Inteligencia y Gobernanza:** El boilerplate incluye agentes de IA locales que auto-reparan código, auto-documentan el Roadmap y generan bases de conocimiento estáticas con coste cero y privacidad total. La justificación de las decisiones DevSecOps reside en la carpeta `/docs`.
+
+## 🚀 Novedades en la v1.20.0 (Pila Híbrida, Circuit Breakers y SRE Extremo)
+
+- **Pila Híbrida (Hybrid Stack):** Evolución del enrutamiento de agentes de inteligencia. Los orquestadores de alta carga cognitiva (`merci-librarian.py`, `merci-ssot.py`, `merci-blogger.py`) abandonan la latencia de los SLMs locales en favor de modelos avanzados en la nube (Proxy Gemini vía LiteLLM), garantizando una comprensión total de bitácoras inmensas sin amnesia de contexto.
+- **Circuit Breakers (Fallback Elegante):** Integración nativa de resiliencia en el pipeline de IA. Si el motor principal en la nube falla (timeout o caída de API), el sistema captura la excepción silenciosamente y ejecuta una degradación elegante (*Graceful Degradation*) hacia modelos más rápidos de respaldo, garantizando que el flujo de trabajo nunca se detenga.
+- **Aislamiento Local (Zero-Trust):** Los Modelos Pequeños Locales (Ollama) han sido relegados estrictamente a labores de auditoría de código (`merci-audit.py`) y seguridad (`merci-chaos.py`), blindando la propiedad intelectual donde la privacidad absoluta es innegociable.
+- **Chaos Engineering y CSS Zero-Bloat:** Ampliación SRE para someter a estrés las conexiones de fallback y optimización profunda de la arquitectura CSS, asegurando micro-animaciones fluidas e interacciones *premium* sin alterar la política de cero dependencias (0ms TBT).
 
 ## 🚀 Novedades en la v1.19.0 (Refactorización, Gobernanza IA y Zero-Bloat)
 

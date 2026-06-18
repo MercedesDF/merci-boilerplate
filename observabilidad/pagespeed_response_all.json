@@ -675,7 +675,7 @@
           "items": [
             {
               "totalBytes": 17445,
-              "url": "https://tuempresa.es/assets/images/tu_logo.webp?v=1781768797"
+              "url": "https://tuempresa.es/assets/images/tu_logo.webp?v=1781769200"
             },
             {
               "url": "https://tuempresa.es/js/brain_data.json",
@@ -691,7 +691,7 @@
             },
             {
               "totalBytes": 4780,
-              "url": "https://tuempresa.es/assets/images/tu_avatar.webp?v=1781768797"
+              "url": "https://tuempresa.es/assets/images/tu_avatar.webp?v=1781769200"
             },
             {
               "totalBytes": 3420,
@@ -2141,7 +2141,7 @@
                   }
                 ]
               },
-              "url": "https://tuempresa.es/assets/images/tu_logo.webp?v=1781768797",
+              "url": "https://tuempresa.es/assets/images/tu_logo.webp?v=1781769200",
               "wastedBytes": 14242,
               "node": {
                 "nodeLabel": "tuempresa",
@@ -2157,7 +2157,7 @@
                   "width": 150,
                   "top": 16
                 },
-                "snippet": "<img src=\"/assets/images/tu_logo.webp?v=1781768797\" alt=\"tuempresa\" class=\"header__logo\" width=\"263\" height=\"65\" fetchpriority=\"low\" decoding=\"async\">"
+                "snippet": "<img src=\"/assets/images/tu_logo.webp?v=1781769200\" alt=\"tuempresa\" class=\"header__logo\" width=\"263\" height=\"65\" fetchpriority=\"low\" decoding=\"async\">"
               }
             }
           ],
@@ -2878,7 +2878,7 @@
               "priority": "Low",
               "protocol": "h2",
               "networkEndTime": 138.0329999923706,
-              "url": "https://tuempresa.es/assets/images/tu_logo.webp?v=1781768797",
+              "url": "https://tuempresa.es/assets/images/tu_logo.webp?v=1781769200",
               "experimentalFromMainFrame": true
             },
             {
@@ -2894,7 +2894,7 @@
               "experimentalFromMainFrame": true,
               "protocol": "h2",
               "networkEndTime": 165.57299995422363,
-              "url": "https://tuempresa.es/assets/images/tu_avatar.webp?v=1781768797",
+              "url": "https://tuempresa.es/assets/images/tu_avatar.webp?v=1781769200",
               "priority": "Low",
               "resourceType": "Image"
             },
