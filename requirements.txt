@@ -6,7 +6,7 @@
 # Política: 0 dependencias en Runtime (navegador). Estas librerías solo operan en el pipeline local.
 
 # Generación de PDFs desde HTML (merci-publish.py, merci-wp.py)
-weasyprint==68.1
+weasyprint==69.0
 
 # Optimización de imágenes a WebP responsivo (merci-optimizer.py)
 Pillow==12.2.0
